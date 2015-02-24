@@ -22,7 +22,7 @@ public class StrategyController implements WorldStateReceiver {
 	public static final int STRATEGY_TICK = 300; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
-		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B
+		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B
 	}
 	
 	public enum BallLocation{
@@ -103,6 +103,12 @@ public class StrategyController implements WorldStateReceiver {
 			radio.sendPacket(new ActivatePacket());
 			
 			break;
+        case MILESTONE_THREE_A:
+            // Without the obstacle, simple version
+            break;
+        case MILESTONE_THREE_B:
+            // With the obstacle, extended version
+            break;
         case MILESTONE_TWO_A:
         	radio.sendPacket(new DisengageCatcherPacket());
             //Strategy ics = new DefenderStrategy(this.bcsDefender);
