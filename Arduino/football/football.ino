@@ -1,5 +1,3 @@
-#include <MotionQueue.h>
-
 #include "SDPArduino.h"
 #include <Wire.h>
 
@@ -11,9 +9,10 @@ bool ON = false;
 
 //Moving
 #define MOTOR_N 3
-bool queueChanged = false;
+bool motorsChanged = false;
 byte motorMapping[MOTOR_N] = {1, 0, 2};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
+long motorTimeoutMillis = 0;
 
 //Kicking
 #define KICK_DELAY_MOVING_UP 250
@@ -52,11 +51,11 @@ int kickPower = 0;
 #define CATCH_ENGAGE_POWER 1
 #define CATCH_ENGAGE_DELAY 200
 
+// Motor timeout
+#define MOTOR_TIMEOUT_MS 1000
+
 long catchStartTime;
 int catchState = CATCH_STATE_IDLE;
-
-// Construct a queue to store motions
-MotionQueue queue;
 
 
 void setup() {
@@ -74,12 +73,6 @@ void loop() {
   
   //Coms
   readComms();
-  if(queue.update() == 1)
-  {
-    Serial.write('O');
-    queueChanged = true;
-  }
- 
  
   //Control 
   if(ON)
@@ -186,21 +179,22 @@ void doKick(){
 }
 
 void doMotors(){
-  if(queueChanged){
-    queueChanged = false;
-    
+  if(motorsChanged){
+    motorsChanged = false;
+    motorTimeoutMillis = millis();
+
     int i = 0;
-    if(queue.count() > 0)
+    for( ; i < MOTOR_N; i++)
     {
-      queued_motion_t* current = queue.current();
-      for( ; i < MOTOR_N; i++)
-      {
-         if(motorMapping[i] > -1){
-           debugPrint(current->power[i]);
-           moveMotor(motorMapping[i], current->power[i] * current->direction[i] * motorMultiplier[i]);
-         }
-      }
-    } else {
+       if(motorMapping[i] > -1){
+         moveMotor(motorMapping[i], motorPower[i] * motorDirs[i] * motorMultiplier[i]);
+       }
+    }
+  }
+  else {
+    long difference = millis() - motorTimeoutMillis;
+
+    if(difference >= MOTOR_TIMEOUT_MS){
       for( ; i < MOTOR_N; i++)
       {
          if(motorMapping[i] > -1){
@@ -209,7 +203,7 @@ void doMotors(){
          }
       }
     }
-  } 
+  }
 }
 
 
@@ -261,47 +255,31 @@ void readComms(){
       Serial.print('S');
       Serial.print("1234");
     }
-    else if (incoming == 'Q') // Enqueue
+    else if (incoming == 'M') // Motor
     {
-      byte m[] = { 
-        getPower(), getDirection(),
-        getPower(), getDirection(),
-        getPower(), getDirection()
-      };
-      
-      unsigned short ms = getMillis();
-      
-      // Enqueue
-      int result = queue.enqueue(
-         m[0],
-         m[1],
-         m[2],
-         m[3],
-         m[4],
-         m[5],
-         ms);
-  
-      if(result == 0)
+      Serial.print('C');
+      debugPrint("MOTORS ");
+
+      int i = 0;
+      for( ; i < MOTOR_N; i++)
       {
-        Serial.print('C');
-        //debugPrint("QUEUED");
-        debugPrint(ms);
-        queueChanged = true;
+        int nextByte = waitForByte();
+        motorPower[i] = nextByte;
+
+
+        nextByte = waitForByte();
+        if(nextByte == 0)
+          motorDirs[i] = 1;
+        else
+          motorDirs[i] = -1;
+
+
+        debugPrint(motorPower[i]);
+        debugPrint(" ");
       }
-    }
-    else if (incoming == 'L') // Clear queue
-    {
-      // Clear queue
-      queue.clear();
-      Serial.print('C');
-      debugPrint("clear");
-    }
-    else if (incoming == 'P') // Pop from queue
-    {
-      // Queue pop
-      queue.pop();
-      Serial.print('C');
-      debugPrint("pop");
+
+      motorsChanged = true;
+
     }
     else if (incoming == 'N') // Engage catcher
     {
@@ -327,29 +305,6 @@ void readComms(){
       debugPrint("get off my lawn");      
     }
   }   
-}
-
-byte getPower()
-{
-  int nextByte = waitForByte();
-  return nextByte;
-}
-
-byte getDirection()
-{
-  int nextByte = waitForByte();
-  if(nextByte == 0)
-    return 1;
-  else
-    return -1;
-}
-
-unsigned short getMillis()
-{
-  byte top = waitForByte();
-  byte bottom = waitForByte();
-
-  return (top << 8) | bottom;
 }
 
 byte waitForByte()
