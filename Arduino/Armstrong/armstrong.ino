@@ -14,6 +14,7 @@ byte motorMapping[MOTOR_N] = {1, 0, 2};
 int motorPower[MOTOR_N] = {0,0,0};
 int motorDirs[MOTOR_N] = {1, 1, 1};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
+long motorTimeoutStart = 0;
 long motorTimeoutMillis = 0;
 
 //Kicking
@@ -52,9 +53,6 @@ int kickPower = 0;
 #define CATCH_ENGAGE_DIR 1
 #define CATCH_ENGAGE_POWER 1
 #define CATCH_ENGAGE_DELAY 200
-
-// Motor timeout
-#define MOTOR_TIMEOUT_MS 1000
 
 long catchStartTime;
 int catchState = CATCH_STATE_IDLE;
@@ -183,7 +181,7 @@ void doKick(){
 void doMotors(){
   if(motorsChanged){
     motorsChanged = false;
-    motorTimeoutMillis = millis();
+    motorTimeoutStart = millis();
 
     int i = 0;
     for( ; i < MOTOR_N; i++)
@@ -194,10 +192,10 @@ void doMotors(){
     }
   }
   else {
-    long difference = millis() - motorTimeoutMillis;
+    long difference = millis() - motorTimeoutStart;
 
     int i = 0;
-    if(difference >= MOTOR_TIMEOUT_MS){
+    if(difference >= motorTimeoutMillis){
       for( ; i < MOTOR_N; i++)
       {
          if(motorMapping[i] > -1){
@@ -281,6 +279,8 @@ void readComms(){
         debugPrint(" ");
       }
 
+      motorTimeoutMillis = getMillis();
+
       motorsChanged = true;
 
     }
@@ -316,6 +316,13 @@ byte waitForByte()
   return Serial.read();
 }
 
+unsigned short getMillis()
+{
+  byte top = waitForByte();
+  byte bottom = waitForByte();
+
+  return (top << 8) | bottom;
+}
 
 void debugPrint(char msg[]){
   if(DEBUG){
