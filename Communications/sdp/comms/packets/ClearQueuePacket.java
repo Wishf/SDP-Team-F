@@ -7,6 +7,7 @@ import sdp.util.CircularByteBuffer;
 /**
  * Created by Matthew on 03/02/2015.
  */
+@Deprecated
 public class ClearQueuePacket extends Packet {
     public static final byte ID = 'L';
     public static final int Length = 1;

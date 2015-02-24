@@ -7,6 +7,7 @@ import sdp.util.CircularByteBuffer;
 /**
  * Created by Matthew on 03/02/2015.
  */
+@Deprecated
 public class PopQueuePacket extends Packet {
     public static final byte ID = 'P';
     public static final int Length = 1;

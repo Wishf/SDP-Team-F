@@ -9,6 +9,7 @@ import sdp.util.DriveDirection;
 /**
  * Created by Matthew on 03/02/2015.
  */
+@Deprecated
 public class EnqueueMotionPacket extends Packet {
     public final static byte ID = 'Q';
     public final static int Length = 9;
