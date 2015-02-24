@@ -226,7 +226,7 @@ void readComms(){
       debugPrint("activated");
       ON = true;
       
-      queueChanged = false;
+      motorsChanged = false;
       kickState = KICK_STATE_IDLE;
       
     }
