@@ -4,8 +4,6 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import sdp.util.CircularByteBuffer;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created by Matthew Summers on 16/01/2015.
  */

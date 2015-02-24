@@ -8,7 +8,6 @@ import sdp.comms.packets.*;
 import sdp.util.CircularByteBuffer;
 
 import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Queue;
 

@@ -103,7 +103,7 @@ public class MarkingStrategy extends GeneralStrategy {
 					this.controlThread.operation.radius = robotToTargetDistance * 10;
 				}
 
-				this.controlThread.operation.travelSpeed = (int) (200);
+				this.controlThread.operation.travelSpeed = (200);
 			} else {
 				if (robotO >= 0 && robotO <= 85) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;

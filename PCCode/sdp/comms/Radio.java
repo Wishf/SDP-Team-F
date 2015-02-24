@@ -6,8 +6,6 @@ import jssc.SerialPortList;
 import sdp.comms.packets.*;
 import sdp.gui.SingletonDebugWindow;
 
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;

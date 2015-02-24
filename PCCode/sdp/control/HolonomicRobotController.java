@@ -4,8 +4,6 @@ import sdp.comms.Radio;
 import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
 
-import java.io.IOException;
-
 /**
  * Created by Matthew on 09/02/2015.
  */
@@ -85,7 +83,8 @@ public class HolonomicRobotController extends BaseRobotController {
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			motor3power, rightMotorDir);
+    			motor3power, rightMotorDir,
+                millis);
     }
     
     
@@ -93,7 +92,7 @@ public class HolonomicRobotController extends BaseRobotController {
     public DrivePacket travel(int distance, int travelSpeed){
     	
     	System.out.println("Travel: "+distance+" "+travelSpeed);
-    	int millis = (int) Math.abs(Math.round(distance * msPerMm[0]));
+    	int millis = Math.abs(Math.round(distance * msPerMm[0]));
     	
     	//TODO: calculate the speed actually
     	byte motor1power = (byte) 255;
@@ -110,11 +109,11 @@ public class HolonomicRobotController extends BaseRobotController {
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
 
-        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			(byte) 0, DriveDirection.FORWARD);
+    			(byte) 0, DriveDirection.FORWARD,
+                millis);
     	
     }
     
@@ -122,7 +121,7 @@ public class HolonomicRobotController extends BaseRobotController {
 public DrivePacket travelSideways(int distance, int travelSpeed){
     	
     	System.out.println("Travel sideways: "+distance+" "+travelSpeed);
-    	int millis = (int) Math.abs(Math.round(distance * msPerMm[2]));
+    	int millis = Math.abs(Math.round(distance * msPerMm[2]));
     	
     	//TODO: calculate the speed actually
     	double powerScaling = 1;//Math.min(1, Math.abs(distance) / 50);
@@ -143,11 +142,11 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
 
-        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			motor3power, rearMotorDir);
+    			motor3power, rearMotorDir,
+                millis);
     	
     }
     
@@ -156,7 +155,7 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     
     public DrivePacket travelArc(double arcRadius, int distance, int speed){
     	
-    	int millis = (int) Math.round(distance * msPerMm[0]);
+    	int millis = Math.round(distance * msPerMm[0]);
     	
     	//TODO: calculate the speed actually
     	byte motor1power = (byte) 255;
@@ -173,11 +172,11 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
 
-        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			(byte) 0, DriveDirection.FORWARD);
+    			(byte) 0, DriveDirection.FORWARD,
+                millis);
     	
     }
     
