@@ -15,13 +15,11 @@ import java.util.Queue;
  * Created by Matthew on 16/01/2015.
  */
 public class RadioController implements SerialPortEventListener {
-    private Queue<Packet> packets;
     private SerialPort parent;
     private CircularByteBuffer buffer;
     private List<PacketListener> listeners;
 
-    public RadioController(Queue<Packet> packets, SerialPort parent, List<PacketListener> listeners) {
-        this.packets = packets;
+    public RadioController(SerialPort parent, List<PacketListener> listeners) {
         this.parent = parent;
         this.buffer = CircularByteBuffer.allocate(10*1024);
         this.listeners = listeners;
