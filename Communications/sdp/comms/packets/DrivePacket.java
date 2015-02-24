@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  * Created by Matthew on 16/01/2015.
  */
 
-@Deprecated
+
 public class DrivePacket extends Packet {
     public final static byte ID = 'M';
     public final static int Length = 7;
