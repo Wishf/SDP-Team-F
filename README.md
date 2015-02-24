@@ -1,8 +1,9 @@
 # SDP-Team-F
-SDP Team F - Group 1 (NASA) and Group 16
+SDP Team F - Team Space Dragon
 
-##Arduino
+##Repository Structure
+###Arduino
 This directory contains all of the code that runs on the Arduino.
 
-##PCCode
+###PCCode
 This directory contains all of the code that runs on the PC.
