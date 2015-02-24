@@ -1,6 +1,6 @@
 package sdp.gui;
 
-import sdp.comms.Radio;
+import sdp.comms.SingletonRadio;
 import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
 

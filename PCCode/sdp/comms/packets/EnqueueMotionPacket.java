@@ -2,7 +2,7 @@ package sdp.comms.packets;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import sdp.sdp9.strategy.StrategyController;
+import sdp.strategy.StrategyController;
 import sdp.util.CircularByteBuffer;
 import sdp.util.DriveDirection;
 

@@ -1,5 +1,6 @@
 package sdp.gui;
 
+import sdp.comms.SingletonRadio;
 import sdp.comms.packets.*;
 
 /**
