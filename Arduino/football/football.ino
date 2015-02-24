@@ -11,6 +11,8 @@ bool ON = false;
 #define MOTOR_N 3
 bool motorsChanged = false;
 byte motorMapping[MOTOR_N] = {1, 0, 2};
+int motorPower[MOTOR_N] = {0,0,0};
+int motorDirs[MOTOR_N] = {1, 1, 1};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
 long motorTimeoutMillis = 0;
 
@@ -194,6 +196,7 @@ void doMotors(){
   else {
     long difference = millis() - motorTimeoutMillis;
 
+    int i = 0;
     if(difference >= MOTOR_TIMEOUT_MS){
       for( ; i < MOTOR_N; i++)
       {
