@@ -190,7 +190,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			}
 			else if(move_robot) {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-				controlThread.operation.travelDistance = (int) 13;
+				controlThread.operation.travelDistance = 13;
 			}
 		}
 

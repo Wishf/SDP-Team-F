@@ -172,7 +172,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			}
 			else if(move_back && canMove) {
 				this.controlThread.operation.op = Operation.Type.DEBACK;
-				controlThread.operation.travelDistance = (int) -7;//Math.min(-5, -(40-Math.abs(checkDx)));
+				controlThread.operation.travelDistance = -7;//Math.min(-5, -(40-Math.abs(checkDx)));
 			}
 			else if(move_robot && canMove) {
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;

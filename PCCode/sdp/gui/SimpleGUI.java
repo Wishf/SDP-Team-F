@@ -77,7 +77,7 @@ public class SimpleGUI extends JFrame implements ActionListener {
         public void stateChanged(ChangeEvent changeEvent) {
             JSlider source = (JSlider)changeEvent.getSource();
             if (!source.getValueIsAdjusting()) {
-                arduino.setKickPower((int)source.getValue());
+                arduino.setKickPower(source.getValue());
             }
         }
     }

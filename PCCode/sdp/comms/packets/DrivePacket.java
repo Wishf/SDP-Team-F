@@ -6,8 +6,6 @@ import sdp.strategy.StrategyController;
 import sdp.util.CircularByteBuffer;
 import sdp.util.DriveDirection;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created by Matthew on 16/01/2015.
  */
