@@ -17,13 +17,11 @@ import java.util.Queue;
  */
 public class Radio {
     private SerialPort port;
-    private Queue<Packet> packetQueue;
     private List<PacketListener> listenerList;
 
     public Radio(String portName){
     	if(portName != null) {
     		port = new SerialPort(portName);
-            packetQueue = new LinkedList<Packet>();
             listenerList = new LinkedList<PacketListener>();
     	}
     }
@@ -43,7 +41,7 @@ public class Radio {
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);
             port.setEventsMask(SerialPort.MASK_RXCHAR);
-            port.addEventListener(new RadioController(packetQueue, port, listenerList));
+            port.addEventListener(new RadioController(port, listenerList));
         }
         catch(SerialPortException ex) {
             ex.printStackTrace();
@@ -59,16 +57,12 @@ public class Radio {
     }
 
     public void sendPacket(Packet packet) {
-        packetQueue.add(packet);
-        Packet next = packetQueue.poll();
-        if(next != null) {
+        try {
+        	System.out.println(packet);
+            next.writePacket(port);
             System.out.println("Sent packet");
-            try {
-            	System.out.println(packet);
-                next.writePacket(port);
-            } catch (SerialPortException e) {
-                e.printStackTrace();
-            }
+        } catch (SerialPortException e) {
+            e.printStackTrace();
         }
     }
 
