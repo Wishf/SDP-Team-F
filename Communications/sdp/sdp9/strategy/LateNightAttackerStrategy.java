@@ -126,6 +126,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		}	
 		else if(ballCaughtAttacker && !kicked){
 			//System.out.println("Kicking");
+            // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
 		}
 		
