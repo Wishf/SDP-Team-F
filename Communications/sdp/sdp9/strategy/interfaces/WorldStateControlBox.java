@@ -10,6 +10,12 @@ public interface WorldStateControlBox {
      */
     public void avoidObstacle(boolean shouldAvoidObstacle);
 
+    public void decideOnRoles(
+            /*
+            Add whatever arguments are needed.
+             */
+    );
+
     public void computeXPositions(
             /*
             Add whatever arguments are needed.
@@ -40,4 +46,5 @@ public interface WorldStateControlBox {
      */
     public void DefenderIsReady();
     public boolean isDefenderReady();
+
 }
