@@ -57,7 +57,7 @@ public class Radio {
     public void sendPacket(Packet packet) {
         try {
         	System.out.println(packet);
-            next.writePacket(port);
+            packet.writePacket(port);
             System.out.println("Sent packet");
         } catch (SerialPortException e) {
             e.printStackTrace();
