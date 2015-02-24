@@ -51,7 +51,7 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     //speed in degrees per second
-    public EnqueueMotionPacket rotate(int angle, int speed){
+    public DrivePacket rotate(int angle, int speed){
     	System.out.println("Rotate: "+angle+" "+speed);
     	
     	double turnAngle = angle * TURN_RATIO;
@@ -82,16 +82,15 @@ public class HolonomicRobotController extends BaseRobotController {
     		rightMotorDir = DriveDirection.FORWARD;
     	}
     	
-    	return new EnqueueMotionPacket(
+    	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			motor3power, rightMotorDir,
-    			millis);    	
+    			motor3power, rightMotorDir);
     }
     
     
     
-    public EnqueueMotionPacket travel(int distance, int travelSpeed){
+    public DrivePacket travel(int distance, int travelSpeed){
     	
     	System.out.println("Travel: "+distance+" "+travelSpeed);
     	int millis = (int) Math.abs(Math.round(distance * msPerMm[0]));
@@ -110,17 +109,17 @@ public class HolonomicRobotController extends BaseRobotController {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
-    	
-    	return new EnqueueMotionPacket(
+
+        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
+    	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			(byte) 0, DriveDirection.FORWARD,
-    			millis); 
+    			(byte) 0, DriveDirection.FORWARD);
     	
     }
     
     
-public EnqueueMotionPacket travelSideways(int distance, int travelSpeed){
+public DrivePacket travelSideways(int distance, int travelSpeed){
     	
     	System.out.println("Travel sideways: "+distance+" "+travelSpeed);
     	int millis = (int) Math.abs(Math.round(distance * msPerMm[2]));
@@ -143,19 +142,19 @@ public EnqueueMotionPacket travelSideways(int distance, int travelSpeed){
     	} else {
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
-    	
-    	return new EnqueueMotionPacket(
+
+        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
+    	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			motor3power, rearMotorDir,
-    			millis); 
+    			motor3power, rearMotorDir);
     	
     }
     
     
     
     
-    public EnqueueMotionPacket travelArc(double arcRadius, int distance, int speed){
+    public DrivePacket travelArc(double arcRadius, int distance, int speed){
     	
     	int millis = (int) Math.round(distance * msPerMm[0]);
     	
@@ -173,12 +172,12 @@ public EnqueueMotionPacket travelSideways(int distance, int travelSpeed){
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
-    	
-    	return new EnqueueMotionPacket(
+
+        // TODO: it won't actually do anything with the millis value any more; might want to check this is okay
+    	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			(byte) 0, DriveDirection.FORWARD,
-    			millis); 
+    			(byte) 0, DriveDirection.FORWARD);
     	
     }
     

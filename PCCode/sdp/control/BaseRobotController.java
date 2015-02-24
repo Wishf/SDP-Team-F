@@ -9,12 +9,10 @@ import sdp.comms.packets.*;
  */
 public abstract class BaseRobotController implements PacketListener {
     private boolean catcherEngaged;
-    private MotionQueue motions;
     private Radio radio;
 
     public BaseRobotController(Radio radio, boolean initialCatcher) {
         catcherEngaged = initialCatcher;
-        motions = new MotionQueue(16);
         this.radio = radio;
         //radio.addListener(this);
     }
@@ -22,33 +20,19 @@ public abstract class BaseRobotController implements PacketListener {
     public boolean sendCommand(RobotCommand command) {
         if(command.canQueue()){
             Maneuver m = (Maneuver) command;
-            if(motions.enqueue(m)) {
-                radio.sendPacket(m.toPacket());
-                return true;
-            }
-
-            return false;
+            radio.sendPacket(m.toPacket());
+            return true;
         }
 
         radio.sendPacket(command.toPacket());
         return true;
     }
 
-    public void popQueue() {
-        motions.pop();
-        radio.sendPacket(new PopQueuePacket());
-    }
-
-    public void clearQueue(){
-        motions.clear();
-        radio.sendPacket(new ClearQueuePacket());
-    }
 
     @Override
     public void packetArrived(Packet p) {
         if(p instanceof MotionCompletePacket){
             onMotionComplete();
-            motions.pop();
         } else if(p instanceof CatcherStateToggledPacket) {
             catcherEngaged = !catcherEngaged;
         }

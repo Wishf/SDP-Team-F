@@ -38,7 +38,9 @@ public class RobotCommand {
 	public static class Stop extends GenericCommand {
 		@Override
 		protected Packet getOpcode() {
-			return new ClearQueuePacket();
+            DriveDirection dir = DriveDirection.FORWARD;
+            byte zero = 0;
+			return new DrivePacket(zero, dir, zero, dir, zero, dir);
 		}
 	}
 
