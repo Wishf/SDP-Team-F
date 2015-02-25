@@ -3,6 +3,7 @@ package sdp.comms;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -15,102 +16,109 @@ import java.util.concurrent.ThreadFactory;
  * 		Rewrite BrickCommServer so it differentiates between the attacker and defender 
  */
 public class BrickCommServer {
-	Radio comm;
-	private boolean connected;
+    Radio comm;
+    private boolean connected;
 
-	private ExecutorService executor;
-	private List<StateChangeListener> stateChangeListeners;
-	
-	private final static ThreadFactory EXECUTOR_FACTORY = new ThreadFactory() {
-		
-		@Override
-		public Thread newThread(Runnable runnable) {
-			Thread t = new Thread(runnable, "BrickCommServer executor");
-			t.setDaemon(true);
-			return t;
-		}
-	};
+    private ExecutorService executor;
+    private List<StateChangeListener> stateChangeListeners;
 
-	public BrickCommServer() {
-		stateChangeListeners = new ArrayList<BrickCommServer.StateChangeListener>();
-		connected = false;
-		executor = Executors.newSingleThreadExecutor(EXECUTOR_FACTORY);
+    private final static ThreadFactory EXECUTOR_FACTORY = new ThreadFactory() {
+
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread t = new Thread(runnable, "BrickCommServer executor");
+            t.setDaemon(true);
+            return t;
+        }
+    };
+
+    public BrickCommServer() {
+        stateChangeListeners = new ArrayList<BrickCommServer.StateChangeListener>();
+        connected = false;
+        executor = Executors.newSingleThreadExecutor(EXECUTOR_FACTORY);
         //comm = new Radio("COM3");
-		Radio.getPortNames();
-        comm = new SingletonRadio("/dev/ttyACM0");
-        
+        String[] serialPorts = Radio.getPortNames();
+        //Now get an input from the user as to which port they want to use.
+        System.out.println("Enter the number for the port you want to use for this connection: ");
+        Scanner userChoiceInput = new Scanner(System.in);
+        int portNum = userChoiceInput.nextInt();
+        while (!(portNum >= 0 && portNum < serialPorts.length)) {
+            System.out.println("ERROR: You need to pick a number between 0 and " + serialPorts.length);
+            System.out.println("Enter the number for the port you want to use: ");
+            portNum = userChoiceInput.nextInt();
+        }
+        comm = new SingletonRadio(serialPorts[portNum]);
         //connect();
-        
-	}
 
-	public void connect()  {
-		System.out.print("Connecting");
-		//comm.start();
-		setConnected(true);
-	}
+    }
 
-	public boolean isConnected() {
-		return connected;
-	}
-	
-	private void setConnected(boolean connected) {
-		if (this.connected != connected) {
-			this.connected = connected;
-			
-			for (StateChangeListener listener : stateChangeListeners) {
-				listener.stateChanged();
-			}
-		}
-	}
+    public void connect() {
+        System.out.print("Connecting");
+        //comm.start();
+        setConnected(true);
+    }
 
-	public void close() {
-		if (comm != null)
-			comm.stop();
+    public boolean isConnected() {
+        return connected;
+    }
 
-		
+    private void setConnected(boolean connected) {
+        if (this.connected != connected) {
+            this.connected = connected;
 
-		setConnected(false);
-	}
-	
-	public void addStateChangeListener(StateChangeListener listener) {
-		stateChangeListeners.add(listener);
-	}
-	
-	public void removeStateChangeListener(StateChangeListener listener) {
-		stateChangeListeners.remove(listener);
-	}
+            for (StateChangeListener listener : stateChangeListeners) {
+                listener.stateChanged();
+            }
+        }
+    }
 
-	/**
-	 * Executes a command asynchronously. Returns immediately and is safe to
-	 * call from any thread.
-	 */
-	public void execute(final RobotCommand.Command command) {
-		executor.execute(new Runnable() {
+    public void close() {
+        if (comm != null)
+            comm.stop();
 
-			@Override
-			public void run() {
-				BrickCommServer.this.executeSync(command);
-			}
-		});
-	}
 
-	/**
-	 * Executes a command synchronously. Never call this method from GUI or
-	 * frame grabber thread!
-	 */
-	public void executeSync(RobotCommand.Command command) {
-		try {
-			command.sendToBrick(comm);
-		} catch (IOException e) {
-			e.printStackTrace();
-			close();
-		}
-	}
+        setConnected(false);
+    }
 
-	// Legacy methods
+    public void addStateChangeListener(StateChangeListener listener) {
+        stateChangeListeners.add(listener);
+    }
+
+    public void removeStateChangeListener(StateChangeListener listener) {
+        stateChangeListeners.remove(listener);
+    }
+
+    /**
+     * Executes a command asynchronously. Returns immediately and is safe to
+     * call from any thread.
+     */
+    public void execute(final RobotCommand.Command command) {
+        executor.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                BrickCommServer.this.executeSync(command);
+            }
+        });
+    }
+
+    /**
+     * Executes a command synchronously. Never call this method from GUI or
+     * frame grabber thread!
+     */
+    public void executeSync(RobotCommand.Command command) {
+        try {
+            command.sendToBrick(comm);
+        } catch (IOException e) {
+            e.printStackTrace();
+            close();
+        }
+    }
+
+    // Legacy methods
 
 	/*@Deprecated
-	public void robotKick(int speed) throws IOException {
+    public void robotKick(int speed) throws IOException {
 		brickOutput.writeInt(RobotOpcode.KICK);
 		brickOutput.writeInt(speed);
 		brickOutput.flush();
@@ -182,7 +190,7 @@ public class BrickCommServer {
 		return robotReceived;
 	}*/
 
-	public interface StateChangeListener {
-		void stateChanged();
-	}
+    public interface StateChangeListener {
+        void stateChanged();
+    }
 }
