@@ -134,6 +134,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			System.out.println("Kicking");
 			kick_ball= true;			
 		}
+
 		
 		
 		

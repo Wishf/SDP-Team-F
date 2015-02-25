@@ -121,7 +121,8 @@ public class WorldState {
 		return this.playingField;
 	}
 
-	public boolean getPossession() {
+
+/*	public boolean getPossession() {
 		if (Math.abs(attackerRobot.x - ball.x) < 50
 				&& Math.abs(attackerRobot.y - ball.y) < 50) {
 			return true;
@@ -130,9 +131,28 @@ public class WorldState {
 			return true;
 		}
 		return false;
-	}
+	}*/
 
-	// update methods
+    public boolean attackerGetBall() {
+        if (Math.abs(attackerRobot.x - ball.x) < 50
+                && Math.abs(attackerRobot.y - ball.y) < 50) {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public boolean defenderGetBall() {
+        if (Math.abs(defenderRobot.x - ball.x) < 50
+                && Math.abs(attackerRobot.y - ball.y) < 50) {
+            return true;
+        }
+        else
+            return false;
+    }
+
+
+        // update methods
 	/**
 	 * Updates the field with data for moving objects: the robots and the ball
 	 */

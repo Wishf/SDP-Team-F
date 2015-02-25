@@ -106,11 +106,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			
 		}
 		
-		
-		
-		
-		
-		
+
 		double ballDistance = Math.sqrt(dx*dx+dy*dy);
 		double catchThreshold = 35;
 		boolean catch_ball = false;
@@ -119,10 +115,10 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		//System.out.println("bds "+ballDistanceSq);
 		
-		if(ballDistance < catchThreshold && !ballCaughtAttacker){
-			//System.out.println("Catching: "+ballDistance);
-			catch_ball = true;
-		}	
+		if(ballDistance < catchThreshold && !ballCaughtAttacker) {
+            //System.out.println("Catching: "+ballDistance);
+            catch_ball = true;
+        }
 		else if(ballCaughtAttacker && !kicked){
 			//System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
