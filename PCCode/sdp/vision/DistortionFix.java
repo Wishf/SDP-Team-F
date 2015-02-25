@@ -25,6 +25,7 @@ public class DistortionFix implements VideoReceiver {
 	private final static int HEIGHT = 480;
 	private double barrelCorrectionX = -0.03;
 	private double barrelCorrectionY = -0.085;
+    private double STRENGTH = 10;
 	private AffineTransform affineTransform;
 
 	private ArrayList<VideoReceiver> videoReceivers = new ArrayList<VideoReceiver>();
@@ -108,6 +109,7 @@ public class DistortionFix implements VideoReceiver {
 		array = raster.getPixels(0, 0, WIDTH, HEIGHT, array);
 
 		// Array for the fixed image
+        // 921600 = 640 * 480 * 3 (every pixel has 3 cell for R,G,B)
 		int[] arrayNew = new int[921600];
 
 		Point2D.Double point = new Point2D.Double();
@@ -196,6 +198,28 @@ public class DistortionFix implements VideoReceiver {
 		// then convert back
 		point.x = (px1 + 1) * WIDTH / 2;
 		point.y = (py1 + 1) * HEIGHT / 2;
+
+/*      // Added a more efficient method to calculate source point
+        int halfWidth = WIDTH / 2;
+        int halfHeight = HEIGHT / 2;
+        double correctionRadius = Math.sqrt(Math.power(WIDTH,2) + Math.power(HEIGHT,2))/STRENGTH;
+
+        double newX = point.x - halfWidth;
+        double newY = point.y - halfHeight;
+
+        double distance = Math.sqrt(Math.power(newX,2) + Math.power(newY,2));
+        double r = distance / correctionRadius;
+
+        double theta;
+        if (r == 0) {
+            theta = 1;
+        }
+        else {
+            theta = Math.atan(r)/r;
+        }
+
+        point.x = halfWidth + theta * newX;
+        point.y = halfHeight + theta * newY;*/
 	}
 
 	/**

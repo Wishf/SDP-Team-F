@@ -92,9 +92,16 @@ public class Position {
 			this.setX(oldX);
 			this.setY(oldY);
 		}
+
+        // set to be median if changed too much
+        if (squareDist(this, new Position(oldX, oldY)) > 400) {
+            this.setX((oldX + this.x)/2);
+            this.setY((oldY + this.y)/2);
+        }
 	}
 
 	/**
+     * Todo: use filterPoints to update. See why it is not used.
 	 * Updates the centre point of the object, given a list of new points to
 	 * compare it to. Any points too far away from the current centre are
 	 * removed, then a new mean point is calculated and set as the centre point.
