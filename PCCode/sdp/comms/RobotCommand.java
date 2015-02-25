@@ -40,7 +40,7 @@ public class RobotCommand {
 		protected Packet getOpcode() {
             DriveDirection dir = DriveDirection.FORWARD;
             byte zero = 0;
-			return new DrivePacket(zero, dir, zero, dir, zero, dir);
+			return new DrivePacket(zero, dir, zero, dir, zero, dir, zero);
 		}
 	}
 
