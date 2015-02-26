@@ -146,6 +146,8 @@ public class StrategySelectorTool implements GUITool {
 		private JButton actStrat = new JButton("Activate");
         private JButton mstAStrat = new JButton("Milestone 2 - Interceptor");
         private JButton mstBStrat = new JButton("Milestone 2 - Score");
+        private JButton ms3AStrat = new JButton("MILESTONE 3 - Pass task 1");
+        private JButton ms3BStrat = new JButton("MILESTONE 3 - Pass task 2");
 		private JButton pauseController = new JButton("Pause");
 		private JButton startController = new JButton("Start");
 
@@ -158,6 +160,8 @@ public class StrategySelectorTool implements GUITool {
 			this.add(actStrat);
             this.add(mstAStrat);
             this.add(mstBStrat);
+            this.add(ms3AStrat);
+            this.add(ms3BStrat);
 			this.add(pauseController);
 			this.add(startController);
 
@@ -216,7 +220,19 @@ public class StrategySelectorTool implements GUITool {
 					sc.changeToStrategy(StrategyType.MILESTONE_TWO_B);
 				}
 			});
-			
+
+            ms3AStrat.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent arg0) { sc.changeToStrategy(StrategyType.MILESTONE_THREE_A);}
+            });
+
+            ms3BStrat.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent arg0) { sc.changeToStrategy(StrategyType.MILESTONE_THREE_B);}
+            });
+
 			pauseController.addActionListener(new ActionListener() {
 
 				@Override
