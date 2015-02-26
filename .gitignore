@@ -31,3 +31,7 @@ tmp/
 local.properties
 .settings/
 .loadpath
+
+#The log files because they're annoying and stupid
+logs/*.txt
+.gitignore~
