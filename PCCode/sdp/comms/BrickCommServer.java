@@ -18,6 +18,8 @@ import java.util.concurrent.ThreadFactory;
 public class BrickCommServer {
     Radio comm;
     private boolean connected;
+    //This is set once the connection is established and it receives a packet from the Arduino.
+    private boolean isAttacker;
 
     private ExecutorService executor;
     private List<StateChangeListener> stateChangeListeners;
@@ -61,6 +63,7 @@ public class BrickCommServer {
     public boolean isConnected() {
         return connected;
     }
+    public boolean isAttacker() { return isAttacker; }
 
     private void setConnected(boolean connected) {
         if (this.connected != connected) {

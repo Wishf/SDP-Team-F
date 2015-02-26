@@ -28,7 +28,8 @@ public class StrategyController implements WorldStateReceiver {
 		DEFENDER, ATTACKER, ENEMY_DEFENDER, ENEMY_ATTACKER
 	}
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	public BrickCommServer bcsAttacker, bcsDefender;
+    public Object bcsTemp;
+	public BrickCommServer bcsDefender, bcsAttacker;
 	private BallLocation ballLocation;
 	private StrategyType currentStrategy = StrategyType.DO_NOTHING;
 	private boolean pauseStrategyController = true;
@@ -43,8 +44,15 @@ public class StrategyController implements WorldStateReceiver {
 	private static ArrayList<Strategy> removedStrategies = new ArrayList<Strategy>();
 
 	public StrategyController() {
+		this.bcsTemp = new Object();
 		this.bcsAttacker = new BrickCommServer();
-		this.bcsDefender = new BrickCommServer();
+        this.bcsDefender = new BrickCommServer();
+        //Check which one is the attacker and defender and assign appropriately
+        if (bcsAttacker.isAttacker() == false){
+            bcsTemp = bcsAttacker;
+            bcsAttacker = bcsDefender;
+            bcsDefender = (BrickCommServer)bcsTemp;
+        }
 	}
 
 	public StrategyType getCurrentStrategy() {
