@@ -1,5 +1,8 @@
 package sdp.comms;
 
+import sdp.comms.packets.PositionPacket;
+import sun.nio.cs.Surrogate;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +53,8 @@ public class BrickCommServer {
             portNum = userChoiceInput.nextInt();
         }
         comm = new SingletonRadio(serialPorts[portNum]);
-        //connect();
-
+        PositionPacket whatPosition = new PositionPacket();
+        comm.sendPacket(whatPosition);
     }
 
     public void connect() {
@@ -64,6 +67,7 @@ public class BrickCommServer {
         return connected;
     }
     public boolean isAttacker() { return isAttacker; }
+    public void setAttacker(boolean isAttacker_) { this.isAttacker = isAttacker_; }
 
     private void setConnected(boolean connected) {
         if (this.connected != connected) {

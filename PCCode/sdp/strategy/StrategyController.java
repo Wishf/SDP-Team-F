@@ -53,6 +53,7 @@ public class StrategyController implements WorldStateReceiver {
             bcsAttacker = bcsDefender;
             bcsDefender = (BrickCommServer)bcsTemp;
         }
+        System.out.println();
 	}
 
 	public StrategyType getCurrentStrategy() {
