@@ -1,5 +1,7 @@
 package sdp.strategy.interfaces;
 
+import sdp.world.oldmodel.Point2;
+
 /**
  * Created by conrad on 24/02/15.
  */
@@ -10,13 +12,7 @@ public interface WorldStateControlBox {
      */
     public void avoidObstacle(boolean shouldAvoidObstacle);
 
-    public void decideOnRoles(
-            /*
-            Add whatever arguments are needed.
-             */
-    );
-
-    public void computeXPositions(
+    public void computePositions(
             /*
             Add whatever arguments are needed.
              */
@@ -32,14 +28,14 @@ public interface WorldStateControlBox {
      */
 
     public boolean shouldAttackerMove();
-    public int AttackerXPosition();
+    public Point2 AttackerPosition();
 
     /*
         DefenderXPosition returns:
          - the ball position if there's no obstacle
          - the computed optimal position if there obstacle is present
      */
-    public int DefenderXPosition();
+    public Point2 DefenderPosition();
 
     /*
        Once the defender is in the X position and ready to catch, it should tell the attacker to kick.
