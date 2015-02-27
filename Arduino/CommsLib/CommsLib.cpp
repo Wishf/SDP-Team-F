@@ -20,8 +20,6 @@ void Communications::set_handler(char identifier, function_pointer_t function)
     if (!validate_identifier(identifier))
         return;
 
-    Serial.print(identifier);
-
     identifier = identifier - 65;
 
     handlers[identifier] = function;
@@ -74,7 +72,7 @@ void Communications::print(char msg[])
     }
 }
 
-void Communications::send(byte value)
+void Communications::send(char value)
 {
     Serial.print(value);
 }

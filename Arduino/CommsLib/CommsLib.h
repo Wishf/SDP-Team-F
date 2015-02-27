@@ -21,7 +21,7 @@ class Communications
         void print(int value);
         void print(unsigned short value);
         void print(char msg[]);
-        void send(byte value);
+        void send(char value);
         void loop();
     private:
         bool validate_identifier(char identifier);
