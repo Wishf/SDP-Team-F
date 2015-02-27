@@ -23,6 +23,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     public Milestone3AttackingStrategy(BrickCommServer brick) {
         this.brick = brick;
         this.controlThread = new ControlThread();
+        System.out.println("Starting.");
     }
 
     @Override
@@ -62,15 +63,16 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
 
         if(!ballCaughtAttacker){
-            dx = goalX - attackerRobotX;
-            dy = goalY[1] - attackerRobotY;
+        	System.out.println("Getting the ball");
+            dx = ballX - attackerRobotX;
+            dy = ballY - attackerRobotY;
         }
         else {
+        	System.out.println("Getting to the goal");
             dx = our_goal.getX() - attackerRobotX;
             dy = our_goal.getY() - attackerRobotY;
 
         }
-
 
         targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
@@ -102,7 +104,15 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {
             catch_ball = true;
+            System.out.println("LALALA");
         }
+        
+        // If the ball slips from the catching area we can guess we did not catch it.
+        if(ballCaughtAttacker && ballDistance > 10*catchThreshold) {
+        	System.out.println("I've lost the ball!");
+        	ballCaughtAttacker = false;
+        }
+        
         else if(ballCaughtAttacker && !kicked && ControlBox.controlBox.isDefenderReady()){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;
@@ -113,7 +123,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         if(!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) {
             move_robot = true;
-            //System.out.println("Need to move the robot since dY=" + dY);
+            System.out.println("Need to move the robot since dY=" + ballDistance);
         }
 
 
@@ -135,13 +145,13 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 controlThread.operation.rotateBy = (int) (angleDifference);
             } else if (catch_ball) {
-                //System.out.println("Catch");
+                System.out.println("Catch");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
             } else if (kick_ball) {
-                //System.out.println("Kick");
+                System.out.println("Kick");
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
             } else if (uncatch) {
-                //System.out.println("Uncatch");
+                System.out.println("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
             } else if (catch_ball) {
                 System.out.println("Catch");
@@ -168,10 +178,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
 
         public void run() {
+        	
             try {
                 while (true) {
                     Operation.Type op;
                     int rotateBy, travelDist;
+                    System.out.println("???");
                     synchronized (this) {
                         op = this.operation.op;
                         rotateBy = this.operation.rotateBy;
