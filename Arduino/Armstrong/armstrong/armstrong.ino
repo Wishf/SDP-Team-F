@@ -1,4 +1,5 @@
 #include "SDPArduino.h"
+#include "CommsLib.h"
 #include <Wire.h>
 
 
@@ -57,12 +58,24 @@ int kickPower = 0;
 long catchStartTime;
 int catchState = CATCH_STATE_IDLE;
 
+Communications comms;
+
 
 void setup() {
   
   SDPsetup(); 
   motorAllStop();
-  debugPrint("started");// transmit started packet
+
+  // Set up packet handlers
+  comms.set_handler('D', deactivate);
+  comms.set_handler('A', activate);
+  comms.set_handler('K', kick);
+  comms.set_handler('R', sensor_read);
+  comms.set_handler('M', drive);
+  comms.set_handler('N', engage_catcher);
+  comms.set_handler('I', disengage_catcher);
+
+  comms.print("started");// transmit started packet
 }
 
 
@@ -72,7 +85,7 @@ void setup() {
 void loop() {
   
   //Coms
-  readComms();
+  comms.loop();
  
   //Control 
   if(ON)
@@ -191,7 +204,7 @@ void doMotors(){
        }
     }
   }
-  else {
+  else if (motorTimeoutMillis > 0 && motorTimeoutStart > 0){
     long difference = millis() - motorTimeoutStart;
 
     int i = 0;
@@ -199,7 +212,7 @@ void doMotors(){
       for( ; i < MOTOR_N; i++)
       {
          if(motorMapping[i] > -1){
-           debugPrint("disabled");
+           comms.print("disabled");
            moveMotor(motorMapping[i], 0);
          }
       }
@@ -207,137 +220,97 @@ void doMotors(){
   }
 }
 
+// Responds to code 'D'
+void deactivate(){
+  comms.send('C');
+  comms.print("deactivated");
 
-void readComms(){
-  if (Serial.available()) // have we got enough characters for a message?
+  ON = false;
+}
+
+// Responds to code 'A'
+void activate() {
+  comms.send('C');
+  comms.print("activated");
+
+  ON = true;
+}
+
+// Responds to code 'K'
+void kick() {
+    comms.send('C');
+    comms.print("kick");
+
+    byte nextByte = comms.read_byte();
+
+    if(kickState == KICK_STATE_IDLE){
+      kickState = KICK_STATE_START;
+      kickPower = nextByte;
+    }
+
+    comms.print(" ");
+    comms.print(kickPower);
+}
+
+// Responds to code 'R'
+// Is currently incomplete; doesn't work properly
+void sensor_read() {
+  comms.print("read");
+  byte nextByte = comms.read_byte();
+  //Read sensor
+  //Reply
+  comms.print(" ");
+  comms.print(nextByte);
+
+
+  //comms.send('S');
+  //comms.send("1234");
+}
+
+// Responds to code 'M'
+void drive() {
+  comms.send('C');
+  comms.print("MOTORS ");
+
+  int i = 0;
+  for( ; i < MOTOR_N; i++)
   {
-    byte incoming = Serial.read();
-    if (incoming == 'D') //Deactivate
-    {
-      Serial.print('C');
-      debugPrint("deactivated");
-      ON = false;
-    }
-    else if (incoming == 'A') // Activate
-    {
-      Serial.print('C');
-      debugPrint("activated");
-      ON = true;
-      
-      motorsChanged = false;
-      kickState = KICK_STATE_IDLE;
-      
-    }
-    else if (incoming == 'K') // Kick
-    {
-      Serial.print('C');
-      debugPrint("kick");
-      
-      int nextByte = waitForByte();   
-      
-      if(kickState == KICK_STATE_IDLE){
-        kickState = KICK_STATE_START;
-        kickPower = nextByte;
-      }      
-      
-      debugPrint(" ");
-      debugPrint(kickPower);      
-    }
-    else if (incoming == 'R') // Sensor read
-    {
-      debugPrint("read");
-      int nextByte = waitForByte(); 
-      //Read sensor
-      //Reply
-      debugPrint(" ");
-      debugPrint(nextByte);
-      
-      
-      Serial.print('S');
-      Serial.print("1234");
-    }
-    else if (incoming == 'M') // Motor
-    {
-      Serial.print('C');
-      debugPrint("MOTORS ");
-
-      int i = 0;
-      for( ; i < MOTOR_N; i++)
-      {
-        int nextByte = waitForByte();
-        motorPower[i] = nextByte;
+    byte nextByte = comms.read_byte();
+    motorPower[i] = nextByte;
 
 
-        nextByte = waitForByte();
-        if(nextByte == 0)
-          motorDirs[i] = 1;
-        else
-          motorDirs[i] = -1;
+    nextByte = comms.read_byte();
+    if(nextByte == 0)
+      motorDirs[i] = 1;
+    else
+      motorDirs[i] = -1;
 
 
-        debugPrint(motorPower[i]);
-        debugPrint(" ");
-      }
+    comms.print(motorPower[i]);
+    comms.print(" ");
+  }
 
-      motorTimeoutMillis = getMillis();
+  motorTimeoutMillis = comms.read_unsigned_short();
 
-      motorsChanged = true;
-
-    }
-    else if (incoming == 'N') // Engage catcher
-    {
-      Serial.print('G');
-      debugPrint("catch");
-
-      if(catchState == CATCH_STATE_IDLE){
-        catchState = CATCH_STATE_ENGAGE;
-      }
-    }
-    else if (incoming == 'I') // Disengage catcher
-    {
-      Serial.print('G');
-      debugPrint("uncatch");
-
-      if(catchState == CATCH_STATE_IDLE){
-        catchState = CATCH_STATE_DISENGAGE;
-      }
-    }
-    else{
-      Serial.print('E');
-      
-      debugPrint("get off my lawn");      
-    }
-  }   
+  motorsChanged = true;
 }
 
-byte waitForByte()
-{
-  while(!Serial.available());
-  return Serial.read();
-}
+// Responds to code 'N'
+void engage_catcher(){
+  comms.send('G');
+  comms.print("catch");
 
-unsigned short getMillis()
-{
-  byte top = waitForByte();
-  byte bottom = waitForByte();
-
-  return (top << 8) | bottom;
-}
-
-void debugPrint(char msg[]){
-  if(DEBUG){
-    Serial.print(msg);
+  if(catchState == CATCH_STATE_IDLE){
+    catchState = CATCH_STATE_ENGAGE;
   }
 }
 
-void debugPrint(int msg){
-  if(DEBUG){
-    Serial.print(msg, DEC);
-  }
-}
+// Respomnds to code 'I'
+void disengage_catcher(){
+  comms.send('G');
+  comms.print("uncatch");
 
-void debugPrint(unsigned short msg){
-  if(DEBUG){
-    Serial.print(msg, HEX);
+  if(catchState == CATCH_STATE_IDLE){
+    catchState = CATCH_STATE_DISENGAGE;
   }
 }

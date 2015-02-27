@@ -143,8 +143,7 @@ public class RadioController implements SerialPortEventListener {
                     buffer.discard();
                     read.readPacket(buffer);
                     this.dispatch(read);
-                } catch (BufferUnderflowException e) {
-
+                } catch (BufferUnderflowException e){
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
