@@ -29,4 +29,7 @@ public class SingletonRadio extends Radio {
         radios.get(port).sendPacket(packet);
     }
 
+    @Override
+    public void addListener(PacketListener listener) { radios.get(port).addListener(listener); }
+
 }

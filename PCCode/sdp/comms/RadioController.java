@@ -134,6 +134,18 @@ public class RadioController implements SerialPortEventListener {
                         }
 
                         read = new CatcherStateToggledPacket();
+                    } else if (peeked_id == AttackerPacket.ID) {
+                        if (buffer.elements() < AttackerPacket.Length) {
+                            break;
+                        }
+
+                        read = new AttackerPacket();
+                    } else if (peeked_id == DefenderPacket.ID) {
+                        if (buffer.elements() < DefenderPacket.Length) {
+                            break;
+                        }
+
+                        read = new DefenderPacket();
                     } else {
                         // Throw away garbage bytes
                         buffer.discard();
