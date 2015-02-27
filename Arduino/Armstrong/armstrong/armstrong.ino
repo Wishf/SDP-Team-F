@@ -4,6 +4,7 @@
 
 
 #define DEBUG 1
+#define PLAYER_POSITION 'Y'
 
 //Globals
 bool ON = false;
@@ -307,7 +308,7 @@ void engage_catcher(){
   }
 }
 
-// Respomnds to code 'I'
+// Responds to code 'I'
 void disengage_catcher(){
   comms.send('G');
   comms.print("uncatch");
@@ -315,4 +316,9 @@ void disengage_catcher(){
   if(catchState == CATCH_STATE_IDLE){
     catchState = CATCH_STATE_DISENGAGE;
   }
+}
+
+// Responds to code 'B'
+void position_request(){
+  comms.send(PLAYER_POSITION);
 }
