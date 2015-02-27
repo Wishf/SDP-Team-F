@@ -48,12 +48,13 @@ public class StrategyController implements WorldStateReceiver {
 		this.bcsAttacker = new BrickCommServer();
         this.bcsDefender = new BrickCommServer();
         //Check which one is the attacker and defender and assign appropriately
-		while(!bcsAttacker.isIdentified()) {
-			if (bcsAttacker.isAttacker() == false) {
-				bcsTemp = bcsAttacker;
-				bcsAttacker = bcsDefender;
-				bcsDefender = (BrickCommServer) bcsTemp;
-			}
+		while(!bcsAttacker.isIdentified() || !bcsDefender.isIdentified()){
+			// Wait
+		}
+		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
+			bcsTemp = bcsAttacker;
+			bcsAttacker = bcsDefender;
+			bcsDefender = (BrickCommServer) bcsTemp;
 		}
         System.out.println();
 	}
