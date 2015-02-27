@@ -1,5 +1,6 @@
 package sdp.strategy;
 
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -20,6 +21,8 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 	private long kickTime;
 	private boolean kicked = false;
 	private boolean ballCaught = false;
+	
+	
 
 	public LateNightDefenderStrategy(BrickCommServer brick) {
 		this.brick = brick;
@@ -43,6 +46,13 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		
 		MovingObject ball = worldState.getBall();
 		MovingObject robot = worldState.getDefenderRobot();
+		//init the controlBox
+		WorldStateControlBox controlBox = worldState.getControlBox();
+		
+		//get the best "passing destinations"for each robot
+		Point defDestination = controlBox.getDefDestination();
+		Point attDestination = controlBox.getAttDestination();
+		
 		
 		
 		boolean ballInAttackerArea = false;
@@ -50,13 +60,14 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		if (ballPositions.size() > 3)
 			ballPositions.removeFirst();
 
-		boolean canMove = false;
+		boolean canMove = true;
 		
-		if (ballX < rightCheck) {
+		/*if (ballX < rightCheck) {
 			canMove = true;
 			//System.out.println(rightCheck+" "+ballX);
 			
-		}
+		}*/
+		
 		
 		Vector2f ball3FramesAgo = ballPositions.getFirst();
 		float ballX1 = ball3FramesAgo.x, ballY1 = ball3FramesAgo.y;
@@ -73,12 +84,13 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		// 1. Check if the robot needs to rotate
 		
 		//System.out.println("Orientation " + defenderOrientation + "; " + attackerOrientation);
-		
+		//boolean should_move = false;
 		boolean rotate_defender = false;
+		
 		double angleRR = defenderOrientation;
 		double dx = ballX2 - defenderRobotX;
 		double dy = ballY2 - defenderRobotY;
-		double targetAngle = 0;//Math.toDegrees(Math.atan2(dy, dx)) % 360;
+		double targetAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.x, attDestination.y);
 		if(targetAngle < 0){
 			targetAngle += 360;
 		}
@@ -96,11 +108,11 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		
 		//System.out.println("Angle difference: "+angleDifference);
 		
-		if(Math.abs(angleDifference) > 25.0 ) {
+		/*if(Math.abs(angleDifference) > 25.0 ) {
 			rotate_defender = true;
 			//System.out.println("Need to rotate the robot because orientation=" + defenderOrientation);
 			
-		}
+		}*/
 		
 		
 		boolean move_robot = false;
@@ -110,12 +122,20 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 
 		//System.out.println("Ball X: " + ball.x + " y " + ball.y);
 		//System.out.println("Robot x" + defenderRobotX + " y " + defenderRobotY);
-		int dY = (int) (targetY - defenderRobotY);
-		if(Math.abs(dY) > 5) {
-			move_robot = true;
+		int dY = (int) (defDestination.y - defenderRobotY);
+		//if(Math.abs(dY) > 5) {
+			//move_robot = true;
 			//System.out.println("Need to move the robot since dY=" + dY);
+	//	}
+		//move the robot along the y axis
+		if (defenderRobotY != defDestination.y){
+			move_robot = true;
 		}
 		
+		
+		if (calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.x , attDestination.y) > 25){
+			rotate_defender = true;
+		}
 		
 		
 		double ballDistanceSq = dx*dx+dy*dy;
@@ -155,9 +175,9 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		synchronized (this.controlThread) {
 			this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 			
-			if(rotate_defender && canMove) {
-				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) (angleDifference);
+			if(move_robot && canMove) {
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int) (dY*0.5);
 			}
 			else if(catch_ball){
 				//System.out.println("Catch");
@@ -175,9 +195,10 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEBACK;
 				controlThread.operation.travelDistance = -7;//Math.min(-5, -(40-Math.abs(checkDx)));
 			}
-			else if(move_robot && canMove) {
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) (dY*0.5);
+			else if(rotate_defender && canMove) {
+				
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+				controlThread.operation.rotateBy = (int) (angleDifference);
 			}
 		}
 
