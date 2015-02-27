@@ -216,6 +216,8 @@ void doMotors(){
            moveMotor(motorMapping[i], 0);
          }
       }
+      motorTimeoutMillis = 0;
+      motorTimeoutStart = 0;
     }
   }
 }
@@ -270,7 +272,7 @@ void sensor_read() {
 // Responds to code 'M'
 void drive() {
   comms.send('C');
-  comms.print("MOTORS ");
+  comms.print("motors ");
 
   int i = 0;
   for( ; i < MOTOR_N; i++)
