@@ -19,6 +19,10 @@ public class WorldState {
 	public boolean attackerNotOnPitch, enemyAttackerNotOnPitch, defenderNotOnPitch, enemyDefenderNotOnPitch;
 	public boolean ballNotOnPitch;
 	private ArrayList<Point2> ballPositionHistory = new ArrayList<Point2>();
+    private static boolean defenderMoveToSafe = false;
+    private static boolean defenderReadyPass = false;
+    private static boolean attackerMoveToSafe = false;
+
 	
 	// #region new world model representation
 	// TODO: convert x/y to mm values
