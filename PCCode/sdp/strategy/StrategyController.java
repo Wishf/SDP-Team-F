@@ -4,10 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 
-import sdp.comms.packets.ActivatePacket;
-import sdp.comms.packets.ClearQueuePacket;
-import sdp.comms.packets.DisengageCatcherPacket;
-import sdp.comms.packets.EnqueueMotionPacket;
+import sdp.comms.packets.*;
 import sdp.comms.SingletonRadio;
 import sdp.comms.BrickCommServer;
 import sdp.strategy.interfaces.Strategy;
@@ -48,9 +45,7 @@ public class StrategyController implements WorldStateReceiver {
 		this.bcsAttacker = new BrickCommServer();
         this.bcsDefender = new BrickCommServer();
         //Check which one is the attacker and defender and assign appropriately
-		while(!bcsAttacker.isIdentified() || !bcsDefender.isIdentified()){
-			// Wait
-		}
+		// TODO: Devise a non-hanging way of doing this
 		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
 			bcsTemp = bcsAttacker;
 			bcsAttacker = bcsDefender;
@@ -133,10 +128,9 @@ public class StrategyController implements WorldStateReceiver {
             ats.startControlThread();
             break;
 		case DO_NOTHING:
-			radio.sendPacket(new ClearQueuePacket());
 			byte stop = 0;
 			DriveDirection fw = DriveDirection.FORWARD;
-			radio.sendPacket(new EnqueueMotionPacket(stop, fw, stop, fw, stop, fw, 0));
+			radio.sendPacket(new DrivePacket(stop, fw, stop, fw, stop, fw, 0));
 			break;
 		case PASSING:
 			Strategy ps = new PassingStrategy(this.bcsAttacker,
