@@ -1,6 +1,7 @@
 package sdp.strategy.interfaces;
 
 import sdp.world.oldmodel.Point2;
+import sdp.world.oldmodel.WorldState;
 
 /**
  * Created by conrad on 24/02/15.
@@ -29,7 +30,7 @@ public interface WorldStateControlBox {
         The x position is returned by 
      */
 
-    public boolean shouldAttackerMove();
+    public boolean shouldAttackerMove(WorldState ws);
     public Point2 getAttackerPosition();
 
     /*
@@ -46,7 +47,7 @@ public interface WorldStateControlBox {
     public boolean isDefenderReady();
 
     //Returns true if robots can pass in the current setup.
-    public boolean canPass(WorldState ws){}
+    public boolean canPass(WorldState ws);
   
     //Resets the the positions and ready flags, also the internal state.
     public void reset();

@@ -50,14 +50,14 @@ public class ControlBox implements WorldStateControlBox {
 
     public void computePositions(WorldState ws) {
       if(!avoid){
-        defPos = ws.getDefenderRobot();
-        attPos = ws.getAttackerRobot();
+        //defPos = ws.getDefenderRobot();
+        //attPos = ws.getAttackerRobot();
         return;
       }
       if(orth){
           int ypos = getOrthogonal(ws); 
-          defPos = new Point(0, ypos);
-          attPos = new Point(0, ypos);
+          defPos = new Point2(0, ypos);
+          attPos = new Point2(0, ypos);
       } else {
           /*Passing at non orhtogonal angles would be done here for proper play, however the intereface and the interraction should be updated for this to
            * work.*/  
@@ -66,7 +66,7 @@ public class ControlBox implements WorldStateControlBox {
 
     //This may need to add a delta range depending if it is possible to move with 1 unit precision.
     public boolean shouldAttackerMove(WorldState ws) {
-        return !(ws.getAttackerRobot().y == attPos.y && ws.getAttackerRobot().x == attPos.x);
+        return !(ws.getAttackerRobot().y == attPos.getY() && ws.getAttackerRobot().x == attPos.getX());
     }
     public Point2 getAttackerPosition() {
         return attPos;
@@ -93,6 +93,7 @@ public class ControlBox implements WorldStateControlBox {
         if(orth){
           return canPassOrth(ws);
         } else {
+        	return false;
           //Check if the direct line between Attacker and Defender is blocked by an object.
         } 
     }

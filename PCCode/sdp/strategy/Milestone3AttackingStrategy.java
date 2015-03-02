@@ -40,7 +40,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
 
-        Point2 our_goal = ControlBox.controlBox.AttackerPosition();
+        Point2 our_goal = ControlBox.controlBox.getAttackerPosition();
         MovingObject ball = worldState.getBall();
 
         boolean ballInAttackerArea = false;
