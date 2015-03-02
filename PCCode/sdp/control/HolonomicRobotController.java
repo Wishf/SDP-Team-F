@@ -199,7 +199,6 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     	
     	
     	
-    	
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 

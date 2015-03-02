@@ -88,19 +88,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		//System.out.println(targetAngle);
 		//System.out.println(defenderOrientation);
-		double angleDifference = (targetAngle - attackerOrientation) % 360;
+		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		
-		if(angleDifference < 0) {
-			angleDifference += 360;
-		}
-		
-		if(angleDifference > 180) {
-			angleDifference -= 360;
-		}
 		
 		//System.out.println("Angle difference: "+angleDifference);
-		
-		if(Math.abs(angleDifference) > 25.0 ) {
+		double angleTollerance = 25.0;
+		if(Math.abs(angleDifference) > angleTollerance ) {
 			rotate = true;
 			//System.out.println("Need to rotate the robot because orientation=" + defenderOrientation);
 			
@@ -214,9 +207,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 						op = this.operation.op;
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
+						
+						
+						double dX, dY, dA;
 					}
-					System.out.println("operation: " + op + " rotateBy: "
-							 + rotateBy + " travelDist: " + travelDist);
+					
+					/*
 					switch (op) {
 					case DEFROTATE:
 						if (rotateBy != 0) {
@@ -274,6 +270,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					default:
 						break;
 					}
+					*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch(Exception e) {
