@@ -187,9 +187,9 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     	double c2 = 1;
     	double c3 = 1;
     	
-    	double vX = Math.min(1, Math.sqrt(dX * c1));
-    	double vY = Math.min(1, Math.sqrt(dY * c2));
-    	double vA = Math.min(1, Math.sqrt(dA * c3));;
+    	double vX = Math.min(1, Math.max(-1, Math.pow(dX*c1, 3)));
+    	double vY = Math.min(1, Math.max(-1, Math.pow(dY*c2, 3)));
+    	double vA = Math.min(1, Math.max(-1, Math.pow(dA*c3, 3)));
     	
     	
     	double v1 = vX + vA;
@@ -198,12 +198,19 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     	
     	
     	
+    	byte motor1power, motor2power, motor3power;
+    	DriveDirection motor1dir, motor2dir, motor3dir;
     	
+    	
+    	
+    	
+    	
+    	/*
     	return new DrivePacket(
-    			motor1power, leftMotorDir, 
-    			motor2power, rightMotorDir, 
-    			(byte) 0, DriveDirection.FORWARD,
-                500);
+    			motor1power, motor1dir, 
+    			motor2power, motor2dir,
+    			motor3power, motor3dir);
+    			*/
     }
     
 }

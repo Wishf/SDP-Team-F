@@ -94,7 +94,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		//System.out.println("Angle difference: "+angleDifference);
 		double angleTollerance = 25.0;
 		if(Math.abs(angleDifference) > angleTollerance ) {
-			rotate = true;
+			angleDifference = 0;
 			//System.out.println("Need to rotate the robot because orientation=" + defenderOrientation);
 			
 		}
@@ -153,6 +153,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		synchronized (this.controlThread) {
 			this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 			
+			this.controlThread.operation.op = Operation.Type.MOVENROTATE;
+			controlThread.operation.dA = angleDifference;
+			controlThread.operation.dX = dx;
+			controlThread.operation.dY = dy;
+			
+			/*
 			if(rotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) (angleDifference);
@@ -181,6 +187,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = 13;
 			}
+			*/
 		}
 
 	}
@@ -203,17 +210,26 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					int rotateBy, travelDist;
+					double dX, dY, dA;
 					synchronized (this) {
 						op = this.operation.op;
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
 						
 						
-						double dX, dY, dA;
+						dX = this.operation.dX;
+						dY = this.operation.dY;
+						dA = this.operation.dA ;
 					}
 					
-					/*
+					
 					switch (op) {
+					case MOVENROTATE:
+						if (rotateBy != 0) {
+							brick.executeSync(new RobotCommand.Move(dX, dY, dA));
+						}
+						break;
+					/*
 					case DEFROTATE:
 						if (rotateBy != 0) {
 						brick.executeSync(new RobotCommand.Rotate(
@@ -267,10 +283,11 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					case DEFUNCATCH:
 						brick.execute(new RobotCommand.ResetCatcher());
 						break;
+						*/
 					default:
 						break;
 					}
-					*/
+					
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch(Exception e) {
