@@ -136,6 +136,23 @@ public class RobotCommand {
 		}
 	}
 	
+	
+	
+	public static class Move extends GenericCommand {
+		private double dX, dY, dA;
+		
+		public Move(double dX, double dY, double dA) {
+			this.dX = dX;
+			this.dY = dY;
+			this.dA = dA;
+		}
+		
+		@Override
+		protected Packet getOpcode() {
+			return robotController.move(dX, dY, dA);
+		}
+	}
+	
 	public static class ResetCatcher extends GenericCommand {
 		@Override
 		protected Packet getOpcode() {

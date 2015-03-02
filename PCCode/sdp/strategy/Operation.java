@@ -10,4 +10,7 @@ public class Operation {
 	public double radius;
 	public int travelDistance, travelSpeed, rotateBy, rotateSpeed;
 	
+	
+	public double dX, dY, dA;
+	
 }

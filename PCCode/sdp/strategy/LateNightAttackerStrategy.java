@@ -73,19 +73,19 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		if(!ballCaughtAttacker){
 			dx = ballX2 - attackerRobotX;
-			dy = ballY2 - attackerRobotY;			
+			dy = ballY2 - attackerRobotY;	
+			
+			targetAngle = calcTargetAngle(dx, dy);
 		}
 		else{
 			dx = goalX - attackerRobotX;
 			dy = goalY[1] - attackerRobotY;
+			
+			targetAngle = calcTargetAngle(dx, dy);
 		}
 		
 
-		targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
-			
-		if(targetAngle < 0){
-			targetAngle += 360;
-		}
+		
 		//System.out.println(targetAngle);
 		//System.out.println(defenderOrientation);
 		double angleDifference = (targetAngle - attackerOrientation) % 360;

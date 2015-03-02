@@ -51,7 +51,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         if (ballX > leftCheck && ballX < rightCheck) {
             ballInAttackerArea = true;
-            System.out.print("A");
+            System.out.print("Hello Konrad. How are you doing? The ball is in my zone bro!");
         }
 
         boolean rotate = false;
@@ -68,25 +68,29 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         float ball_dy = ballY - attackerRobotY;
         
         if(!ballCaughtAttacker){
-        	System.out.print("O");
+        	System.out.print("I am after the ball. ");
             target = new Point2(ballX, ballY);
+        
         }
         else {
-        	System.out.print("T");
+        	System.out.print("I am after some other target.");
             target = our_goal;
         }
         
-        dx = our_goal.getX() - attackerRobotX;
-        dy = our_goal.getY() - attackerRobotY;
+        dx = target.getX() - attackerRobotX;
+        dy = target.getY() - attackerRobotY;
 
         targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
+        System.out.println("My rotation angle is " + targetAngle);
         if(targetAngle < 0){
+        	
             targetAngle += 360;
         }
 
         double angleDifference = (targetAngle - attackerOrientation) % 360;
 
+        System.out.println(angleDifference);
         if(angleDifference < 0) {
             angleDifference += 360;
         }
@@ -95,7 +99,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             angleDifference -= 360;
         }
 
+        System.out.println("Ball position " + ballX + " - " + ballY);
         if(Math.abs(angleDifference) > 40.0 ) {
+        	//System.out.print("At" + targetAngle + " Ao" + attackerOrientation);
             rotate = true;
         }
 
@@ -106,12 +112,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         boolean kick_ball = false;
         boolean uncatch = false;
 
-        System.out.print("D"+targetDistance);
-        System.out.print("R"+attackerRobotX);
+       // System.out.print("D"+targetDistance);
+       // System.out.print("R"+attackerRobotX);
  
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {
             catch_ball = true;
-            System.out.println("L");
+            //System.out.println("L");
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
@@ -122,7 +128,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         else if(ballCaughtAttacker && !kicked && ControlBox.controlBox.isDefenderReady()){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;
-            System.out.println("K");
+            //System.out.println("K");
         }
 
         boolean move_robot = false;
@@ -130,7 +136,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
         		|| (targetDistance > 25)) {
             move_robot = true;
-            System.out.println("M");
+           // System.out.println("M");
            //System.out.println("Need to move the robot since dY=" + ballDistance);
         }
 
@@ -204,20 +210,20 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                         case DEFROTATE:
                             if (rotateBy != 0) {
                                 brick.executeSync(new RobotCommand.Rotate(
-                                        rotateBy, Math.abs(rotateBy)));
+                                        rotateBy, 100));
                             }
                             break;
                         case DEFTRAVEL:
                             if (travelDist != 0) {
                                 brick.execute(new RobotCommand.Travel(
-                                        travelDist / 3,
+                                        travelDist,
                                         Math.abs(travelDist) * 3 + 25));
                             }
                             break;
                         case DESIDEWAYS:
                             if (travelDist != 0) {
                                 brick.execute(new RobotCommand.TravelSideways(
-                                        travelDist / 3,
+                                        travelDist,
                                         Math.abs(travelDist) * 3 + 25));
                             }
                             break;

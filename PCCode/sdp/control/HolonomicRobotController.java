@@ -180,4 +180,31 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     	
     }
     
+    
+    public DrivePacket move(double dX, double dY, double dA){
+    	
+    	double c1 = 1;
+    	double c2 = 1;
+    	double c3 = 1;
+    	
+    	double vX = Math.min(1, Math.sqrt(dX * c1));
+    	double vY = Math.min(1, Math.sqrt(dY * c2));
+    	double vA = Math.min(1, Math.sqrt(dA * c3));;
+    	
+    	
+    	double v1 = vX + vA;
+    	double v2 = vY + vA;
+    	double v3 = vX + vA;
+    	
+    	
+    	
+    	
+    	
+    	return new DrivePacket(
+    			motor1power, leftMotorDir, 
+    			motor2power, rightMotorDir, 
+    			(byte) 0, DriveDirection.FORWARD,
+                500);
+    }
+    
 }

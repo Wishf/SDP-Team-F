@@ -77,6 +77,32 @@ public class GeneralStrategy implements Strategy {
 	public enum RobotType {
 		ATTACKER, DEFENDER
 	}
+	
+	
+	public double calcTargetAngle(double dx, double dy){
+		double targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
+		
+		if(targetAngle < 0){
+			targetAngle += 360;
+		}
+		
+		return targetAngle;
+	}
+	
+	public double calcAngleDiff(double ourAngle, double targetAngle){
+		double angleDifference = (targetAngle - ourAngle) % 360;
+		
+		if(angleDifference < 0) {
+			angleDifference += 360;
+		}
+		
+		if(angleDifference > 180) {
+			angleDifference -= 360;
+		}
+		
+		return targetAngle;
+	}
+	
 
 	public Operation catchBall(RobotType robot) {
 		defenderHasArrived = false;
