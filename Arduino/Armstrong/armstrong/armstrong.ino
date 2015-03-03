@@ -10,12 +10,12 @@
 #define ROTARY_COUNT 6
 
 //Globals
-bool ON = true;
+bool ON = false;
 
 //Moving
 #define MOTOR_N 3
 bool motorsChanged = false;
-byte motorMapping[MOTOR_N] = {1, 0, 2};
+byte motorMapping[MOTOR_N] = {1, 0, 3};
 int motorPower[MOTOR_N] = {0,0,0};
 int motorDirs[MOTOR_N] = {1, 1, 1};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
@@ -40,7 +40,7 @@ int positions[ROTARY_COUNT] = {0};
 #define KICK_STATE_UP 3
 #define KICK_STATE_MOVING_DOWN 4
 
-#define KICK_MOTOR 3
+#define KICK_MOTOR 5
 #define KICK_TACHOMETER 4
 #define KICK_TICKS_QUARTER 5
 #define KICK_MOTOR_DIR -1
@@ -93,6 +93,12 @@ void setup() {
   comms.set_handler('X', kicker_dec);
 
   comms.print("started");// transmit started packet
+  
+  
+  
+  
+  
+  
 }
 
 
@@ -202,6 +208,9 @@ void doKick(){
 void doMotors(){
   int i = 0;
 
+  motorTimeoutMillis = 500;
+
+
   if(motorsChanged){
       motorsChanged = false;
       motorTimeoutStart = millis();
@@ -209,7 +218,7 @@ void doMotors(){
 
   for( ; i < MOTOR_N; i++)
   {
-    if(motorTimeoutMillis > 0 && motorTimeoutStart > 0){
+    if(millis() - motorTimeoutStart > motorTimeoutMillis){
        if(motorMapping[i] > -1){
          //comms.print("disabled");
          moveMotor(motorMapping[i], 0);
@@ -239,6 +248,8 @@ int diff_scale(int diff)
   double deadzone = 3;
   double b = 75;
   double c = 2;
+  
+  return diff;
 
   if(abs(diff) < deadzone){
     return 0;
