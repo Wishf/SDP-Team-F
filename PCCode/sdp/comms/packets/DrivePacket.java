@@ -13,7 +13,7 @@ import sdp.util.DriveDirection;
 
 public class DrivePacket extends Packet {
     public final static byte ID = 'M';
-    public final static int Length = 7;
+    public final static int Length = 9;
 
     private byte[] motorPowers;
     private int millis;

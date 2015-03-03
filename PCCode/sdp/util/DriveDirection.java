@@ -5,7 +5,8 @@ package sdp.util;
  */
 public enum DriveDirection {
     FORWARD ((byte)0),
-    BACKWARD ((byte)1);
+    BACKWARD ((byte)1),
+    ACTIVE_RESIST ((byte)2);
 
     private final byte encodedValue;
     DriveDirection(byte encoding) {

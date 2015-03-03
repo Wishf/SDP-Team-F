@@ -75,6 +75,7 @@ void setup() {
   comms.set_handler('M', drive);
   comms.set_handler('N', engage_catcher);
   comms.set_handler('I', disengage_catcher);
+  comms.set_handler('B', position_request);
 
   comms.print("started");// transmit started packet
 }
