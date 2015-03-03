@@ -17,7 +17,7 @@ public class ControlBox implements WorldStateControlBox {
     private Point2 attPos = new Point2(0, 0);
     private Point2 defPos = new Point2(0, 0);
     private boolean computed = false;
-    private ControlBox(){}
+   
     //If it has already been computed and still works, just return the value.
     //If not, compute a new one based on the position of the enemies attacker.
     public int getOrthogonal(WorldState ws){
