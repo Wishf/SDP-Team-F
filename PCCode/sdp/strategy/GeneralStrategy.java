@@ -12,6 +12,7 @@ public class GeneralStrategy implements Strategy {
 	private static final int DEFENDER_SPEED_CONSTANT = 0;
 
 	protected ControlThread controlThread;
+	boolean isBallPassed;
 	protected float attackerRobotX;
 	protected float attackerRobotY;
 	protected float defenderRobotX;
