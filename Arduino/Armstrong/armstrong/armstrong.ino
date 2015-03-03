@@ -16,6 +16,9 @@ byte motorMapping[MOTOR_N] = {1, 0, 2};
 int motorPower[MOTOR_N] = {0,0,0};
 int motorDirs[MOTOR_N] = {1, 1, 1};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
+int motorActiveResistEnabled[MOTOR_N] = {0, 0, 0};
+int motorTachometerMapping[MOTOR_N] = {0,0,0};
+int motorTargetTachometerReading[MOTOR_N] = {0,0,0};
 long motorTimeoutStart = 0;
 long motorTimeoutMillis = 0;
 
@@ -31,11 +34,14 @@ long motorTimeoutMillis = 0;
 #define KICK_STATE_MOVING_DOWN 4
 
 #define KICK_MOTOR 4
+#define KICK_TACHOMETER 4
+#define KICK_TICKS_QUARTER 1
 #define KICK_MOTOR_DIR -1
 
 long kickStartTime;
 int kickState = KICK_STATE_IDLE;
 int kickPower = 0;
+int kickerTachometerStart = 0;
 
 //Catch
 #define CATCH_MOTOR 3
@@ -161,67 +167,60 @@ void doCatcher(){
 
 void doKick(){  
   if(kickState == KICK_STATE_START){
-    kickStartTime = millis();
+    kickStartTime = tacho(KICK_TACHOMETER);
     
     kickState = KICK_STATE_MOVING_UP;
     
     moveMotor(KICK_MOTOR, kickPower * KICK_MOTOR_DIR);
   }
   else if(kickState == KICK_STATE_MOVING_UP){
-    if(millis() - kickStartTime > KICK_DELAY_MOVING_UP){
-      kickStartTime = millis();
-      
-      kickState = KICK_STATE_UP;
+    if(tacho(KICK_TACHOMETER) - kickerTachometerStart > KICK_TICKS_QUARTER){
+      kickState = KICK_STATE_IDLE;
     
       motorStop(KICK_MOTOR); 
     }
   }
-  else if(kickState == KICK_STATE_UP){
-    if(millis() - kickStartTime > KICK_DELAY_UP){
-      kickStartTime = millis();
-      
-      kickState = KICK_STATE_MOVING_DOWN;
-      
-      moveMotor(KICK_MOTOR, -kickPower * KICK_MOTOR_DIR);
-    }
-  } 
-  else if(kickState == KICK_STATE_MOVING_DOWN)
-    if(millis() - kickStartTime > KICK_DELAY_MOVING_DOWN){
-      kickState = KICK_STATE_IDLE;
-      
-      motorStop(KICK_MOTOR); 
-  } 
 }
 
 void doMotors(){
-  if(motorsChanged){
-    motorsChanged = false;
-    motorTimeoutStart = millis();
+  int i = 0;
 
-    int i = 0;
-    for( ; i < MOTOR_N; i++)
-    {
+  if(motorsChanged){
+      motorsChanged = false;
+      motorTimeoutStart = millis();
+  }
+
+  for( ; i < MOTOR_N; i++)
+  {
+    if(motorTimeoutMillis > 0 && motorTimeoutStart > 0){
        if(motorMapping[i] > -1){
-         moveMotor(motorMapping[i], motorPower[i] * motorDirs[i] * motorMultiplier[i]);
+         //comms.print("disabled");
+         moveMotor(motorMapping[i], 0);
        }
     }
-  }
-  else if (motorTimeoutMillis > 0 && motorTimeoutStart > 0){
-    long difference = millis() - motorTimeoutStart;
+    else {
+      // move towards target
+      int diff = tacho(motorTachometerMapping[i]) - motorTargetTachometerReading[i];
 
-    int i = 0;
-    if(difference >= motorTimeoutMillis){
-      for( ; i < MOTOR_N; i++)
-      {
-         if(motorMapping[i] > -1){
-           comms.print("disabled");
-           moveMotor(motorMapping[i], 0);
-         }
-      }
-      motorTimeoutMillis = 0;
-      motorTimeoutStart = 0;
+      int power = diff_scale(diff);
+
+      moveMotor(motorMapping[i], power * motorMultiplier[i]);
     }
   }
+}
+
+int tacho(int motor)
+{
+  return 1;
+}
+
+int diff_scale(int diff)
+{
+  if(diff == 0){
+    return 0;
+  }
+
+  return constrain(diff * c + 120, 255, -255);
 }
 
 // Responds to code 'D'
@@ -279,18 +278,19 @@ void drive() {
   int i = 0;
   for( ; i < MOTOR_N; i++)
   {
-    byte nextByte = comms.read_byte();
-    motorPower[i] = nextByte;
+    byte ticks = comms.read_byte();
 
 
-    nextByte = comms.read_byte();
-    if(nextByte == 0)
-      motorDirs[i] = 1;
-    else
-      motorDirs[i] = -1;
+    byte direction = comms.read_byte();
+    if(direction == 0)
+      motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]) + motorMultiplier[i] * ticks;
+    else if(direction == 1)
+      motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]) - motorMultiplier[i] * ticks;
+    else if (direction == 2)
+      motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]);
 
 
-    comms.print(motorPower[i]);
+    comms.print(motorTargetTachometerReading[i]);
     comms.print(" ");
   }
 
