@@ -62,7 +62,7 @@ public class GeneralStrategy implements Strategy {
 		controlThread.start();
 	}
 
-	private class ControlThread extends Thread {
+	class ControlThread extends Thread {
 
 		public ControlThread() {
 			super("Robot control thread");

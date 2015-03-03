@@ -4,7 +4,7 @@ import sdp.comms.packets.AttackerPacket;
 import sdp.comms.packets.DefenderPacket;
 import sdp.comms.packets.Packet;
 import sdp.comms.packets.PositionPacket;
-import sun.nio.cs.Surrogate;
+//import sun.nio.cs.Surrogate;
 
 import java.io.IOException;
 import java.util.ArrayList;
