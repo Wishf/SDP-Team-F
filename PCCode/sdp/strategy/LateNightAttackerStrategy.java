@@ -50,6 +50,9 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		MovingObject robot = worldState.getAttackerRobot();
 		
 		//get the best "passing destinations"for each robot
+		if(!ControlBox.controlBox.computed()){
+			ControlBox.controlBox.computePositions(worldState);
+		}
 		Point2 attackerPosition = ControlBox.controlBox.getAttackerPosition();
 		Point2 defenderPosition = ControlBox.controlBox.getDefenderPosition();
 		
@@ -99,7 +102,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			
 		}*/ 
 		else{
-			dx = attackerPosition.getX() - attackerRobotX;
+			dx = attackerRobotX - attackerRobotX;
 			dy = attackerPosition.getY() - attackerRobotY;
 			targetAngle = calcTargetAngle(dx, dy);
 		}
@@ -119,7 +122,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
         //In this case ball distance is also the distance to the target position/destination
 		double targetDistance = Math.sqrt(dx*dx+dy*dy);
-		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderPosition.getX(), defenderPosition.getY());
+		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, attackerRobotX, defenderPosition.getY());
 		
 		double catchThreshold = 35;
 		boolean catch_ball = false;

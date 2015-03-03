@@ -10,7 +10,7 @@
 #define ROTARY_COUNT 6
 
 //Globals
-bool ON = false;
+bool ON = true;
 
 //Moving
 #define MOTOR_N 3
@@ -40,9 +40,9 @@ int positions[ROTARY_COUNT] = {0};
 #define KICK_STATE_UP 3
 #define KICK_STATE_MOVING_DOWN 4
 
-#define KICK_MOTOR 4
+#define KICK_MOTOR 3
 #define KICK_TACHOMETER 4
-#define KICK_TICKS_QUARTER 1
+#define KICK_TICKS_QUARTER 5
 #define KICK_MOTOR_DIR -1
 
 long kickStartTime;
@@ -51,7 +51,7 @@ int kickPower = 0;
 int kickerTachometerStart = 0;
 
 //Catch
-#define CATCH_MOTOR 3
+#define CATCH_MOTOR 4
 
 #define CATCH_STATE_IDLE 0
 #define CATCH_STATE_DISENGAGE 1
@@ -89,6 +89,8 @@ void setup() {
   comms.set_handler('N', engage_catcher);
   comms.set_handler('I', disengage_catcher);
   comms.set_handler('B', position_request);
+  comms.set_handler('Z', kicker_inc);
+  comms.set_handler('X', kicker_dec);
 
   comms.print("started");// transmit started packet
 }
@@ -176,14 +178,20 @@ void doCatcher(){
 
 void doKick(){  
   if(kickState == KICK_STATE_START){
-    kickStartTime = tacho(KICK_TACHOMETER);
+    kickerTachometerStart = tacho(KICK_TACHOMETER);
+    //comms.print("Tacho start: ");
+    //comms.print(kickerTachometerStart);
     
     kickState = KICK_STATE_MOVING_UP;
     
-    moveMotor(KICK_MOTOR, kickPower * KICK_MOTOR_DIR);
+    moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
   }
   else if(kickState == KICK_STATE_MOVING_UP){
-    if(tacho(KICK_TACHOMETER) - kickerTachometerStart > KICK_TICKS_QUARTER){
+    //comms.print(tacho(KICK_TACHOMETER));
+    //comms.print("\n");
+    //moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
+    
+    if(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) > KICK_TICKS_QUARTER){
       kickState = KICK_STATE_IDLE;
     
       motorStop(KICK_MOTOR); 
@@ -356,3 +364,42 @@ void disengage_catcher(){
 void position_request(){
   comms.send(PLAYER_POSITION);
 }
+
+
+
+
+// Responds to code 'N'
+void kicker_inc(){
+  comms.print("k+");
+
+  kickerTachometerStart = tacho(KICK_TACHOMETER);
+  
+  moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
+  
+  while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
+    updateMotorPositions();
+  }
+  
+  
+  motorStop(KICK_MOTOR); 
+  
+}
+
+
+
+void kicker_dec(){
+  comms.print("k+");
+
+  kickerTachometerStart = tacho(KICK_TACHOMETER);
+  
+  moveMotor(KICK_MOTOR, -255 * KICK_MOTOR_DIR);
+  
+  while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
+    updateMotorPositions();
+  }
+  
+  motorStop(KICK_MOTOR); 
+  
+}
+
+

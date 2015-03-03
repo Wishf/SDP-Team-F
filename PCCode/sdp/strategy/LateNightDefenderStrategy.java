@@ -55,6 +55,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		//WorldStateControlBox controlBox = worldState.getControlBox();
 		
 		//get the best "passing destinations"for each robot
+		ControlBox.controlBox.computePositions(worldState);
 		Point2 defDestination = ControlBox.controlBox.getDefenderPosition();
 		Point2 attDestination = ControlBox.controlBox.getAttackerPosition();
 		

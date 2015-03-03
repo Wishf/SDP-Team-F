@@ -40,14 +40,14 @@ public class BrickCommServer implements PacketListener {
         }
     };
 
-    public BrickCommServer() {
+    public BrickCommServer(String name) {
         stateChangeListeners = new ArrayList<BrickCommServer.StateChangeListener>();
         connected = false;
         executor = Executors.newSingleThreadExecutor(EXECUTOR_FACTORY);
         //comm = new Radio("COM3");
         String[] serialPorts = Radio.getPortNames();
         //Now get an input from the user as to which port they want to use.
-        System.out.println("Enter the number for the port you want to use for this connection: ");
+        System.out.println("Enter the number for the port you want to use for "+name+" connection: ");
         Scanner userChoiceInput = new Scanner(System.in);
         int portNum = userChoiceInput.nextInt();
         while (!(portNum >= 0 && portNum < serialPorts.length)) {
