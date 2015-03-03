@@ -10,7 +10,7 @@
 #define ROTARY_COUNT 6
 
 //Globals
-bool ON = true;
+bool ON = false;
 
 //Moving
 #define MOTOR_N 3
@@ -208,7 +208,7 @@ void doKick(){
 void doMotors(){
   int i = 0;
 
-  //motorTimeoutMillis = 500;
+  motorTimeoutMillis = 500;
 
 
   if(motorsChanged){
@@ -224,25 +224,17 @@ void doMotors(){
          moveMotor(motorMapping[i], 0);
        }
     }
-    else{ 
-      if(motorMapping[i] > -1){
-         moveMotor(motorMapping[i], motorPower[i] * motorDirs[i] * motorMultiplier[i]);
-       }
-    }
-    
-    /*
     else{
       // move towards target
       int diff = tacho(motorTachometerMapping[i]) - motorTargetTachometerReading[i];
 
       int power = diff_scale(diff);
 
-      comms.print("\n");
-      comms.print(power);
+      //comms.print("\n");
+      //comms.print(power);
 
       moveMotor(motorMapping[i], power * motorMultiplier[i]);
     }
-    */
   }
 }
 
@@ -254,10 +246,10 @@ int tacho(int motor)
 int diff_scale(int diff)
 {
   double deadzone = 3;
-  double b = 80;
-  double c = 0.5;
+  double b = 75;
+  double c = 2;
   
-  //return diff;
+  return diff;
 
   if(abs(diff) < deadzone){
     return 0;
@@ -334,35 +326,13 @@ void sensor_read() {
 void drive() {
   comms.send('C');
   comms.print("motors ");
-  
-  
+
   int i = 0;
   for( ; i < MOTOR_N; i++)
   {
-    byte nextByte = comms.read_byte();
-    motorPower[i] = nextByte;
-
-
-    nextByte = comms.read_byte();
-    if(nextByte == 0)
-      motorDirs[i] = 1;
-    else
-      motorDirs[i] = -1;
-
-
-    comms.print(motorPower[i]);
-    comms.print(" ");
-  }
-  
-  
-  /*
-  int i = 0;
-  for( ; i < MOTOR_N; i++)
-  {
-    
     byte ticks = comms.read_byte();
 
-  
+
     byte direction = comms.read_byte();
     if(direction == 0)
       motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]) + motorMultiplier[i] * ticks;
@@ -370,14 +340,11 @@ void drive() {
       motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]) - motorMultiplier[i] * ticks;
     else if (direction == 2)
       motorTargetTachometerReading[i] = tacho(motorTachometerMapping[i]);
-      
 
 
     comms.print(motorTargetTachometerReading[i]);
     comms.print(" ");
   }
-  
-  */
 
   motorTimeoutMillis = comms.read_unsigned_short();
 
@@ -445,4 +412,5 @@ void kicker_dec(){
   motorStop(KICK_MOTOR); 
   
 }
+
 
