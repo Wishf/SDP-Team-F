@@ -207,11 +207,14 @@ void doMotors(){
          moveMotor(motorMapping[i], 0);
        }
     }
-    else {
+    else{
       // move towards target
       int diff = tacho(motorTachometerMapping[i]) - motorTargetTachometerReading[i];
 
       int power = diff_scale(diff);
+
+      //comms.print("\n");
+      //comms.print(power);
 
       moveMotor(motorMapping[i], power * motorMultiplier[i]);
     }
@@ -225,11 +228,22 @@ int tacho(int motor)
 
 int diff_scale(int diff)
 {
-  if(diff == 0){
+  double deadzone = 3;
+  double b = 75;
+  double c = 2;
+
+  if(abs(diff) < deadzone){
     return 0;
   }
+  else if(diff > 0){
+      return -min(diff * c + b, 255);
+  }
+  else if(diff < 0){
+    return -max(diff * c - b, -255);
+  }
 
-  return constrain(diff * 1 + 120, 255, -255);
+
+  
 }
 
 void updateMotorPositions() {
