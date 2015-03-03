@@ -6,6 +6,9 @@
 #define DEBUG 1
 #define PLAYER_POSITION 'Y'
 
+#define ROTARY_SLAVE_ADDRESS 5
+#define ROTARY_COUNT 6
+
 //Globals
 bool ON = false;
 
@@ -16,11 +19,15 @@ byte motorMapping[MOTOR_N] = {1, 0, 2};
 int motorPower[MOTOR_N] = {0,0,0};
 int motorDirs[MOTOR_N] = {1, 1, 1};
 int motorMultiplier[MOTOR_N] = {1, 1, 1};
-int motorActiveResistEnabled[MOTOR_N] = {0, 0, 0};
-int motorTachometerMapping[MOTOR_N] = {0,0,0};
+int motorTachometerMapping[MOTOR_N] = {1,0,2};
 int motorTargetTachometerReading[MOTOR_N] = {0,0,0};
 long motorTimeoutStart = 0;
 long motorTimeoutMillis = 0;
+
+int positions[ROTARY_COUNT] = {0};
+
+#define ROTARY_SLAVE_ADDRESS 5
+#define ROTARY_COUNT 6
 
 //Kicking
 #define KICK_DELAY_MOVING_UP 250
@@ -91,6 +98,8 @@ void setup() {
 //4 motor 4byte
 //5 read sensor 2byte
 void loop() {
+  
+  updateMotorPositions();
   
   //Coms
   comms.loop();
@@ -211,7 +220,7 @@ void doMotors(){
 
 int tacho(int motor)
 {
-  return 1;
+  return positions[motor];
 }
 
 int diff_scale(int diff)
@@ -220,7 +229,17 @@ int diff_scale(int diff)
     return 0;
   }
 
-  return constrain(diff * c + 120, 255, -255);
+  return constrain(diff * 1 + 120, 255, -255);
+}
+
+void updateMotorPositions() {
+  // Request motor position deltas from rotary slave board
+  Wire.requestFrom(ROTARY_SLAVE_ADDRESS, ROTARY_COUNT);
+
+  // Update the recorded motor positions
+  for (int i = 0; i < ROTARY_COUNT; i++) {
+    positions[i] += (int8_t) Wire.read();  // Must cast to signed 8-bit type
+  }
 }
 
 // Responds to code 'D'
