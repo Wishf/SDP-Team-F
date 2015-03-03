@@ -84,7 +84,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		boolean rotate = false;
 		double targetAngle;		
 		boolean facingTeamMate;
-		//
+		
 		
 		double dx;
 		double dy;
@@ -154,14 +154,10 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		boolean move_robot = false;
 		
 		
-		if(targetDistance > 25) {
+		if(Math.abs(targetDistance) > 25) {
 			move_robot = true;
 			//System.out.println("Need to move the robot since dY=" + dY);
 		}//else if(targetDistance )
-		
-		
-		
-		
 		
 		
 		
@@ -193,10 +189,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) (angleDifference);
 			}
-			else if(catch_ball){
-				//System.out.println("Catch");
-				this.controlThread.operation.op = Operation.Type.DEFCATCH;
-			}
+			
 			else if(kick_ball){
 				//System.out.println("Kick");
 				this.controlThread.operation.op = Operation.Type.DEFKICK;
@@ -215,6 +208,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				controlThread.operation.travelDistance = (int) Math.min(-10, -(40-Math.abs(checkDx)));
 			}
 			else if(move_robot) {
+				System.out.println("A: ");
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = 13;
 			}
@@ -255,14 +249,10 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					
 					
 					switch (op) {
-					case MOVENROTATE:
-						if (rotateBy != 0) {
-							brick.executeSync(new RobotCommand.Move(dX, dY, dA));
-						}
-						break;
-					/*
+					
 					case DEFROTATE:
 						if (rotateBy != 0) {
+						System.out.println("A: ");
 						brick.executeSync(new RobotCommand.Rotate(
 								rotateBy, Math.abs(rotateBy)));
 						}
@@ -270,8 +260,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
 							brick.execute(new RobotCommand.Travel(
-									travelDist / 3,
-									Math.abs(travelDist) * 3 + 25));
+									travelDist));
 						}
 						break;
 					case DESIDEWAYS:
@@ -284,7 +273,6 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					case DEBACK:
 						if (travelDist != 0) {
 							brick.execute(new RobotCommand.Travel(
-									travelDist,
 									travelDist));
 						}
 					case DEFCATCH:
@@ -314,7 +302,6 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					case DEFUNCATCH:
 						brick.execute(new RobotCommand.ResetCatcher());
 						break;
-						*/
 					default:
 						break;
 					}
