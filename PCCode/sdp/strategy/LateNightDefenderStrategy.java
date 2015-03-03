@@ -8,6 +8,7 @@ import sdp.comms.BrickCommServer;
 import sdp.comms.RobotCommand;
 import sdp.vision.Vector2f;
 import sdp.world.oldmodel.MovingObject;
+import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
 public class LateNightDefenderStrategy extends GeneralStrategy {
@@ -47,11 +48,11 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		MovingObject ball = worldState.getBall();
 		MovingObject robot = worldState.getDefenderRobot();
 		//init the controlBox
-		WorldStateControlBox controlBox = worldState.getControlBox();
+		//WorldStateControlBox controlBox = worldState.getControlBox();
 		
 		//get the best "passing destinations"for each robot
-		Point defDestination = controlBox.getDefDestination();
-		Point attDestination = controlBox.getAttDestination();
+		Point2 defDestination = ControlBox.controlBox.getDefenderPosition();
+		Point2 attDestination = ControlBox.controlBox.getAttackerPosition();
 		
 		
 		
@@ -90,7 +91,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		double angleRR = defenderOrientation;
 		double dx = ballX2 - defenderRobotX;
 		double dy = ballY2 - defenderRobotY;
-		double targetAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.x, attDestination.y);
+		double targetAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.getX(), attDestination.getY());
 		if(targetAngle < 0){
 			targetAngle += 360;
 		}
@@ -122,18 +123,18 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 
 		//System.out.println("Ball X: " + ball.x + " y " + ball.y);
 		//System.out.println("Robot x" + defenderRobotX + " y " + defenderRobotY);
-		int dY = (int) (defDestination.y - defenderRobotY);
+		int dY = (int) (defDestination.getY() - defenderRobotY);
 		//if(Math.abs(dY) > 5) {
 			//move_robot = true;
 			//System.out.println("Need to move the robot since dY=" + dY);
 	//	}
 		//move the robot along the y axis
-		if (defenderRobotY != defDestination.y){
+		if (defenderRobotY != defDestination.getY()){
 			move_robot = true;
 		}
 		
 		
-		if (calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.x , attDestination.y) > 25){
+		if (calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attDestination.getX() , attDestination.getY()) > 25){
 			rotate_defender = true;
 		}
 		

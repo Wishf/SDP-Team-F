@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 300; //100; // TODO: Test lower values for this and see where it breaks
+	public static final int STRATEGY_TICK = 500; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
 		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B
@@ -111,6 +111,10 @@ public class StrategyController implements WorldStateReceiver {
 			break;
         case MILESTONE_THREE_A:
             // Without the obstacle, simple version
+        	ControlBox.controlBox.avoidObstacle(false);
+        	Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
+        	StrategyController.currentStrategies.add(m3as);
+        	m3as.startControlThread();
             break;
         case MILESTONE_THREE_B:
             // With the obstacle, extended version

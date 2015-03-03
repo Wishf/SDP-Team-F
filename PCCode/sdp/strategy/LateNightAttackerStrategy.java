@@ -73,35 +73,28 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		if(!ballCaughtAttacker){
 			dx = ballX2 - attackerRobotX;
-			dy = ballY2 - attackerRobotY;			
+			dy = ballY2 - attackerRobotY;	
+			
+			targetAngle = calcTargetAngle(dx, dy);
 		}
 		else{
 			dx = goalX - attackerRobotX;
 			dy = goalY[1] - attackerRobotY;
+			
+			targetAngle = calcTargetAngle(dx, dy);
 		}
 		
 
-		targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
-			
-		if(targetAngle < 0){
-			targetAngle += 360;
-		}
+		
 		//System.out.println(targetAngle);
 		//System.out.println(defenderOrientation);
-		double angleDifference = (targetAngle - attackerOrientation) % 360;
+		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		
-		if(angleDifference < 0) {
-			angleDifference += 360;
-		}
-		
-		if(angleDifference > 180) {
-			angleDifference -= 360;
-		}
 		
 		//System.out.println("Angle difference: "+angleDifference);
-		
-		if(Math.abs(angleDifference) > 25.0 ) {
-			rotate = true;
+		double angleTollerance = 25.0;
+		if(Math.abs(angleDifference) > angleTollerance ) {
+			angleDifference = 0;
 			//System.out.println("Need to rotate the robot because orientation=" + defenderOrientation);
 			
 		}
@@ -160,6 +153,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		synchronized (this.controlThread) {
 			this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 			
+			this.controlThread.operation.op = Operation.Type.MOVENROTATE;
+			controlThread.operation.dA = angleDifference;
+			controlThread.operation.dX = dx;
+			controlThread.operation.dY = dy;
+			
+			/*
 			if(rotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) (angleDifference);
@@ -188,6 +187,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = 13;
 			}
+			*/
 		}
 
 	}
@@ -210,14 +210,26 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					int rotateBy, travelDist;
+					double dX, dY, dA;
 					synchronized (this) {
 						op = this.operation.op;
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
+						
+						
+						dX = this.operation.dX;
+						dY = this.operation.dY;
+						dA = this.operation.dA ;
 					}
-					System.out.println("operation: " + op + " rotateBy: "
-							 + rotateBy + " travelDist: " + travelDist);
+					
+					
 					switch (op) {
+					case MOVENROTATE:
+						if (rotateBy != 0) {
+							brick.executeSync(new RobotCommand.Move(dX, dY, dA));
+						}
+						break;
+					/*
 					case DEFROTATE:
 						if (rotateBy != 0) {
 						brick.executeSync(new RobotCommand.Rotate(
@@ -271,9 +283,11 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					case DEFUNCATCH:
 						brick.execute(new RobotCommand.ResetCatcher());
 						break;
+						*/
 					default:
 						break;
 					}
+					
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch(Exception e) {
