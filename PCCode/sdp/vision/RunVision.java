@@ -123,6 +123,7 @@ public class RunVision {
 			gui.addTool(alignmentTool, "Alignment");
 			vision.addRecogniser(alignmentTool.new FrameDisplay());
 
+            // Add receiver to wait for the mouse click
 			vStream.addReceiver(pmvTool);
 			vStream.addReceiver(distortionFix);
 			vStream.addReceiver(vision);
