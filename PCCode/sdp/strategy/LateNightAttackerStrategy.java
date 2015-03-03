@@ -144,7 +144,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		boolean move_robot = false;
 		
 		
-		if(ballInAttackerArea && targetDistance > 25) {
+		if(targetDistance > 25) {
 			move_robot = true;
 			//System.out.println("Need to move the robot since dY=" + dY);
 		}//else if(targetDistance )

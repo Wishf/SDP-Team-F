@@ -154,7 +154,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		
 		
 		double targetDistance = Math.sqrt(dx*dx+dy*dy);
-		double angleDiffToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, attackerOrientation, attackerRobotX, attackerRobotY);
+		double angleDiffToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attackerRobotX, attackerRobotY);
 		
 		double catchThreshold = 35;
 		boolean catch_ball = false;
@@ -162,7 +162,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		boolean uncatch = false;
 		double angleTollerance = 25;
 		//System.out.println("bds "+ballDistanceSq);
-		if(ballInAttackerArea && targetDistance < catchThreshold && !ballCaughtDefender) {
+		if(ballInDefenderArea && (targetDistance < catchThreshold) && !ballCaughtDefender) {
             //System.out.println("Catching: "+ballDistance);
             catch_ball = true;
         }
@@ -170,7 +170,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			//System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
-		}else if(targetDistance < catchThreshold && angleDiffToTeamMate < angleTollerance){
+		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate < angleTollerance)){
 			rotate = true;
 			angleDifference = angleDiffToTeamMate;
 		}
@@ -182,7 +182,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		boolean move_robot = false;
 		
 		
-		if(ballInAttackerArea && targetDistance > 25) {
+		if(targetDistance > 25) {
 			move_robot = true;
 			//System.out.println("Need to move the robot since dY=" + dY);
 		}
