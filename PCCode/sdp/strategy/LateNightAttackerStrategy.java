@@ -102,7 +102,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			
 		}*/ 
 		else{
-			dx = attackerRobotX - attackerRobotX;
+			dx = attackerPosition.getX()- attackerRobotX;
 			dy = attackerPosition.getY() - attackerRobotY;
 			targetAngle = calcTargetAngle(dx, dy);
 		}
@@ -122,7 +122,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
         //In this case ball distance is also the distance to the target position/destination
 		double targetDistance = Math.sqrt(dx*dx+dy*dy);
-		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, attackerRobotX, defenderPosition.getY());
+		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderPosition.getX(), defenderPosition.getY());
 		
 		double catchThreshold = 35;
 		boolean catch_ball = false;
@@ -131,7 +131,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		//System.out.println("bds "+ballDistanceSq);
 		
-		if(ballInAttackerArea && targetDistance < catchThreshold && !ballCaughtAttacker) {
+		if(ballInAttackerArea && Math.abs(targetDistance)< catchThreshold && !ballCaughtAttacker) {
             //System.out.println("Catching: "+ballDistance);
             catch_ball = true;
         }
@@ -139,11 +139,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			//System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
-		}else if(targetDistance < catchThreshold && angleDiffToTeamMate > angleTollerance){
+		}else if(Math.abs(targetDistance) < catchThreshold && Math.abs(angleDiffToTeamMate) > angleTollerance){
 			rotate = true;
 			angleDifference = angleDiffToTeamMate;
-		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate < angleTollerance)){
+		}else if((Math.abs(targetDistance)< catchThreshold) && (Math.abs(angleDiffToTeamMate) < angleTollerance)){
 			this.isReady = true;
+			System.out.println("The robot has reahced the desired position");
 		}
 		
 		

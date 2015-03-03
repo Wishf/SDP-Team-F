@@ -98,7 +98,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		//boolean should_move = false;
 		boolean rotate = false;
 		double targetAngle;		
-		boolean facingTeamMate;
+		//boolean facingTeamMate;
 		
 		/*double angleRR = defenderOrientation;
 		double dx = ballX2 - defenderRobotX;
@@ -176,11 +176,11 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			//System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
-		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate > angleTollerance)){
+		}else if((Math.abs(targetDistance) < catchThreshold) && (Math.abs(angleDiffToTeamMate) > angleTollerance)){
 			rotate = true;
 			angleDifference = angleDiffToTeamMate;
 			
-		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate < angleTollerance)){
+		}else if((Math.abs(targetDistance) < catchThreshold) && (Math.abs(angleDiffToTeamMate) < angleTollerance)){
 			this.isReady = true;
 		}
 		
