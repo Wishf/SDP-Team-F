@@ -52,15 +52,24 @@ public class HolonomicRobotController extends BaseRobotController {
     public DrivePacket rotate(int angle, int speed){
     	System.out.println("Rotate: "+angle);
     	
-    	double turnAngle = angle * TURN_RATIO;
+    	angle = -angle;
+    	
+    	double a = 0.8;
+    	double b = 60;
+    	double turnAngle = a*Math.abs(angle) + b;
+    	
+    	turnAngle = Math.min(255, turnAngle);
+    		   	
+    	//double powerScale = 0.9;//Math.min(1, angle+90/180);
     	
     	
     	
-    	double powerScale = 0.9;//Math.min(1, angle+90/180);
     	//TODO: calculate the speed actually
-    	byte motor1power = (byte) (150*powerScale);
-    	byte motor2power = (byte) (150*powerScale);
-    	byte motor3power = (byte) (150*powerScale);
+    	byte motor1power = (byte) turnAngle;
+    	byte motor2power = (byte) turnAngle;
+    	byte motor3power = (byte) turnAngle;
+    	System.out.println("power:"+motor1power);
+        
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
@@ -73,23 +82,28 @@ public class HolonomicRobotController extends BaseRobotController {
     		rightMotorDir = DriveDirection.FORWARD;
     	}
     	
+    	//System.out.println("motor1power:"+motor1power+" leftMotorDir:"+leftMotorDir+" motor2power:"+motor2power
+    			//+" rightMotorDir:"+rightMotorDir+" motor3power:"+motor3power+" rightMotorDir:"+rightMotorDir);
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
     			motor3power, rightMotorDir,
-                500);
+                150);
     }
     
     
     
-    public DrivePacket travel(int distance, int travelSpeed){
+    public DrivePacket travel(int distance){
     	
     	System.out.println("Travel: "+distance);
-    	int millis = Math.abs(Math.round(distance * msPerMm[0]));
+    	
+    	double a = 0.5, b = 50;
+    	double power = a*distance +b;
+    	power = Math.min(255, power);
     	
     	//TODO: calculate the speed actually
-    	byte motor1power = (byte) 255;
-    	byte motor2power = (byte) 255;
+    	byte motor1power = (byte) power;
+    	byte motor2power = (byte) power;
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
@@ -106,22 +120,26 @@ public class HolonomicRobotController extends BaseRobotController {
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
     			(byte) 0, DriveDirection.FORWARD,
-                5000);
+                150);
     	
     }
     
     
-public DrivePacket travelSideways(int distance, int travelSpeed){
+public DrivePacket travelSideways(int distance){
     	
-    	System.out.println("Travel sideways: "+distance+" "+travelSpeed);
-    	int millis = Math.abs(Math.round(distance * msPerMm[2]));
+    	System.out.println("Travel sideways: "+distance);
     	
-    	//TODO: calculate the speed actually
-    	double powerScaling = 1;//Math.min(1, Math.abs(distance) / 50);
     	
-    	byte motor1power = (byte) 0;
-    	byte motor2power = (byte) 0;
-    	byte motor3power = (byte) Math.max(100, (255 * powerScaling));
+    	double a = 0.5, b = 50;
+    	double power = a*distance +b;
+    	power = Math.min(255, power);
+    	
+    	
+    	double arcCorrectionCoef = 0.1;
+    	
+    	byte motor1power = (byte) (power*arcCorrectionCoef);
+    	byte motor2power = (byte) (power*arcCorrectionCoef);
+    	byte motor3power = (byte) power;
     	
     	System.out.println(motor3power);
     	
@@ -130,8 +148,12 @@ public DrivePacket travelSideways(int distance, int travelSpeed){
     	DriveDirection rearMotorDir;
     	
     	if(distance > 0){
+    		leftMotorDir = DriveDirection.FORWARD;
+        	rightMotorDir = DriveDirection.BACKWARD;
     		rearMotorDir = DriveDirection.FORWARD;
     	} else {
+    		leftMotorDir = DriveDirection.BACKWARD;
+        	rightMotorDir = DriveDirection.FORWARD;
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
 

@@ -13,7 +13,7 @@ public class ControlBox implements WorldStateControlBox {
     private boolean avoid = true;
     private boolean isDefenderReady = false;
     private int curr_Y = -1;
-    private boolean orth = false;
+    private boolean orth = true;
     private Point2 attPos = new Point2(0, 0);
     private Point2 defPos = new Point2(0, 0);
     private boolean comp = false;

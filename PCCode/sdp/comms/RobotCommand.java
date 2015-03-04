@@ -110,9 +110,9 @@ public class RobotCommand {
 		private int distance;
 		private int travelSpeed;
 		
-		public Travel(int distance, int travelSpeed) {
+		public Travel(int distance) {
 			this.distance = distance;
-			this.travelSpeed = travelSpeed;
+			//this.travelSpeed = travelSpeed;
 		}
 		
 		@Override
