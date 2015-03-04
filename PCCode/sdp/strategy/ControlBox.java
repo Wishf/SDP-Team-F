@@ -13,10 +13,10 @@ public class ControlBox implements WorldStateControlBox {
     private boolean avoid = true;
     private boolean isDefenderReady = false;
     private int curr_Y = -1;
-    private boolean orth = false;
+    private boolean orth = true;
     private Point2 attPos = new Point2(0, 0);
     private Point2 defPos = new Point2(0, 0);
-    private boolean computed = false;
+    private boolean comp = false;
    
     //If it has already been computed and still works, just return the value.
     //If not, compute a new one based on the position of the enemies attacker.
@@ -62,6 +62,7 @@ public class ControlBox implements WorldStateControlBox {
           /*Passing at non orhtogonal angles would be done here for proper play, however the intereface and the interraction should be updated for this to
            * work.*/  
       }
+      comp = true;
     };
 
     //This may need to add a delta range depending if it is possible to move with 1 unit precision.
@@ -105,10 +106,15 @@ public class ControlBox implements WorldStateControlBox {
     }
 
     public void reset(){
-      computed = false;
+      comp = false;
       isDefenderReady = false;
       attPos = new Point2(0, 0);
       defPos = new Point2(0, 0);
+    }
+    
+    public boolean computed(){
+    	return comp;
+    	
     }
 
 }

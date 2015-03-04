@@ -13,6 +13,7 @@ import sdp.vision.gui.tools.AlignmentTool;
 import sdp.vision.gui.tools.ColourThresholdConfigTool;
 import sdp.vision.gui.tools.HistogramTool;
 import sdp.vision.gui.tools.PitchModelView;
+import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.vision.gui.tools.StrategySelectorTool;
 import sdp.vision.recognisers.BallRecogniser;
 import sdp.vision.recognisers.RobotRecogniser;
@@ -122,7 +123,11 @@ public class RunVision {
 			AlignmentTool alignmentTool = new AlignmentTool(gui);
 			gui.addTool(alignmentTool, "Alignment");
 			vision.addRecogniser(alignmentTool.new FrameDisplay());
+			
+			RobotDebugWindow debugWindow = new RobotDebugWindow(gui, strategyController);
+			gui.addTool(debugWindow, "Debug Window");
 
+            // Add receiver to wait for the mouse click
 			vStream.addReceiver(pmvTool);
 			vStream.addReceiver(distortionFix);
 			vStream.addReceiver(vision);

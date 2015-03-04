@@ -16,6 +16,7 @@ import sdp.vision.interfaces.VideoReceiver;
 
 /**
  * Class to remove barrel distortion
+ * One of the receiver of video stream
  * 
  * @author Rado
  * @author James Hulme

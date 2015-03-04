@@ -101,7 +101,7 @@ public class GeneralStrategy implements Strategy {
 			angleDifference -= 360;
 		}
 		
-		return targetAngle;
+		return angleDifference;
 	}
 	
 

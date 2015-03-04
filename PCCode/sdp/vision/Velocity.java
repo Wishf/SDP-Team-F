@@ -1,5 +1,6 @@
 package sdp.vision;
 
+// This class is not used now
 public class Velocity {
 
 	private float x,y;

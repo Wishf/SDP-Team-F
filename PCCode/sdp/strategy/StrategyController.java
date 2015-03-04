@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 500; //100; // TODO: Test lower values for this and see where it breaks
+	public static final int STRATEGY_TICK = 50; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
 		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B
@@ -42,8 +42,8 @@ public class StrategyController implements WorldStateReceiver {
 
 	public StrategyController() {
 		this.bcsTemp = new Object();
-		this.bcsAttacker = new BrickCommServer();
-        this.bcsDefender = new BrickCommServer();
+		this.bcsAttacker = new BrickCommServer("attacker");
+        this.bcsDefender = new BrickCommServer("deffender");
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
 		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
@@ -130,9 +130,9 @@ public class StrategyController implements WorldStateReceiver {
             ats.startControlThread();
             break;
         case MILESTONE_TWO_B:
-            //Strategy ats = new LateNightAttackerStrategy(this.bcsDefender);
-            //StrategyController.currentStrategies.add(ats);
-           // ats.startControlThread();
+            ats = new TestStrategy(this.bcsAttacker);
+            StrategyController.currentStrategies.add(ats);
+            ats.startControlThread();
             break;
 		case DO_NOTHING:
 			byte stop = 0;
@@ -168,12 +168,12 @@ public class StrategyController implements WorldStateReceiver {
 			}
 			break;
 		case MARKING:
-			Strategy newMar = new newMarkingStrategy(this.bcsAttacker);
-			ics = new InterceptorStrategy(this.bcsDefender);
+			/*Strategy newMar = new newMarkingStrategy(this.bcsAttacker);
+			Strategy ics = new InterceptorStrategy(this.bcsDefender);
 			StrategyController.currentStrategies.add(newMar);
 			StrategyController.currentStrategies.add(ics);
 			newMar.startControlThread();
-			ics.startControlThread();
+			ics.startControlThread();*/
 			break;
 		default:
 			break;

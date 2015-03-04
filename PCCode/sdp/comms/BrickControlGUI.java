@@ -79,7 +79,7 @@ public class BrickControlGUI extends JFrame implements KeyListener {
 	}
 
 	public static void main(String[] args) {
-		BrickCommServer bcs = new BrickCommServer();
+		BrickCommServer bcs = new BrickCommServer("yola");
 		// BrickControlGUI.guiConnect(bcs, BtInfo.MEOW);
 		BrickControlGUI client = new BrickControlGUI(bcs);
 		client.setVisible(true);

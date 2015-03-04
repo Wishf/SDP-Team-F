@@ -51,4 +51,5 @@ public interface WorldStateControlBox {
   
     //Resets the the positions and ready flags, also the internal state.
     public void reset();
+    public boolean computed();
 }

@@ -55,6 +55,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		//WorldStateControlBox controlBox = worldState.getControlBox();
 		
 		//get the best "passing destinations"for each robot
+		ControlBox.controlBox.computePositions(worldState);
 		Point2 defDestination = ControlBox.controlBox.getDefenderPosition();
 		Point2 attDestination = ControlBox.controlBox.getAttackerPosition();
 		
@@ -63,6 +64,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		boolean ballInAttackerArea = false;
 		if (ballX > leftCheck && ballX < rightCheck) {
 			ballInAttackerArea = true;
+			System.out.println("This is an attacker robot and the ball is at: " + ballX);
 		}
 		boolean ballInDefenderArea = (ballX < defenderCheck == worldState.weAreShootingRight);
 		
@@ -97,7 +99,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		//boolean should_move = false;
 		boolean rotate = false;
 		double targetAngle;		
-		boolean facingTeamMate;
+		//boolean facingTeamMate;
 		
 		/*double angleRR = defenderOrientation;
 		double dx = ballX2 - defenderRobotX;
@@ -175,11 +177,11 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			//System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
-		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate > angleTollerance)){
+		}else if((Math.abs(targetDistance) < catchThreshold) && (Math.abs(angleDiffToTeamMate) > angleTollerance)){
 			rotate = true;
 			angleDifference = angleDiffToTeamMate;
 			
-		}else if((targetDistance < catchThreshold) && (angleDiffToTeamMate < angleTollerance)){
+		}else if((Math.abs(targetDistance) < catchThreshold) && (Math.abs(angleDiffToTeamMate) < angleTollerance)){
 			this.isReady = true;
 		}
 		
@@ -216,6 +218,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 			
 			 if(rotate) {
+				    System.out.println("D: ");
 					this.controlThread.operation.op = Operation.Type.DEFROTATE;
 					controlThread.operation.rotateBy = (int) (angleDifference);
 				}
@@ -232,15 +235,13 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 					//System.out.println("Uncatch");
 					this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
 				}
-				else if(catch_ball){
-					System.out.println("Catch");
-					this.controlThread.operation.op = Operation.Type.DEFCATCH;
-				}
+				
 				else if(move_back) {
 					this.controlThread.operation.op = Operation.Type.DEBACK;
 					controlThread.operation.travelDistance = (int) Math.min(-10, -(40-Math.abs(checkDx)));
 				}
 				else if(move_robot) {
+					System.out.println("D: ");
 					this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 					controlThread.operation.travelDistance = (int) targetDistance;
 				}
@@ -269,8 +270,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
 					}
-					System.out.println("operation: " + op + " rotateBy: "
-							 + rotateBy + " travelDist: " + travelDist);
+					
 					switch (op) {
 					case DEFROTATE:
 						if (rotateBy != 0) {
@@ -281,8 +281,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
 							brick.execute(new RobotCommand.Travel(
-									travelDist / 3,
-									Math.abs(travelDist) * 3 + 25));
+									travelDist));
 						}
 						break;
 					case DESIDEWAYS:
@@ -295,7 +294,6 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 					case DEBACK:
 						if (travelDist != 0) {
 							brick.execute(new RobotCommand.Travel(
-									travelDist,
 									travelDist));
 						}
 						break;
