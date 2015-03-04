@@ -230,9 +230,9 @@ int tacho(int motor)
 
 int diff_scale(int diff)
 {
-  double deadzone = 3;
+  double deadzone = 2;
   double b = 0;
-  double c = 1;
+  double c = 3;
 
   if(abs(diff) < deadzone){
     return 0;

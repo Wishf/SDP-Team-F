@@ -123,13 +123,16 @@ public class StrategyController implements WorldStateReceiver {
         	radio.sendPacket(new DisengageCatcherPacket());
             //Strategy ics = new DefenderStrategy(this.bcsDefender);
         	Strategy ics = new LateNightDefenderStrategy(this.bcsDefender);
+        	Strategy ats = new LateNightAttackerStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ics);
+            StrategyController.currentStrategies.add(ats);
             ics.startControlThread();
+            ats.startControlThread();
             break;
         case MILESTONE_TWO_B:
-            Strategy ats = new LateNightAttackerStrategy(this.bcsDefender);
-            StrategyController.currentStrategies.add(ats);
-            ats.startControlThread();
+            //Strategy ats = new LateNightAttackerStrategy(this.bcsDefender);
+            //StrategyController.currentStrategies.add(ats);
+           // ats.startControlThread();
             break;
 		case DO_NOTHING:
 			byte stop = 0;
