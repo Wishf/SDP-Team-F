@@ -27,11 +27,10 @@ public class Radio {
     }
 
     public static String[] getPortNames() {
-        SingletonDebugWindow debugWindow = new SingletonDebugWindow();
-        debugWindow.addDebugInfo("Serial Ports available on this computer: ");
+        System.out.println("Serial Ports available on this computer: ");
         String [] serialPorts = SerialPortList.getPortNames();
         for (int i=0; i<serialPorts.length; i++) {
-            debugWindow.addDebugInfo("[" + i + "]  " + serialPorts[i]);
+        	System.out.println("[" + i + "]  " + serialPorts[i]);
         }
         return serialPorts;
     }

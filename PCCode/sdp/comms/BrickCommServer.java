@@ -48,7 +48,7 @@ public class BrickCommServer implements PacketListener {
         String[] serialPorts = Radio.getPortNames();
         
         //Now get an input from the user as to which port they want to use.
-        System.out.println(name+" port: ");
+        System.out.println("Pick the connection for " + name + " port: ");
         Scanner userChoiceInput = new Scanner(System.in);
         int portNum = userChoiceInput.nextInt();
         while (!(portNum >= 0 && portNum < serialPorts.length)) {

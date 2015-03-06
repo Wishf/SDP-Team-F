@@ -45,7 +45,7 @@ public class StrategyController implements WorldStateReceiver {
 	public StrategyController() {
 		this.bcsTemp = new Object();
 		this.bcsAttacker = new BrickCommServer("attacker");
-        this.bcsDefender = new BrickCommServer("deffender");
+        this.bcsDefender = new BrickCommServer("defender");
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
 		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
