@@ -17,6 +17,7 @@ bool ON = true;
 // This variable is true if any of the motors are running
 bool motorsIdle = false;
 
+// This variable is true if a packet has been recieved that changes the state of the motors
 bool motorsChanged = false;
 
 // This is the ports that the main drive motors are assigned to
