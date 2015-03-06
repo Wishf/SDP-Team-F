@@ -7,12 +7,6 @@ import sdp.util.DriveDirection;
 import sdp.control.HolonomicRobotController;
 
 public class RobotCommand {
-    private static byte FORWARD_SPEED = (byte) 200;
-    private static byte BACKWARD_SPEED = (byte) 200;
-    private static byte STOP_SPEED = (byte) 0;
-    private static int TIME_TO_MOVE_90_DEGREES = 500;
-    private static byte ROTATION_SPEED = (byte) 150;
-    
     private static HolonomicRobotController robotController = new HolonomicRobotController(null, false, 40,40,40);
     
 	private RobotCommand() {		
@@ -29,6 +23,8 @@ public class RobotCommand {
 		@Override
 		public void sendToBrick(Radio radio)
 				throws IOException {
+			Packet opcode = getOpcode();		
+			
 			radio.sendPacket(getOpcode());
 		}
 	}
@@ -45,16 +41,11 @@ public class RobotCommand {
 	}
 
 	public static class Kick extends GenericCommand {
-		private byte speed;
-
-		public Kick(int speed) {
-			// The speed parameter is in percent, so we can scale it by multipling against 255
-			this.speed = (byte)Math.round((speed / 100f) * 255);
-		}
+		public Kick() {}
 
 		@Override
 		protected Packet getOpcode() {
-			return new KickPacket(speed);
+			return new KickPacket();
 		}
 	}
 
@@ -66,90 +57,56 @@ public class RobotCommand {
 	}
 
 	public static class Rotate extends GenericCommand {
-		private int angle;
-        private DriveDirection direction;
-		private byte speed;
+		private double angle;
 
-		public Rotate(int angle, int speed, boolean immediateReturn){
-            
+		public Rotate(double angle){            
 			this.angle = angle;
-			// TODO: The speeds passed as parameters are tuned for group 9's robot; we'll need to scale them
-			this.speed = (byte)speed;
-		}
-		
-		public Rotate(int angle, int speed) {
-			this(angle, speed, true);
 		}
 
 		@Override
 		protected Packet getOpcode() {
-
-			return robotController.rotate(angle, speed);
+			return robotController.rotate(angle);
 		}
 	}
 
-	public static class TravelArc extends GenericCommand {
-		private double arcRadius;
-		private int distance;
-		private int speed;
-
-		public TravelArc(double arcRadius, int distance, int speed) {
-			this.arcRadius = arcRadius;
-			this.distance = distance;
-			this.speed = speed;
-		}
-
-		@Override
-		protected Packet getOpcode() {
-			return robotController.travelArc(arcRadius, distance, speed);
-		}
-
-	}
-
-	public static class Travel extends GenericCommand {
-		private int distance;
-		private int travelSpeed;
+	public static class Trave extends GenericCommand {
+		private double displacement;
 		
-		public Travel(int distance) {
-			this.distance = distance;
-			//this.travelSpeed = travelSpeed;
+		public Trave(double displacement) {
+			this.displacement = displacement;
 		}
 		
 		@Override
 		protected Packet getOpcode() {
-			return robotController.travel(distance, travelSpeed);
+			return robotController.travel(displacement);
 		}
 	}
 	
 	public static class TravelSideways extends GenericCommand {
-		private int distance;
-		private int travelSpeed;
+		private double distance;
 		
-		public TravelSideways(int distance, int travelSpeed) {
+		public TravelSideways(double distance) {
 			this.distance = distance;
-			this.travelSpeed = travelSpeed;
 		}
 		
 		@Override
 		protected Packet getOpcode() {
-			return robotController.travelSideways(distance, travelSpeed);
+			return robotController.travelSideways(distance);
 		}
 	}
 	
 	
-	
-	public static class Move extends GenericCommand {
-		private double dX, dY, dA;
+	public static class TravelDiagonally extends GenericCommand {
+		private double angle, distance;
 		
-		public Move(double dX, double dY, double dA) {
-			this.dX = dX;
-			this.dY = dY;
-			this.dA = dA;
+		public TravelDiagonally(double angle, double distance) {
+			this.angle = angle;
+			this.distance = distance;
 		}
 		
 		@Override
 		protected Packet getOpcode() {
-			return robotController.move(dX, dY, dA);
+			return robotController.travelDiagonally(angle, distance);
 		}
 	}
 	

@@ -13,6 +13,10 @@ bool ON = true;
 
 //Moving
 #define MOTOR_N 3
+
+// This variable is true if any of the motors are running
+bool motorsIdle = false;
+
 bool motorsChanged = false;
 
 // This is the ports that the main drive motors are assigned to
@@ -116,8 +120,7 @@ void setup() {
   comms.set_handler('N', engage_catcher);
   comms.set_handler('I', disengage_catcher);
 
-  comms.print("started");// transmit started packet
-  
+  comms.print("started\n");// transmit started packet
 }
 
 
@@ -145,7 +148,10 @@ void loop() {
   else
   {
     // Stop all motors if we're not accepting motion packets
-    motorAllStop();
+  	if(!motorsIdle){  
+    	motorAllStop();
+    	motorsIdle = true;
+    }
   } 
 }
 
@@ -156,9 +162,11 @@ void loop() {
 void moveMotor(int motor, int power){
   if(power > 0){
     motorForward(motor, power);
+    motorsIdle = false;
   }
   else if(power < 0){
     motorBackward(motor, -power);
+    motorsIdle = false;
   }
   else {
     motorStop(motor);
@@ -237,6 +245,7 @@ void doKick(){
   }
 }
 
+
 // This function updates the motor state machine, handling timeout and expiry of motions, as well as controlling
 // the drive motors
 void doMotors(){
@@ -288,7 +297,9 @@ void updateMotorPositions() {
   }
 }
 
+
 // COMMUNICATIONS
+
 
 // Responds to code 'D'
 // Tells robot to refuse movement packets
@@ -299,6 +310,7 @@ void deactivate(){
   ON = false;
 }
 
+
 // Responds to code 'A'
 // Tells robot to accept movement packets
 void activate() {
@@ -306,7 +318,11 @@ void activate() {
   comms.print("activated");
 
   ON = true;
+  
+  // Make sure the catcher is open on initialise
+  catchState = CATCH_STATE_DISENGAGE;
 }
+
 
 // Responds to code 'K'
 // Completes a full kick cycle
@@ -319,6 +335,7 @@ void kick() {
       kickState = KICK_STATE_START;
     }
 }
+
 
 // Responds to code 'M'
 // Activates motors at a given power and direction for at most a given number of milliseconds
@@ -355,6 +372,7 @@ void drive() {
 
   motorsChanged = true;
 }
+
 
 // Responds to code 'N'
 // Close catcher pincers

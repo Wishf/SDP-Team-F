@@ -41,9 +41,9 @@ public final class Calculations {
 	    a1_2 = Math.abs(v2-v1);
 	    a2_3 = Math.abs(v3-v2);
 	    acc_decay = a2_3 - a1_2;
-	   // System.out.println(a1_2);
-	    //System.out.println(a2_3);
-	    //System.out.println(acc_decay);
+	   // //System.out.println(a1_2);
+	    ////System.out.println(a2_3);
+	    ////System.out.println(acc_decay);
 		if(v1 - (a1_2 - acc_decay) > 0)
 			return v1 - (a1_2 - acc_decay);
 		else
@@ -126,10 +126,10 @@ public final class Calculations {
 			distances[0] = GetDistance(history.get(size - 4), history.get(size-3));
 			distances[1] = GetDistance(history.get(size - 3), history.get(size-2));
 			distances[2] = GetDistance(history.get(size - 2), history.get(size-1));
-			//System.out.println(String.format("%f %f %f",distances[0], distances[1], distances[2]));
+			////System.out.println(String.format("%f %f %f",distances[0], distances[1], distances[2]));
 			//Get predicted distance
 			float prediction = LinearPrediction(distances);
-			//System.out.println(prediction);
+			////System.out.println(prediction);
 			Point2 pred = GetPointViaDistance(prediction, history.get(size-2), history.get(size-1));
 			
 			
@@ -216,12 +216,12 @@ public final class Calculations {
 		float fl_choice_angle = (float) (Math.PI/2 - choice_angle);
 		float angle_to_turn = (float) (fl_choice_angle - (robotRad));
 		angle_to_turn = (float) Math.toDegrees(angle_to_turn);
-		System.out.println("left angle: " + Math.toDegrees(left_angle) + " right angle: " + Math.toDegrees(right_angle) + " choice angle: " + Math.toDegrees(choice_angle) + " fl_choice_angle: " + Math.toDegrees(fl_choice_angle) + " angle to turn: " + angle_to_turn);
+		//System.out.println("left angle: " + Math.toDegrees(left_angle) + " right angle: " + Math.toDegrees(right_angle) + " choice angle: " + Math.toDegrees(choice_angle) + " fl_choice_angle: " + Math.toDegrees(fl_choice_angle) + " angle to turn: " + angle_to_turn);
 		//the angle the robot needs to turn
 //		if(y3 == bottom_boundary)
-//			//System.out.println("Bouncing off bottom boundary |Angle to turn = "+angle_to_turn);
+//			////System.out.println("Bouncing off bottom boundary |Angle to turn = "+angle_to_turn);
 //		if(y3 == top_boundary)
-			//System.out.println("Bouncing off top boundary |Angle to turn = "+angle_to_turn);
+			////System.out.println("Bouncing off top boundary |Angle to turn = "+angle_to_turn);
 		*/
 		return (float)choice_angle;
 	}

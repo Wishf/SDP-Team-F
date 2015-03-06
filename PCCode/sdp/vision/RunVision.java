@@ -54,7 +54,7 @@ public class RunVision {
 		final PitchConstants pitchConstants = new PitchConstants(1);
 		final Pitch pitch = new Pitch(yamlConfig, pitchConstants);
 		WorldState worldState = new WorldState(pitch);
-
+		
 		DynamicWorldState dynamicWorldState = new DynamicWorldState();
 
 		// Default values for the main vision window
@@ -124,8 +124,8 @@ public class RunVision {
 			gui.addTool(alignmentTool, "Alignment");
 			vision.addRecogniser(alignmentTool.new FrameDisplay());
 			
-			RobotDebugWindow debugWindow = new RobotDebugWindow(gui, strategyController);
-			gui.addTool(debugWindow, "Debug Window");
+			RobotDebugWindow robotDebugWindow = new RobotDebugWindow(gui, strategyController);
+			gui.addTool(robotDebugWindow, "Robot Debug Window");
 
             // Add receiver to wait for the mouse click
 			vStream.addReceiver(pmvTool);

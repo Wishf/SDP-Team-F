@@ -63,6 +63,14 @@ unsigned short Communications::read_unsigned_short()
     return (top << 8) | bottom;
 }
 
+
+void Communications::println(int value)
+{
+    if(DEBUG){
+        Serial.println(value, DEC);
+    }
+}
+
 void Communications::print(int value)
 {
     if(DEBUG){
@@ -70,10 +78,25 @@ void Communications::print(int value)
     }
 }
 
+
+void Communications::println(unsigned short value)
+{
+    if(DEBUG){
+        Serial.print(value, HEX);
+    }
+}
 void Communications::print(unsigned short value)
 {
     if(DEBUG){
         Serial.print(value, HEX);
+    }
+}
+
+
+void Communications::println(char msg[])
+{
+    if(DEBUG){
+        Serial.println(msg);
     }
 }
 

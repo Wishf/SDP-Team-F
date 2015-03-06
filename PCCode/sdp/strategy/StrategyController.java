@@ -15,7 +15,8 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 50; //100; // TODO: Test lower values for this and see where it breaks
+	public static final int STRATEGY_TICK = 200;
+			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
 		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B
@@ -30,6 +31,7 @@ public class StrategyController implements WorldStateReceiver {
 	private BallLocation ballLocation;
 	private StrategyType currentStrategy = StrategyType.DO_NOTHING;
 	private boolean pauseStrategyController = true;
+	private TestStrategy ats;
 	
 	// Advanced Tactics flags
 	public static boolean confusionEnabled = false;
@@ -43,7 +45,7 @@ public class StrategyController implements WorldStateReceiver {
 	public StrategyController() {
 		this.bcsTemp = new Object();
 		this.bcsAttacker = new BrickCommServer("attacker");
-        this.bcsDefender = new BrickCommServer("deffender");
+        this.bcsDefender = new BrickCommServer("defender");
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
 		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
@@ -51,7 +53,7 @@ public class StrategyController implements WorldStateReceiver {
 			bcsAttacker = bcsDefender;
 			bcsDefender = (BrickCommServer) bcsTemp;
 		}
-        System.out.println();
+        //System.out.println();
 	}
 
 	public StrategyType getCurrentStrategy() {
@@ -120,9 +122,9 @@ public class StrategyController implements WorldStateReceiver {
             // With the obstacle, extended version
             break;
         case MILESTONE_TWO_A:
-        	radio.sendPacket(new DisengageCatcherPacket());
-            //Strategy ics = new DefenderStrategy(this.bcsDefender);
-        	Strategy ics = new LateNightDefenderStrategy(this.bcsDefender);
+        	//radio.sendPacket(new DisengageCatcherPacket());
+            Strategy ics = new DefenderStrategy(this.bcsDefender);
+        	//Strategy ics = new LateNightDefenderStrategy(this.bcsDefender);
         	Strategy ats = new LateNightAttackerStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ics);
             StrategyController.currentStrategies.add(ats);
@@ -133,6 +135,7 @@ public class StrategyController implements WorldStateReceiver {
             ats = new TestStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
+            
             break;
 		case DO_NOTHING:
 			byte stop = 0;

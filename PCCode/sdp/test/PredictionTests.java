@@ -93,15 +93,15 @@ public class PredictionTests {
 			if(data[2] != 0)
 				prediction = Calculations.LinearPrediction(data);
 			if(i > 1)
-				System.out.println("Prediction: "+prediction+" Actual distance: "+velocities[i-1]);
+				//System.out.println("Prediction: "+prediction+" Actual distance: "+velocities[i-1]);
 		}
 		*/
 		
 		//Point2 t_pred = Calculations.PredictNextPoint(travelPath);
-		//System.out.println(t_pred.getX()+" "+t_pred.getY());
+		////System.out.println(t_pred.getX()+" "+t_pred.getY());
 		//Linear prediction tests
 		//float[] trajectory1 = {10f, 8f, 7f, 6.75f }; 
-		//System.out.println(Calculations.LinearPrediction(trajectory1));
+		////System.out.println(Calculations.LinearPrediction(trajectory1));
 		
 		
 		//boundary prediction tests, Right side
@@ -109,9 +109,9 @@ public class PredictionTests {
 		Point2 r_1 = new Point2(5f,5f);
 		Point2 r_2 = new Point2(10f,10f);
 		Point2 corr = Calculations.CalculateBounceCoordinate(r_2, Calculations.CorrectionType.LEFT_OR_RIGHT, 7.5f);
-		System.out.println("X="+corr.getX()+" Y="+corr.getY());
+		//System.out.println("X="+corr.getX()+" Y="+corr.getY());
 		corr = Calculations.CalculateBounceCoordinate(r_2, Calculations.CorrectionType.TOP_OR_BOTTOM, 7.5f);
-		System.out.println("X="+corr.getX()+" Y="+corr.getY());
+		//System.out.println("X="+corr.getX()+" Y="+corr.getY());
 		*/
 		
 		Oracle tester = new Oracle(0, 1000, 0, 1000);
@@ -122,13 +122,13 @@ public class PredictionTests {
 		Point2 pred2 = Calculations.PredictNextPoint(singleSample);
 		
 		//float angle = Calculations.GetBounceAngle(-35.0f, -150.0f, 80f, -60f, -60.0f);
-		//System.out.println("Angle is: "+angle);
+		////System.out.println("Angle is: "+angle);
 		//System.out.print(pred2.getX() + " " + pred2.getY());
 		//System.out.print(pred.getX() + " " + pred.getY());
 		 /*
 		try {
 			String result = RunLinearPredictionAnalysis("/afs/inf.ed.ac.uk/user/s11/s1109056/Documents/test1.txt", tester);
-			System.out.println(result);
+			//System.out.println(result);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -191,8 +191,8 @@ public class PredictionTests {
 			
 			history.add(allPointSamples.get(i));
 			Point2 prediction = oracle.PredictState(history, 1);
-			System.out.println("Prediction X="+prediction.getX()+" Prediction Y="+prediction.getY());
-			System.out.println("Actual X="+allPointSamples.get(i+1).getX()+" Actual Y="+allPointSamples.get(i+1).getY());
+			//System.out.println("Prediction X="+prediction.getX()+" Prediction Y="+prediction.getY());
+			//System.out.println("Actual X="+allPointSamples.get(i+1).getX()+" Actual Y="+allPointSamples.get(i+1).getY());
 			//after each computation, compare against the actual velocity
 			float diff_x = Math.abs(prediction.getX() - allPointSamples.get(i+1).getX());
 			float diff_y = Math.abs(prediction.getY() - allPointSamples.get(i+1).getY());

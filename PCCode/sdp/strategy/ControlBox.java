@@ -11,13 +11,13 @@ public class ControlBox implements WorldStateControlBox {
     public static ControlBox controlBox = new ControlBox();
        
     private boolean avoid = true;
-    private boolean isDefenderReady = false;
+    private boolean isDefenderReady = true;
     private int curr_Y = -1;
     private boolean orth = true;
     private Point2 attPos = new Point2(0, 0);
     private Point2 defPos = new Point2(0, 0);
     private boolean comp = false;
-   
+    private ControlBox(){}
     //If it has already been computed and still works, just return the value.
     //If not, compute a new one based on the position of the enemies attacker.
     public int getOrthogonal(WorldState ws){
@@ -28,7 +28,7 @@ public class ControlBox implements WorldStateControlBox {
         if(oppY > pitchY/2.0){
             return (int)(oppY/2);
         } else {
-            return (int)((pitchY-oppY)/2);
+            return (int)(pitchY-(oppY/2));
         }
 
     }
@@ -50,14 +50,15 @@ public class ControlBox implements WorldStateControlBox {
 
     public void computePositions(WorldState ws) {
       if(!avoid){
-        //defPos = ws.getDefenderRobot();
-        //attPos = ws.getAttackerRobot();
+        float pitchY = ws.getPitch().getPitchHeight();
+        defPos = new Point2((int)(ws.getDefenderRobot().x), pitchY/2);
+        attPos = new Point2((int)(ws.getAttackerRobot().x), pitchY/2);
         return;
       }
       if(orth){
           int ypos = getOrthogonal(ws); 
-          defPos = new Point2(0, ypos);
-          attPos = new Point2(0, ypos);
+          defPos = new Point2((int)(ws.getDefenderRobot().x), ypos);
+          attPos = new Point2((int)(ws.getAttackerRobot().x), ypos);
       } else {
           /*Passing at non orhtogonal angles would be done here for proper play, however the intereface and the interraction should be updated for this to
            * work.*/  
@@ -113,8 +114,6 @@ public class ControlBox implements WorldStateControlBox {
     }
     
     public boolean computed(){
-    	return comp;
-    	
+        return comp;
     }
-
 }
