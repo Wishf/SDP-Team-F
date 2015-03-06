@@ -127,7 +127,6 @@ public class RunVision {
 			RobotDebugWindow robotDebugWindow = new RobotDebugWindow(gui, strategyController);
 			gui.addTool(robotDebugWindow, "Robot Debug Window");
 
-            // Add receiver to wait for the mouse click
 			vStream.addReceiver(pmvTool);
 			vStream.addReceiver(distortionFix);
 			vStream.addReceiver(vision);

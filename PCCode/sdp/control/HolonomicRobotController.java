@@ -54,11 +54,11 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	angle = -angle;
     	
-    	double a = 0.9;
-    	double b = 90;
+    	double a = 0.40;
+    	double b = 50;
     	double turnAngle = a*Math.abs(angle) + b;
     	
-    	turnAngle = Math.min( 200, Math.max(50, turnAngle));
+    	turnAngle = Math.min( 170, Math.max(50, turnAngle));
     		   	
     	//double powerScale = 0.9;//Math.min(1, angle+90/180);
     	
@@ -97,7 +97,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	//System.out.println("Travel: "+distance);
     	
-    	double a = 1.5, b = 80;
+    	double a = 0.9, b = 120;
     	double power = a*displacement +b;
     	power = Math.min(255, power);
     	

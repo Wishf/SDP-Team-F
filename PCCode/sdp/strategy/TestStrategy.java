@@ -54,21 +54,22 @@ public class TestStrategy extends GeneralStrategy {
 		double targetAngle = calcTargetAngle(dx, dy);
 		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		
-		if(Math.abs(angleDifference) < 10)
+		/*if(Math.abs(angleDifference) < 10)
 		{
 			angleDifference = 0;
 		}
 		if (Math.abs(angleDifference) < 30){
 			angleDifference = -angleDifference*0.3;
-		}
+		}*/
 			
 		double targetDistance = Math.sqrt(dx*dx+dy*dy);
 		boolean move_robot = false;
 		
 		
-		if(Math.abs(targetDistance) > 25) {
-			//move_robot = true;
-			////System.out.println("Need to move the robot since dY=" + dY);
+		if(Math.abs(targetDistance) > 15) {
+			move_robot = true;
+			
+			System.out.println("Need to move the robot since dY=" + targetDistance);
 		}//else if(targetDistance )
 		
 		
@@ -124,12 +125,12 @@ public class TestStrategy extends GeneralStrategy {
 									travelDist));
 						}
 						break;
-					case DEBACK:
+					/*case DEBACK:
 						if (travelDist != 0) {
 							brick.execute(new RobotCommand.Trave(
 									travelDist));
 						}
-						break;
+						break;*/
 					case DEFCATCH:
 						if((System.currentTimeMillis() - kickTime > 3000)){
 							brick.execute(new RobotCommand.Catch());
