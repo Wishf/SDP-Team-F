@@ -265,15 +265,17 @@ void doMotors(){
   }
 }
 
+// TACHOMETER
+
+// Tachometer positions
+int positions[ROTARY_COUNT] = {0};
+
 // Read tachometer readings for a given motor; indexed by port on the tachometer board
 // This function was created to abstract details before we had the tachometer code
 int tacho(int motor)
 {
   return positions[motor];
 }
-
-// Tachometer positions
-int positions[ROTARY_COUNT] = {0};
 
 // Get tachometer readings from tachometer board; taken from example code
 void updateMotorPositions() {
@@ -285,6 +287,8 @@ void updateMotorPositions() {
     positions[i] += (int8_t) Wire.read();  // Must cast to signed 8-bit type
   }
 }
+
+// COMMUNICATIONS
 
 // Responds to code 'D'
 // Tells robot to refuse movement packets
