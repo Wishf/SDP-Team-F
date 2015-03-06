@@ -3,7 +3,7 @@
 #include <Wire.h>
 
 
-#define DEBUG 1
+#define DEBUG 0
 #define PLAYER_POSITION 'Y'
 
 #define ROTARY_SLAVE_ADDRESS 5
@@ -11,6 +11,7 @@
 
 //Globals
 bool ON = true;
+bool motorsIdle = false;
 
 //Moving
 #define MOTOR_N 3
@@ -30,24 +31,17 @@ int positions[ROTARY_COUNT] = {0};
 #define ROTARY_COUNT 6
 
 //Kicking
-#define KICK_DELAY_MOVING_UP 250
-#define KICK_DELAY_UP 200
-#define KICK_DELAY_MOVING_DOWN 220
-
 #define KICK_STATE_IDLE 0
 #define KICK_STATE_START 1
-#define KICK_STATE_MOVING_UP 2
-#define KICK_STATE_UP 3
-#define KICK_STATE_MOVING_DOWN 4
+#define KICK_STATE_KICKING 
 
 #define KICK_MOTOR 5
 #define KICK_TACHOMETER 4
 #define KICK_TICKS_QUARTER 5
 #define KICK_MOTOR_DIR -1
 
-long kickStartTime;
 int kickState = KICK_STATE_IDLE;
-int kickPower = 0;
+int kickPower = 255;
 int kickerTachometerStart = 0;
 
 //Catch
@@ -58,8 +52,8 @@ int kickerTachometerStart = 0;
 #define CATCH_STATE_ENGAGE 2
 #define CATCH_STATE_OPERATING_ENGAGE 3
 #define CATCH_STATE_OPERATING_DISENGAGE 4
-//#define CATCH_STATE_ENGAGED 5
-//#define CATCH_STATE_DISENGAGE 6
+#define CATCH_STATE_CLOSED 5
+#define CATCH_STATE_OPEN 6
 
 #define CATCH_DISENGAGE_DIR 1
 #define CATCH_DISENGAGE_POWER 100
@@ -92,9 +86,11 @@ void setup() {
   comms.set_handler('Z', kicker_inc);
   comms.set_handler('X', kicker_dec);
 
-  comms.print("started");// transmit started packet
+  comms.print("started\n");// transmit started packet
   
   
+  comms.print("opening catcher\n");  
+  catchState = CATCH_STATE_DISENGAGE;
   
   
   
@@ -120,8 +116,11 @@ void loop() {
     doCatcher();
   }
   else
-  {    
-    motorAllStop();
+  { 
+  	if(!motorsIdle){  
+    	motorAllStop();
+    	motorsIdle = true;
+    }
   } 
 }
 
@@ -157,9 +156,9 @@ void doCatcher(){
   }
   else if(catchState == CATCH_STATE_OPERATING_ENGAGE){
      if(millis() - catchStartTime >= CATCH_ENGAGE_DELAY){
-       catchStartTime = millis();
+       catchLastCoughtTime = millis();
 
-       catchState = CATCH_STATE_IDLE;
+       catchState = CATCH_STATE_CLOSED;
 
        motorStop(CATCH_MOTOR);
      }
@@ -175,7 +174,7 @@ void doCatcher(){
       if(millis() - catchStartTime >= CATCH_DISENGAGE_DELAY){
        catchStartTime = millis();
 
-       catchState = CATCH_STATE_IDLE;
+       catchState = CATCH_STATE_OPEN;
 
        motorStop(CATCH_MOTOR);
      }
@@ -185,25 +184,31 @@ void doCatcher(){
 void doKick(){  
   if(kickState == KICK_STATE_START){
     kickerTachometerStart = tacho(KICK_TACHOMETER);
-    //comms.print("Tacho start: ");
-    //comms.print(kickerTachometerStart);
+    comms.print("Tacho start: ");
+    comms.println(kickerTachometerStart);
     
-    kickState = KICK_STATE_MOVING_UP;
+    kickState = KICK_STATE_KICKING;
     
     moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
   }
-  else if(kickState == KICK_STATE_MOVING_UP){
-    //comms.print(tacho(KICK_TACHOMETER));
-    //comms.print("\n");
-    //moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
-    
-    if(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) > KICK_TICKS_QUARTER){
+  else if(kickState == KICK_STATE_KICKING){   
+  		
+  	comms.println(tacho(KICK_TACHOMETER));
+  	
+  
+  	if(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) > KICK_TICKS_QUARTER){
       kickState = KICK_STATE_IDLE;
-    
+    	
+    	comms.println("Kick done");	
       motorStop(KICK_MOTOR); 
     }
   }
 }
+
+
+
+
+
 
 void doMotors(){
   int i = 0;

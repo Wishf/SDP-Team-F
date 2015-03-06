@@ -42,7 +42,7 @@ public class GeneralStrategy implements Strategy {
 	protected float defenderResetY;
 	protected float attackerResetX;
 	protected float attackerResetY;
-	protected boolean ballCaughtDefender;
+	protected boolean ballCaughtDefender = false;
 	protected boolean ballCaughtAttacker;
 	protected boolean attackerHasArrived;
 	protected boolean passingAttackerHasArrived;

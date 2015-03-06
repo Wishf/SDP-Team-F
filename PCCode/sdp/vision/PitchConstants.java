@@ -365,7 +365,7 @@ public class PitchConstants extends Observable {
 			}
 			pitchFile.close();
 
-			System.out.println("Wrote successfully!");
+			//System.out.println("Wrote successfully!");
 		} catch (IOException e) {
 			System.err.println("Cannot save constants file " + fileName + ":");
 			System.err.println(e.getMessage());

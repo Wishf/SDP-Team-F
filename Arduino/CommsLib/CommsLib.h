@@ -21,6 +21,11 @@ class Communications
         void print(int value);
         void print(unsigned short value);
         void print(char msg[]);
+	void println(int value);
+        void println(unsigned short value);
+        void println(char msg[]);
+        void send(char value);
+
         void send(char value);
         void loop();
     private:

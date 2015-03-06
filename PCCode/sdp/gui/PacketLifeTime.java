@@ -29,7 +29,7 @@ public class PacketLifeTime implements Runnable {
             e.printStackTrace();
         }
         SingletonRadio rad = new SingletonRadio("/dev/ttyACM0");
-        System.out.println(packet);
+        //System.out.println(packet);
         rad.sendPacket(packet);
     }
 }

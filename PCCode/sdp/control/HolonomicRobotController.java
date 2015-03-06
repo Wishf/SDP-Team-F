@@ -49,16 +49,16 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     //speed in degrees per second
-    public DrivePacket rotate(int angle, int speed){
-    	System.out.println("Rotate: "+angle);
+    public DrivePacket rotate(double angle){
+    	//System.out.println("Rotate:............... "+angle);
     	
     	angle = -angle;
     	
-    	double a = 0.8;
-    	double b = 60;
+    	double a = 0.9;
+    	double b = 90;
     	double turnAngle = a*Math.abs(angle) + b;
     	
-    	turnAngle = Math.min(255, turnAngle);
+    	turnAngle = Math.min( 200, Math.max(50, turnAngle));
     		   	
     	//double powerScale = 0.9;//Math.min(1, angle+90/180);
     	
@@ -68,7 +68,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	byte motor1power = (byte) turnAngle;
     	byte motor2power = (byte) turnAngle;
     	byte motor3power = (byte) turnAngle;
-    	System.out.println("power:"+motor1power);
+    	//System.out.println("power:"+motor1power);
         
     	
     	DriveDirection leftMotorDir;
@@ -82,23 +82,23 @@ public class HolonomicRobotController extends BaseRobotController {
     		rightMotorDir = DriveDirection.FORWARD;
     	}
     	
-    	//System.out.println("motor1power:"+motor1power+" leftMotorDir:"+leftMotorDir+" motor2power:"+motor2power
-    			//+" rightMotorDir:"+rightMotorDir+" motor3power:"+motor3power+" rightMotorDir:"+rightMotorDir);
+    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
+    			//"motor3power:" +motor3power);
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
-    			motor3power, rightMotorDir,
+    			motor3power, leftMotorDir,
                 150);
     }
     
     
     
-    public DrivePacket travel(int distance){
+    public DrivePacket travel(double displacement){
     	
-    	System.out.println("Travel: "+distance);
+    	//System.out.println("Travel: "+distance);
     	
-    	double a = 0.5, b = 50;
-    	double power = a*distance +b;
+    	double a = 1.5, b = 80;
+    	double power = a*displacement +b;
     	power = Math.min(255, power);
     	
     	//TODO: calculate the speed actually
@@ -108,13 +108,15 @@ public class HolonomicRobotController extends BaseRobotController {
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
     	
-    	if(distance > 0){
+    	if(displacement > 0){
     		leftMotorDir = DriveDirection.FORWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
+    	
+    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power);
 
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
@@ -125,9 +127,9 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     
-public DrivePacket travelSideways(int distance){
+public DrivePacket travelSideways(double distance){
     	
-    	System.out.println("Travel sideways: "+distance);
+    	//System.out.println("Travel sideways: "+distance);
     	
     	
     	double a = 0.5, b = 50;
@@ -141,7 +143,7 @@ public DrivePacket travelSideways(int distance){
     	byte motor2power = (byte) (power*arcCorrectionCoef);
     	byte motor3power = (byte) power;
     	
-    	System.out.println(motor3power);
+    	//System.out.println(motor3power);
     	
     	DriveDirection leftMotorDir = DriveDirection.FORWARD;
     	DriveDirection rightMotorDir = DriveDirection.FORWARD;
@@ -156,6 +158,9 @@ public DrivePacket travelSideways(int distance){
         	rightMotorDir = DriveDirection.FORWARD;
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
+    	
+    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
+    			//"motor3power:" +motor3power);
 
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
@@ -196,36 +201,18 @@ public DrivePacket travelSideways(int distance){
     }
     
     
-    public DrivePacket move(double dX, double dY, double dA){
-    	
-    	double c1 = 1;
-    	double c2 = 1;
-    	double c3 = 1;
-    	
-    	double vX = Math.min(1, Math.max(-1, Math.pow(dX*c1, 3)));
-    	double vY = Math.min(1, Math.max(-1, Math.pow(dY*c2, 3)));
-    	double vA = Math.min(1, Math.max(-1, Math.pow(dA*c3, 3)));
-    	
-    	
-    	double v1 = vX + vA;
-    	double v2 = vY + vA;
-    	double v3 = vX + vA;
-    	
-    	
-    	
-    	byte motor1power, motor2power, motor3power;
-    	DriveDirection motor1dir, motor2dir, motor3dir;
-    	
-    	
-    	
-    	return null;
-    	
-    	/*
-    	return new DrivePacket(
-    			motor1power, motor1dir, 
-    			motor2power, motor2dir,
-    			motor3power, motor3dir);
-    			*/
-    }
+    
+    
+    
+    /**
+     * Not yet implemented posibly never will be, don't account for it
+     * @param angle
+     * @param distance
+     * @return
+     */
+	public Packet travelDiagonally(double angle, double distance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

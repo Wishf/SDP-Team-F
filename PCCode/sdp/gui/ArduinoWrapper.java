@@ -31,7 +31,7 @@ public class ArduinoWrapper implements Runnable {
 
     public void sendCommand(String comm) {
         commandQueue.add(comm);
-        System.out.println("Got command "+comm);
+        //System.out.println("Got command "+comm);
     }
 
     private String getNextCommand() {

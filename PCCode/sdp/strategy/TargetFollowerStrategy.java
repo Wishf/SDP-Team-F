@@ -44,7 +44,7 @@ public class TargetFollowerStrategy implements WorldStateReceiver {
 		}
 
 		double ang1 = calculateAngle(robotX, robotY, robotO, ballX, ballY);
-		System.out.println("dist: " + dist + " angle: " + ang1);
+		//System.out.println("dist: " + dist + " angle: " + ang1);
 
 		double radius = Math.hypot(ballX - robotX, ballY - robotY) / 2;
 
@@ -121,14 +121,14 @@ public class TargetFollowerStrategy implements WorldStateReceiver {
 						radius = this.radius;
 					}
 
-					System.out.println("op: " + op.toString() + " travelDist: "
-							+ travelDist);
-
+					//System.out.println("op: " + op.toString() + " travelDist: "
+							//+ travelDist);
+					/*
 					switch (op) {
 					case DO_NOTHING:
 						break;
 					case TRAVEL:
-						brick.execute(new RobotCommand.Travel(travelDist, travelSpeed));
+						brick.execute(new RobotCommand.Trave(travelDist));
 						break;
 					// case ROTATE:
 					// brick.robotRotateBy(rotateBy, travelSpeed);
@@ -140,6 +140,7 @@ public class TargetFollowerStrategy implements WorldStateReceiver {
 						brick.execute(new RobotCommand.TravelArc(-radius, travelDist, travelSpeed));
 						break;
 					}
+					*/
 
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}

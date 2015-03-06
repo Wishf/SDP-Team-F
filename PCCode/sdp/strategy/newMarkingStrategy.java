@@ -114,8 +114,9 @@ public class newMarkingStrategy extends GeneralStrategy {
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
 					}
-//					System.out.println("operation: " + op + " rotateBy: "
-//							 + rotateBy + " travelDist: " + travelDist);
+//					
+					
+					/*
 					switch (op) {
 					case ATKROTATE:
 						if (rotateBy != 0) {
@@ -125,9 +126,8 @@ public class newMarkingStrategy extends GeneralStrategy {
 						break;
 					case ATKTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(
-									travelDist,
-									Math.abs(travelDist) * 10 + 25));
+							brick.execute(new RobotCommand.Trave(
+									travelDist));
 						}
 						break;
 					case DEFKICK:
@@ -140,6 +140,7 @@ public class newMarkingStrategy extends GeneralStrategy {
 					default:
 						break;
 					}
+					*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch (InterruptedException e) {

@@ -15,11 +15,13 @@ import java.util.Queue;
  */
 public class Radio {
     private SerialPort port;
+    private String portName;
     private List<PacketListener> listenerList;
 
     public Radio(String portName){
     	if(portName != null) {
     		port = new SerialPort(portName);
+    		this.portName = portName;
             listenerList = new LinkedList<PacketListener>();
     	}
     }
@@ -59,9 +61,10 @@ public class Radio {
 
     public void sendPacket(Packet packet) {
         try {
-        	//System.out.println(packet);
+        	////System.out.println(packet);
+        	////System.out.println(portName);
             packet.writePacket(port);
-            //System.out.println("Sent packet");
+            ////System.out.println("Sent packet");
         } catch (SerialPortException e) {
             e.printStackTrace();
         }
