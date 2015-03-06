@@ -80,12 +80,6 @@ public class RadioController implements SerialPortEventListener {
                         }
 
                         read = new KickPacket();
-                    } else if (peeked_id == ReadSensorPacket.ID) {
-                        if (buffer.elements() < ReadSensorPacket.Length) {
-                            break;
-                        }
-
-                        read = new ReadSensorPacket();
                     } else if (peeked_id == SensorDataPacket.ID) {
                         if (buffer.elements() < SensorDataPacket.Length) {
                             break;
