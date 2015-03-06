@@ -1,9 +1,5 @@
 package sdp.comms;
 
-import sdp.comms.packets.AttackerPacket;
-import sdp.comms.packets.DefenderPacket;
-import sdp.comms.packets.Packet;
-import sdp.comms.packets.PositionPacket;
 //import sun.nio.cs.Surrogate;
 
 import java.io.IOException;
@@ -21,11 +17,9 @@ import java.util.concurrent.ThreadFactory;
  * 		Rewrite the radio singleton so it is a "doubleton"
  * 		Rewrite BrickCommServer so it differentiates between the attacker and defender 
  */
-public class BrickCommServer implements PacketListener {
+public class BrickCommServer {
     Radio comm;
     private boolean connected;
-    //This is set once the connection is established and it receives a packet from the Arduino.
-    private Packet playerType;
 
     private ExecutorService executor;
     private List<StateChangeListener> stateChangeListeners;
@@ -56,9 +50,6 @@ public class BrickCommServer implements PacketListener {
             portNum = userChoiceInput.nextInt();
         }
         comm = new SingletonRadio(serialPorts[portNum]);
-        comm.addListener(this);
-        PositionPacket whatPosition = new PositionPacket();
-        comm.sendPacket(whatPosition);
     }
 
     public void connect() {
@@ -70,8 +61,6 @@ public class BrickCommServer implements PacketListener {
     public boolean isConnected() {
         return connected;
     }
-    public boolean isAttacker() { return playerType instanceof AttackerPacket; }
-    public boolean isIdentified() { return playerType != null; }
 
     private void setConnected(boolean connected) {
         if (this.connected != connected) {
@@ -123,13 +112,6 @@ public class BrickCommServer implements PacketListener {
         } catch (IOException e) {
             e.printStackTrace();
             close();
-        }
-    }
-
-    @Override
-    public void packetArrived(Packet p) {
-        if(p instanceof AttackerPacket || p instanceof DefenderPacket){
-            this.playerType = p;
         }
     }
 
