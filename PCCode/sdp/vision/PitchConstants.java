@@ -469,14 +469,17 @@ public class PitchConstants extends Observable {
 		// Pitch Dimensions
 		this.pitchBounds.setBounds(40, 40, 600, 400);
 
+        // Divide the pitch into four zones
 		this.dividers[0] = 70;
 		this.dividers[1] = 120;
 		this.dividers[2] = 170;
-		
+
+        // Set the range of left goal area
 		this.leftGoal[0] = 20;
 		this.leftGoal[1] = 30;
 		this.leftGoal[2] = 40;
-		
+
+        // Set the range of right goal area
 		this.rightGoal[0] = 20;
 		this.rightGoal[1] = 30;
 		this.rightGoal[2] = 40;

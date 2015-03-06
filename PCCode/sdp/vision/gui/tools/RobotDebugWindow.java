@@ -85,7 +85,7 @@ public class RobotDebugWindow implements GUITool {
 	@SuppressWarnings("serial")
 	public class DebugWindow extends JPanel {
 		private JLabel label = new JLabel();
-		private JTextField field = new JTextField(100);
+		private JTextField field = new JTextField("Robot says hi!");
 
 		public DebugWindow(String robot) {
 			this.add(label);

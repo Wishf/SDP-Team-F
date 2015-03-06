@@ -74,6 +74,7 @@ public class Vision implements VideoReceiver {
 	}
 
 	/**
+     * One of the receiver of video stream
 	 * Processes an input image, extracting the ball and robot positions and
 	 * robot orientations from it, and then displays the image (with some
 	 * additional graphics layered on top for debugging) in the vision frame.
@@ -93,11 +94,14 @@ public class Vision implements VideoReceiver {
 		debugGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
+		// draw the pitch area
 		int top = pitchConstants.getPitchTop();
 		int left = pitchConstants.getPitchLeft();
 		int right = left + pitchConstants.getPitchWidth();
 		int bottom = top + pitchConstants.getPitchHeight();
 		PixelInfo[][] pixels = new PixelInfo[VideoStream.FRAME_WIDTH][VideoStream.FRAME_HEIGHT];
+		
+		// read each point in pitch into pixels array
 		for (int row = top; row < bottom; row++) {
 			for (int column = left; column < right; column++) {
 				Color c = new Color(frame.getRGB(column, row));

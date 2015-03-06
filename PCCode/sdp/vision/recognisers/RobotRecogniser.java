@@ -201,6 +201,7 @@ public class RobotRecogniser implements ObjectRecogniser {
 			worldState.enemyDefenderNotOnPitch = blueDefNotOnPitch;
 		}
 
+        // Initialize the robots in world state
 		worldState.setAttackerRobot(attackerRobot);
 		worldState.setDefenderRobot(defenderRobot);
 		worldState.setEnemyAttackerRobot(enemyAttackerRobot);

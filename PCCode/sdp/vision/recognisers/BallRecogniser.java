@@ -42,6 +42,7 @@ public class BallRecogniser implements ObjectRecogniser {
 		logger = new sdp.logging.Logging();
 	}
 
+    // Draw the pitch, read each points in video frame into pixels array
 	@Override
 	public void processFrame(PixelInfo[][] pixels, BufferedImage frame,
 			Graphics2D debugGraphics, BufferedImage debugOverlay,
@@ -57,6 +58,7 @@ public class BallRecogniser implements ObjectRecogniser {
 				if (pixels[column][row] != null) {
 					if (vision.isColour(pixels[column][row],
 							PitchConstants.OBJECT_BALL)) {
+                        // If the pixel is red, add the pixel to ball array
 						ballPoints.add(new Position(column, row));
 						if (this.pitchConstants
 								.debugMode(PitchConstants.OBJECT_BALL)) {
