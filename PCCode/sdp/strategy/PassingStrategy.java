@@ -67,7 +67,7 @@ public class PassingStrategy extends GeneralStrategy {
 		float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
 		boolean ballIsMoving = Math.abs(ballX2 - ballX1) > 1
 				|| Math.abs(ballY2 - ballY1) > 1;
-	//	System.out.println("ball is moving: " + ballIsMoving);
+	//	//System.out.println("ball is moving: " + ballIsMoving);
 		float targetX = ballX;
 		float targetY = ballY;
 		int ballDistFromTop = (int) Math.abs(ballY
@@ -278,21 +278,21 @@ public class PassingStrategy extends GeneralStrategy {
 						this.controlThread.operation.op = Operation.Type.DEFKICK;
 					} else {
 						if (!defenderHasArrivedAtSafe && !defenderIsSafe) {
-						//	System.out.println("Ball is safe, make attacker safe");
+						//	//System.out.println("Ball is safe, make attacker safe");
 							this.controlThread.operation = travelTo(RobotType.DEFENDER,
 									defenderResetX, defenderResetY, 40);
 							if (this.controlThread.operation.op == Operation.Type.DO_NOTHING) {
 								defenderHasArrivedAtSafe = true;
 							}
 						} else {
-						//	System.out.println("Ball and robot are safe, catch ball");
+						//	//System.out.println("Ball and robot are safe, catch ball");
 							affectBallCaught = true;
 							this.controlThread.operation = catchBall(RobotType.DEFENDER);
 						}
 					}
 				} else {
 					if (!defenderHasArrivedAtSafe && !defenderIsSafe) {
-					//	System.out.println("Ball needs scooping, make attacker safe");
+					//	//System.out.println("Ball needs scooping, make attacker safe");
 						this.controlThread.operation = travelTo(RobotType.DEFENDER,
 								defenderResetX, defenderResetY, 40);
 						if (this.controlThread.operation.op == Operation.Type.DO_NOTHING) {
@@ -317,7 +317,7 @@ public class PassingStrategy extends GeneralStrategy {
 											RobotType.DEFENDER, targetX, targetY, 30);
 								}
 								if (ballIsOnSideEdge && ballIsOnSlopeEdge) {
-									//System.out.println("Ball in corner, scoup it out");
+									////System.out.println("Ball in corner, scoup it out");
 									this.controlThread.operation = travelToNoArcNoReverse(
 											RobotType.DEFENDER, targetX, targetY, 30);
 								}
@@ -328,12 +328,12 @@ public class PassingStrategy extends GeneralStrategy {
 											RobotType.DEFENDER, targetX, ballY, 40);
 								}
 								if (ballIsOnDefCheck) {
-								//	System.out.println("Ball on def check, grab it");
+								//	//System.out.println("Ball on def check, grab it");
 									this.controlThread.operation = travelToNoArcNoReverse(
 											RobotType.DEFENDER, targetX, ballY, 15);
 								}
 								if (ballIsOnDefCheck && ballIsOnSideEdge) {
-								//	System.out.println("Ball not catchable");
+								//	//System.out.println("Ball not catchable");
 									this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 								}
 								if (this.controlThread.operation.op == Operation.Type.DO_NOTHING) {
@@ -488,15 +488,16 @@ public class PassingStrategy extends GeneralStrategy {
 						rotateSpeed = this.operation.rotateSpeed;
 						radius = this.operation.radius;
 					}
-					// System.out.println("ball on def check: " +
+					// //System.out.println("ball on def check: " +
 					// ballIsOnDefCheck + " robot too close to goal: " +
 					// robotIsOnGoalLine + " Ball on slope Edge: "
 					// + ballIsOnSlopeEdge + " ball is on side edge: "
 					// + ballIsOnSideEdge + " Catcher is up: "
 					// + catcherIsUp + " ballIsOnGoalLine: " +
 					// ballIsOnGoalLine);
-					// System.out.println("ballCaught: " + ballCaughtDefender
+					// //System.out.println("ballCaught: " + ballCaughtDefender
 					// + " op: " + op);
+					/*
 					switch (op) {
 					case DO_NOTHING:
 						break;
@@ -505,8 +506,8 @@ public class PassingStrategy extends GeneralStrategy {
 								rotateBy, Math.abs(rotateBy)));
 						break;
 					case ATKTRAVEL:
-						attackerBrick.executeSync(new RobotCommand.Travel(
-								travelDist, travelSpeed));
+						attackerBrick.executeSync(new RobotCommand.Trave(
+								travelDist));
 						break;
 					case DEFCATCH:
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
@@ -530,7 +531,7 @@ public class PassingStrategy extends GeneralStrategy {
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
 							defenderBrick.execute(new RobotCommand.Rotate(25, 33, false));
 							defenderBrick.execute(new RobotCommand.Rotate(-33 , 1000, false));
-							defenderBrick.execute(new RobotCommand.Travel(-50, 10000));
+							defenderBrick.execute(new RobotCommand.Trave(-50));
 							defenderBrick.execute(new RobotCommand.Kick(100));
 							ballCaughtDefender = false;
 							lastKickerEventTime = System.currentTimeMillis();
@@ -539,7 +540,7 @@ public class PassingStrategy extends GeneralStrategy {
 					case DEFKICKSTRONG:
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
 							catcherIsUp = true;
-							defenderBrick.execute(new RobotCommand.Travel(-50, 100000));
+							defenderBrick.execute(new RobotCommand.Trave(-50));
 							if (Math.abs(defenderAngleToGoal) > 45) {
 								defenderBrick.execute(new RobotCommand.Kick(25));
 							}
@@ -552,18 +553,18 @@ public class PassingStrategy extends GeneralStrategy {
 								rotateBy, Math.abs(rotateBy)));
 						break;
 					case DEFTRAVEL:
-						defenderBrick.executeSync(new RobotCommand.Travel(
-								travelDist, travelSpeed));
+						defenderBrick.executeSync(new RobotCommand.Trave(
+								travelDist));
 						break;
 					case ROTATENMOVE:
-						attackerBrick.execute(new RobotCommand.Travel(
-								travelDist, travelSpeed));
+						attackerBrick.execute(new RobotCommand.Trave(
+								travelDist));
 						defenderBrick.execute(new RobotCommand.Rotate(rotateBy,
 								(byte)Math.abs(rotateBy)));
 						break;
 					case MOVENROTATE:
-						defenderBrick.executeSync(new RobotCommand.Travel(
-								travelDist, travelSpeed));
+						defenderBrick.executeSync(new RobotCommand.Trave(
+								travelDist));
 						attackerBrick.executeSync(new RobotCommand.Rotate(
 								rotateBy, Math.abs(rotateBy)));
 					case DEFARC_LEFT:
@@ -578,6 +579,7 @@ public class PassingStrategy extends GeneralStrategy {
 
 						break;
 					}
+					*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 

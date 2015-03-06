@@ -36,7 +36,7 @@ public class MarkingStrategy extends GeneralStrategy {
 
 	@Override
 	public void sendWorldState(WorldState worldState) {
-//		System.out.println("Marking");
+//		//System.out.println("Marking");
 		float robotX = worldState.getAttackerRobot().x;
 		float robotY = worldState.getAttackerRobot().y;
 		float robotO = worldState.getAttackerRobot().orientation_angle;
@@ -85,7 +85,7 @@ public class MarkingStrategy extends GeneralStrategy {
 				else if (Math.abs(robotToTargetAngle) > 150 || Math.abs(robotToTargetAngle) < 10) {
 					//Go in a straight line
 					this.controlThread.operation.op = Operation.Type.ATKTRAVEL;
-					//System.out.println("Straight line: " + targetY);
+					////System.out.println("Straight line: " + targetY);
 				} //Now we decide if we need to go left or right 
 				else if (robotToTargetAngle > 10) {
 					this.controlThread.operation.op = Operation.Type.ATKARC_LEFT;
@@ -108,19 +108,19 @@ public class MarkingStrategy extends GeneralStrategy {
 				if (robotO >= 0 && robotO <= 85) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
 					this.controlThread.operation.rotateBy = (int) (90 - robotO);
-				//	System.out.println("Rotating to align");
+				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 95 && robotO <= 179) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
 					this.controlThread.operation.rotateBy = (int) -(90 - robotO);
-				//	System.out.println("Rotating to align");
+				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 180 && robotO <= 265) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
 					this.controlThread.operation.rotateBy = (int) (270 - robotO);
-				//	System.out.println("Rotating to align");
+				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 275 && robotO <= 360) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
 					this.controlThread.operation.rotateBy = (int) -(270 - robotO);
-				//	System.out.println("Rotating to align");
+				//	//System.out.println("Rotating to align");
 				} else {
 					this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 				}
@@ -156,7 +156,7 @@ public class MarkingStrategy extends GeneralStrategy {
 						radius = this.operation.radius;
 					}
 
-
+					/*
 					switch (op) {
 					case DO_NOTHING:
 
@@ -169,7 +169,7 @@ public class MarkingStrategy extends GeneralStrategy {
 						}
 						break;
 					case ATKTRAVEL:
-						brick.executeSync(new RobotCommand.Travel(travelDist, travelSpeed));
+						brick.executeSync(new RobotCommand.Trave(travelDist));
 						break;
 					case ATKARC_LEFT:
 						brick.executeSync(new RobotCommand.TravelArc(radius, travelDist, travelSpeed));
@@ -183,6 +183,7 @@ public class MarkingStrategy extends GeneralStrategy {
 					default:
 						break;
 					}
+					*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch (InterruptedException e) {

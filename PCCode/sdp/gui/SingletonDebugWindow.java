@@ -17,7 +17,7 @@ public class SingletonDebugWindow {
 
     public void addDebugInfo(String info) {
         debugInfo.append(info + "\n");
-        System.out.println(info);
+        //System.out.println(info);
     }
 
     public JTextArea getTextArea() {

@@ -23,7 +23,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     public Milestone3AttackingStrategy(BrickCommServer brick) {
         this.brick = brick;
         this.controlThread = new ControlThread();
-        System.out.println("Starting.");
+        //System.out.println("Starting.");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         if (ballX > leftCheck && ballX < rightCheck) {
             ballInAttackerArea = true;
-            System.out.print("Hello Konrad. How are you doing? The ball is in my zone bro!");
+            //System.out.print("Hello Konrad. How are you doing? The ball is in my zone bro!");
         }
 
         boolean rotate = false;
@@ -68,12 +68,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         float ball_dy = ballY - attackerRobotY;
         
         if(!ballCaughtAttacker){
-        	System.out.print("I am after the ball. ");
+        	//System.out.print("I am after the ball. ");
             target = new Point2(ballX, ballY);
         
         }
         else {
-        	System.out.print("I am after some other target.");
+        	//System.out.print("I am after some other target.");
             target = our_goal;
         }
         
@@ -82,7 +82,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
-        System.out.println("My rotation angle is " + targetAngle);
+        ////System.out.println("My rotation angle is " + targetAngle);
         if(targetAngle < 0){
         	
             targetAngle += 360;
@@ -90,7 +90,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
         double angleDifference = (targetAngle - attackerOrientation) % 360;
 
-        System.out.println(angleDifference);
+       // //System.out.println(angleDifference);
         if(angleDifference < 0) {
             angleDifference += 360;
         }
@@ -99,8 +99,8 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             angleDifference -= 360;
         }
 
-        System.out.println("Ball position " + ballX + " - " + ballY);
-        if(Math.abs(angleDifference) > 40.0 ) {
+        ////System.out.println("Ball position " + ballX + " - " + ballY);
+        if(Math.abs(angleDifference) > 10.0 ) {
         	//System.out.print("At" + targetAngle + " Ao" + attackerOrientation);
             rotate = true;
         }
@@ -117,18 +117,18 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
  
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {
             catch_ball = true;
-            //System.out.println("L");
+            ////System.out.println("L");
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
         if(ballCaughtAttacker && ballDistance > 5*catchThreshold) {
-        	System.out.println("I've lost the ball!");
+        	////System.out.println("I've lost the ball!");
         	ballCaughtAttacker = false;
         }
         else if(ballCaughtAttacker && !kicked && ControlBox.controlBox.isDefenderReady()){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;
-            //System.out.println("K");
+            ////System.out.println("K");
         }
 
         boolean move_robot = false;
@@ -136,8 +136,8 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
         		|| (targetDistance > 25)) {
             move_robot = true;
-           // System.out.println("M");
-           //System.out.println("Need to move the robot since dY=" + ballDistance);
+           // //System.out.println("M");
+           ////System.out.println("Need to move the robot since dY=" + ballDistance);
         }
 
 
@@ -160,20 +160,20 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 controlThread.operation.rotateBy = (int) (angleDifference);
             } else if (catch_ball) {
-                System.out.println("Catch");
+                //System.out.println("Catch");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
             } else if (kick_ball) {
-                System.out.println("Kick");
+                //System.out.println("Kick");
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
             } else if (uncatch) {
-                System.out.println("Uncatch");
+                //System.out.println("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
             } else if (catch_ball) {
-                System.out.println("Catch");
+                //System.out.println("Catch");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-                controlThread.operation.travelDistance = 13;
+                controlThread.operation.travelDistance = (int) targetDistance;
             }
         }
 
@@ -198,44 +198,40 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                 while (true) {
                     Operation.Type op;
                     int rotateBy, travelDist;
-                    System.out.println("???");
+                    
                     synchronized (this) {
                         op = this.operation.op;
                         rotateBy = this.operation.rotateBy;
                         travelDist = this.operation.travelDistance;
                     }
-                    System.out.println("operation: " + op + " rotateBy: "
-                            + rotateBy + " travelDist: " + travelDist);
+                    //System.out.println("operation: " + op);
                     switch (op) {
                         case DEFROTATE:
                             if (rotateBy != 0) {
                                 brick.executeSync(new RobotCommand.Rotate(
-                                        rotateBy, 100));
+                                        rotateBy));
                             }
                             break;
                         case DEFTRAVEL:
                             if (travelDist != 0) {
-                                brick.execute(new RobotCommand.Travel(
-                                        travelDist,
-                                        Math.abs(travelDist) * 3 + 25));
+                                brick.execute(new RobotCommand.Trave(
+                                        travelDist));
                             }
                             break;
                         case DESIDEWAYS:
                             if (travelDist != 0) {
                                 brick.execute(new RobotCommand.TravelSideways(
-                                        travelDist,
-                                        Math.abs(travelDist) * 3 + 25));
+                                        travelDist));
                             }
                             break;
                         case DEBACK:
                             if (travelDist != 0) {
-                                brick.execute(new RobotCommand.Travel(
-                                        travelDist,
+                                brick.execute(new RobotCommand.Trave(
                                         travelDist));
                             }
                         case DEFCATCH:
                             if((System.currentTimeMillis() - kickTime > 3000)){
-                                System.out.println("Catching");
+                                //System.out.println("Catching");
 
 
                                 brick.execute(new RobotCommand.Catch());
@@ -246,9 +242,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                             break;
                         case DEFKICK:
                             if((System.currentTimeMillis() - caughtTime > 1000)){
-                                System.out.println("Kicking");
+                                //System.out.println("Kicking");
 
-                                brick.execute(new RobotCommand.Kick(0));
+                                brick.execute(new RobotCommand.Kick());
                                 Thread.sleep(500);
                                 brick.execute(new RobotCommand.ResetCatcher());
 

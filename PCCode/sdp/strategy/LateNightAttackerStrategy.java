@@ -50,19 +50,23 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		MovingObject robot = worldState.getAttackerRobot();
 		
 		//get the best "passing destinations"for each robot
-		if(!ControlBox.controlBox.computed()){
+		/*if(!ControlBox.controlBox.computed()){
 			ControlBox.controlBox.computePositions(worldState);
+			//System.out.println("Robot destinations computed");
 		}
 		Point2 attackerPosition = ControlBox.controlBox.getAttackerPosition();
 		Point2 defenderPosition = ControlBox.controlBox.getDefenderPosition();
-		
+		*/
 		//boolean ballInDefenderArea = (ballX < defenderCheck == worldState.weAreShootingRight);
 		ballPositions.addLast(new Vector2f(ball.x, ball.y));
 		if (ballPositions.size() > 3)
 			ballPositions.removeFirst();
 		boolean ballInAttackerArea = false;
+		////System.out.println(" Ball is in att are : " + ballInAttackerArea);
 		if (ballX > leftCheck && ballX < rightCheck) {
 			ballInAttackerArea = true;
+			
+			//System.out.println(" Ball is in att area : " + ballInAttackerArea);
 		}
 		
 		Vector2f ball3FramesAgo = ballPositions.getFirst();
@@ -79,7 +83,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 				
 		// 1. Check if the robot needs to rotate
 		
-		//System.out.println("Orientation " + defenderOrientation + "; " + attackerOrientation);
+		////System.out.println("Orientation " + defenderOrientation + "; " + attackerOrientation);
 		boolean isTeamMateReady = ControlBox.controlBox.isDefenderReady();
 		boolean rotate = false;
 		double targetAngle;		
@@ -89,62 +93,66 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		double dx;
 		double dy;
 		
-		if(!ballCaughtAttacker && ballInAttackerArea){
+		//if(!ballCaughtAttacker && ballInAttackerArea){
 			dx = ballX2 - attackerRobotX;
-			dy = ballY2 - attackerRobotY;	
+			dy = ballY2 - attackerRobotY;
 			
 			targetAngle = calcTargetAngle(dx, dy);
-		}
+		//}
 		/*else if(!ballInAttackerArea){
 			dx = goalX - attackerRobotX;
 			dy = goalY[1] - attackerRobotY;
 			targetAngle = calcTargetAngle(dx, dy);
 			
 		}*/ 
-		else{
+		/*else{
 			dx = attackerPosition.getX()- attackerRobotX;
 			dy = attackerPosition.getY() - attackerRobotY;
 			targetAngle = calcTargetAngle(dx, dy);
-		}
+		}*/
 		
-		//System.out.println(targetAngle);
-		//System.out.println(defenderOrientation);
+		////System.out.println(targetAngle);
+		////System.out.println(defenderOrientation);
 		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		
 		
-		//System.out.println("Angle difference: "+angleDifference);
-		double angleTollerance = 25.0;
+		////System.out.println("Angle difference: "+angleDifference);
+		double angleTollerance = 20.0;
 		if(Math.abs(angleDifference) > angleTollerance ) {
 			rotate = true;
-			//System.out.println("Need to rotate the robot because orientation=" + defenderOrientation);
+			//System.out.println("We need to rotate " + angleDifference);
+			//System.out.println(".........................................................................." + defenderOrientation);
 			
 		}
 		
         //In this case ball distance is also the distance to the target position/destination
 		double targetDistance = Math.sqrt(dx*dx+dy*dy);
-		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderPosition.getX(), defenderPosition.getY());
+		double angleDiffToTeamMate = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderRobotX, defenderRobotY);
 		
-		double catchThreshold = 35;
+		double catchThreshold = 30;
 		boolean catch_ball = false;
 		boolean kick_ball = false;
 		boolean uncatch = false;
 		
-		//System.out.println("bds "+ballDistanceSq);
+		
+		////System.out.println("bds "+ballDistanceSq);
 		
 		if(ballInAttackerArea && Math.abs(targetDistance)< catchThreshold && !ballCaughtAttacker) {
-            //System.out.println("Catching: "+ballDistance);
+            ////System.out.println("Catching: "+ballDistance);
             catch_ball = true;
         }
-		else if(ballCaughtAttacker && !kicked && isTeamMateReady && !isBallPassed){
-			//System.out.println("Kicking");
+		else if(ballCaughtAttacker && !kicked && isReady){
+			////System.out.println("Kicking");
             // Here: need to check if the defender is ready and we don't need to move any further
 			kick_ball= true;			
-		}else if(Math.abs(targetDistance) < catchThreshold && Math.abs(angleDiffToTeamMate) > angleTollerance){
+		}else if(/*Math.abs(targetDistance) < catchThreshold*/ Math.abs(angleDiffToTeamMate) > angleTollerance && ballCaughtAttacker){
 			rotate = true;
 			angleDifference = angleDiffToTeamMate;
+			//System.out.println("We have reached the destination given by ControlBox");
 		}else if((Math.abs(targetDistance)< catchThreshold) && (Math.abs(angleDiffToTeamMate) < angleTollerance)){
 			this.isReady = true;
-			System.out.println("The robot has reahced the desired position");
+			kick_ball= true;
+			//System.out.println("The robot has reahced the desired position");
 		}
 		
 		
@@ -154,9 +162,10 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		boolean move_robot = false;
 		
 		
-		if(Math.abs(targetDistance) > 25) {
+		if(Math.abs(targetDistance) > 25 && ballInAttackerArea) {
 			move_robot = true;
-			//System.out.println("Need to move the robot since dY=" + dY);
+			//System.out.println("we need to move, Ball is in attacker area");
+			////System.out.println("Need to move the robot since dY=" + dY);
 		}//else if(targetDistance )
 		
 		
@@ -168,10 +177,11 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		
 		boolean move_back = false;
 		
-		double checkDx = defenderRobotX - defenderCheck;
-		//System.out.println(checkDx);
-		if(Math.abs(checkDx) < 40 ){
-			//move_back = true;
+		double checkAxRight = Math.abs(attackerRobotX - rightCheck);
+		double checkAxLeft = Math.abs(attackerRobotX - leftCheck);
+		////System.out.println(checkDx);
+		if(checkAxRight < 20  || checkAxLeft < 20){
+			move_back = true;
 			//System.out.println("Move back");
 		}
 		
@@ -188,29 +198,32 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		    if(rotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) (angleDifference);
+				rotate = false;
 			}
 			
 			else if(kick_ball){
-				//System.out.println("Kick");
+				////System.out.println("Kick");
 				this.controlThread.operation.op = Operation.Type.DEFKICK;
 				super.isBallPassed = true;
 			}
 			else if(uncatch){
-				//System.out.println("Uncatch");
+				////System.out.println("Uncatch");
 				this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
 			}
 			else if(catch_ball){
-				System.out.println("Catch");
+				//System.out.println("Catch");
 				this.controlThread.operation.op = Operation.Type.DEFCATCH;
+				ballCaughtAttacker = true;
+				
 			}
 			else if(move_back) {
 				this.controlThread.operation.op = Operation.Type.DEBACK;
-				controlThread.operation.travelDistance = (int) Math.min(-10, -(40-Math.abs(checkDx)));
+				controlThread.operation.travelDistance = (int) -40;
 			}
 			else if(move_robot) {
-				System.out.println("A: ");
+				//stem.out.println("A: ");
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-				controlThread.operation.travelDistance = 13;
+				controlThread.operation.travelDistance = (int) targetDistance;
 			}
 			
 		}
@@ -252,32 +265,31 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 					
 					case DEFROTATE:
 						if (rotateBy != 0) {
-						System.out.println("A: ");
+						//System.out.println("A: ");
 						brick.executeSync(new RobotCommand.Rotate(
-								rotateBy, Math.abs(rotateBy)));
+								rotateBy));
 						}
 						break;
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(
+							brick.execute(new RobotCommand.Trave(
 									travelDist));
 						}
 						break;
 					case DESIDEWAYS:
 						if (travelDist != 0) {
 							brick.execute(new RobotCommand.TravelSideways(
-									travelDist / 3,
-									Math.abs(travelDist) * 3 + 25));
+									travelDist));
 						}
 						break;
 					case DEBACK:
 						if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(
+							brick.execute(new RobotCommand.Trave(
 									travelDist));
 						}
 					case DEFCATCH:
 						if((System.currentTimeMillis() - kickTime > 3000)){
-							System.out.println("Catching");
+							//System.out.println("Catching");
 							
 							
 							brick.execute(new RobotCommand.Catch());
@@ -288,11 +300,9 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 						break;
 					case DEFKICK:
 						if((System.currentTimeMillis() - caughtTime > 1000)){
-							System.out.println("Kicking");
+							//System.out.println("Kicking");
 							
-							brick.execute(new RobotCommand.Kick(0));
-							Thread.sleep(500);
-							brick.execute(new RobotCommand.ResetCatcher());
+							brick.execute(new RobotCommand.Kick());
 							
 							kicked = true;
 							ballCaughtAttacker = false;

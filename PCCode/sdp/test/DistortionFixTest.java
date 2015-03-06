@@ -51,6 +51,6 @@ public class DistortionFixTest {
 	public static void main(String args[]) {
 		InputStream file = DistortionFixTest.class.getResourceAsStream("/resources/pitch.jpg");
 		DistortionFixTest dft = new DistortionFixTest(file);
-		System.out.println(dft.fixImage());
+		//System.out.println(dft.fixImage());
 	}
 }
