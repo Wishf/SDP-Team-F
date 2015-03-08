@@ -51,6 +51,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         boolean ballInDefenderArea = false;
         boolean ballInEnemyDefenderArea = false;
         boolean ballInEnemyAttackerArea = false;
+        boolean catch_ball = false;
+        boolean kick_ball = false;
+        boolean uncatch = false;
 
         if (ballX < defenderCheck == worldState.weAreShootingRight) {
             ballInDefenderArea = true;
@@ -81,23 +84,35 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 1. Catch the ball
             // 2. Ask the control box where to go.
             if(ballCaughtAttacker) {
-                target = ControlBox.controlBox.getAttackerPosition();
+            	ControlBox.controlBox.computePositions(worldState);
+                target = ControlBox.controlBox.getShootingPosition();
+                System.out.println("Ball attacker CB");
             } else {
                 target = new Point2(ballX, ballY);
+                System.out.println("Ball attacker b");
             }
 
         }
+        
         if(ballInDefenderArea) {
             // Rotate to face the defender and ask the control box what to do.
-            target = ControlBox.controlBox.getAttackerPosition();
+        	ControlBox.controlBox.computePositions(worldState);
+        	target = ControlBox.controlBox.getAttackerPosition();
+            System.out.println("Ball defender");
+            //Need to make sure we can catch the ball.
+            uncatch = true;
         }
+        
         if(ballInEnemyAttackerArea) {
             // Rotate to face the defender?
-
+        	System.out.println("Ball enemy attacker");
+        	target = new Point2(attackerRobotX, attackerRobotY);
         }
+        
         if(ballInEnemyDefenderArea) {
             // Follow the defender.
             target = new Point2(attackerRobotX, enemyAttackerRobotY);
+            System.out.println("Ball enemy defender");
         }
 
         boolean rotate = false;
@@ -109,28 +124,22 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         //float ballX1 = ball3FramesAgo.x, ballY1 = ball3FramesAgo.y;
         //float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
 
+        System.out.println("Going to " + target);
         float ball_dx = ballX - attackerRobotX;
         float ball_dy = ballY - attackerRobotY;
         
         dx = target.getX() - attackerRobotX;
         dy = target.getY() - attackerRobotY;
+        
+        double ballDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
+        double targetDistance = Math.sqrt(dx*dx + dy*dy);
+        double catchThreshold = 35;
+        
+        boolean move_robot = false;
 
-        targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
+        targetAngle = calcTargetAngle(dx,dy);
 
-        if(targetAngle < 0){
-        	
-            targetAngle += 360;
-        }
-
-        double angleDifference = (targetAngle - attackerOrientation) % 360;
-
-        if(angleDifference < 0) {
-            angleDifference += 360;
-        }
-
-        if(angleDifference > 180) {
-            angleDifference -= 360;
-        }
+        double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 
         ////System.out.println("Ball position " + ballX + " - " + ballY);
         if(Math.abs(angleDifference) > 10.0 ) {
@@ -138,12 +147,19 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             rotate = true;
         }
 
-        double ballDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
-        double targetDistance = Math.sqrt(dx*dx + dy*dy);
-        double catchThreshold = 35;
-        boolean catch_ball = false;
-        boolean kick_ball = false;
-        boolean uncatch = false;
+        if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
+        		|| (targetDistance > 25)) {
+            move_robot = true;
+        } 
+        
+        if(!move_robot && ballCaughtAttacker && ballInAttackerArea) {
+        	angleDifference = calcAngleDiff(attackerOrientation, ControlBox.controlBox.getShootingAngle());
+        	// If we dont have to move the robot anymore (it is in the shooting position)
+        	// we can try to rotate it to the shooting angle.
+        	if(Math.abs(angleDifference) > 10.0 ) {
+                rotate = true;
+            }
+        }
  
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {
             catch_ball = true;
@@ -153,16 +169,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         if(ballCaughtAttacker && ballDistance > 5*catchThreshold) {
         	ballCaughtAttacker = false;
         }
-        else if(ballCaughtAttacker && !kicked && ControlBox.controlBox.isDefenderReady()){
+        else if(ballCaughtAttacker && !kicked && !move_robot && !rotate){
+        	// We kick once we're ready. We don't need to wait for anyone.
             kick_ball = true;
         }
 
-        boolean move_robot = false;
-
-        if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
-        		|| (targetDistance > 25)) {
-            move_robot = true;
-        }
+        
         
 
         synchronized (this.controlThread) {
@@ -263,6 +275,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                                 kicked = true;
                                 ballCaughtAttacker = false;
                                 kickTime = System.currentTimeMillis();
+                                ControlBox.controlBox.reset();
                             }
                             break;
                         case DEFUNCATCH:

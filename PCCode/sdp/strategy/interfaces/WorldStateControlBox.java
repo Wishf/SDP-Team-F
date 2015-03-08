@@ -52,4 +52,10 @@ public interface WorldStateControlBox {
     //Resets the the positions and ready flags, also the internal state.
     public void reset();
     public boolean computed();
+    
+    // Returns the position from which to shoot (attacker).
+    public Point2 getShootingPosition();
+    
+    // Returns the angle from which the attacking robot needs to shoot.
+    public int getShootingAngle();
 }

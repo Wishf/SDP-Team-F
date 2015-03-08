@@ -116,4 +116,14 @@ public class ControlBox implements WorldStateControlBox {
     public boolean computed(){
         return comp;
     }
+	@Override
+	public Point2 getShootingPosition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public int getShootingAngle() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

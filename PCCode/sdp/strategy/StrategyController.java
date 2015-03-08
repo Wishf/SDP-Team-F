@@ -105,10 +105,10 @@ public class StrategyController implements WorldStateReceiver {
 			StrategyController.removedStrategies.add(s);
 		}
 		StrategyController.currentStrategies = new ArrayList<Strategy>();
-		SingletonRadio radio = new SingletonRadio("/dev/ttyACM0");
+		//SingletonRadio radio = new SingletonRadio("/dev/ttyACM0");
 		switch (type) {
 		case DO_SOMETHING:	
-			radio.sendPacket(new ActivatePacket());
+			//radio.sendPacket(new ActivatePacket());
 			
 			break;
         case MILESTONE_THREE_A:
@@ -146,7 +146,7 @@ public class StrategyController implements WorldStateReceiver {
 		case DO_NOTHING:
 			byte stop = 0;
 			DriveDirection fw = DriveDirection.FORWARD;
-			radio.sendPacket(new DrivePacket(stop, fw, stop, fw, stop, fw, 0));
+			//radio.sendPacket(new DrivePacket(stop, fw, stop, fw, stop, fw, 0));
 			break;
 		case PASSING:
 			Strategy ps = new PassingStrategy(this.bcsAttacker,
