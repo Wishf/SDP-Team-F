@@ -97,7 +97,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	//System.out.println("Travel: "+distance);
     	
-    	double a = 0.9, b = 120;
+    	double a = 1.5, b = 50;
     	double power = a*displacement +b;
     	power = Math.min(255, power);
     	
@@ -132,15 +132,15 @@ public DrivePacket travelSideways(double distance){
     	//System.out.println("Travel sideways: "+distance);
     	
     	
-    	double a = 0.9, b = 90;
+    	double a = 2, b = 50;
     	double power = a*distance +b;
     	power = Math.min(255, power);
     	
     	
-    	double arcCorrectionCoef = 0.1;
+    	double arcCorrectionCoef = 0.15;
     	
     	byte motor1power = (byte) (power*arcCorrectionCoef);
-    	byte motor2power = (byte) (power*0.03 - 50);
+    	byte motor2power = (byte) (power*arcCorrectionCoef);
     	byte motor3power = (byte) power;
     	
     	//System.out.println(motor3power);
