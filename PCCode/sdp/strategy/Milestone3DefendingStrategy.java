@@ -40,14 +40,17 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
     @Override
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
-
+        
+        ControlBox.controlBox.computePositions(worldState);
         Point2 our_goal = ControlBox.controlBox.getDefenderPosition();
+        ControlBox.controlBox.reset();
         MovingObject ball = worldState.getBall();
 
         boolean ballInDefenderArea = false;
         /*boolean ballNearDefenderArea = ballX + 10 < defenderCheck == worldState.weAreShootingRight 
          *  
          */
+        double angleToDefCheck = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
         ballPositions.addLast(new Vector2f(ball.x, ball.y));
         if (ballPositions.size() > 3)
             ballPositions.removeFirst();
@@ -126,8 +129,12 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
              
         
         if(!ballInDefenderArea){
-        	alignWithEnemyAttacker = true;        	
-        	if(enemyAttackerRobotY - defenderRobotY < 0 ){        
+        	alignWithEnemyAttacker = true;
+        	if(Math.abs(angleToDefCheck) > 15){
+        		rotate = true;
+        		angleDifference = angleToDefCheck;
+        	}
+        	else if(enemyAttackerRobotY - defenderRobotY < 0 ){        
         	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
         	}else {
         	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
@@ -153,8 +160,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         		rotate = true;
         		angleDifference = angleToTeamMate;
         	}
-        }
-        
+        }        
              
 
         if( (ballInDefenderArea && ballDistance > 25) 

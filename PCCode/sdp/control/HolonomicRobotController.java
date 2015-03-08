@@ -3,6 +3,7 @@ package sdp.control;
 import sdp.comms.Radio;
 import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
+import sdp.vision.gui.tools.RobotDebugWindow;
 
 /**
  * Created by Matthew on 09/02/2015.
@@ -55,19 +56,19 @@ public class HolonomicRobotController extends BaseRobotController {
     	angle = -angle;
     	
     	double a = 0.50;
-    	double b = 70;
+    	double b = 90;
     	double turnAngle = a*Math.abs(angle) + b;
-    	
-    	turnAngle = Math.min( 230, Math.max(50, turnAngle));
+    	   
+    	turnAngle = Math.min( 230,  turnAngle);
     		   	
     	//double powerScale = 0.9;//Math.min(1, angle+90/180);
     	
     	
     	
     	//TODO: calculate the speed actually
-    	byte motor1power = (byte) turnAngle;
-    	byte motor2power = (byte) turnAngle;
-    	byte motor3power = (byte) turnAngle;
+    	byte motor1power = (byte) 200;
+    	byte motor2power = (byte) 200;
+    	byte motor3power = (byte) 200;
     	//System.out.println("power:"+motor1power);
         
     	
@@ -75,20 +76,21 @@ public class HolonomicRobotController extends BaseRobotController {
     	DriveDirection rightMotorDir;
     	
     	if(angle > 0){
-    		leftMotorDir = DriveDirection.FORWARD;
+    		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	}
-    	
-    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
-    			//"motor3power:" +motor3power);
+    	RobotDebugWindow.messageAttacker.setMessage(motor1power + " ");
+    	System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
+    			"motor3power:" +motor3power);
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
     			motor2power, rightMotorDir, 
     			motor3power, leftMotorDir,
                 150);
+    	
     }
     
     
@@ -139,8 +141,8 @@ public DrivePacket travelSideways(double distance){
     	
     	double arcCorrectionCoef = 0.15;
     	
-    	byte motor1power = (byte) (power*arcCorrectionCoef);
-    	byte motor2power = (byte) (power*arcCorrectionCoef);
+    	byte motor1power = (byte) (power*0);//arcCorrectionCoef);
+    	byte motor2power = (byte) (power*0);//arcCorrectionCoef);
     	byte motor3power = (byte) power;
     	
     	//System.out.println(motor3power);
