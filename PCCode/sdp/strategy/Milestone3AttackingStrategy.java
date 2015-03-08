@@ -84,7 +84,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 1. Catch the ball
             // 2. Ask the control box where to go.
             if(ballCaughtAttacker) {
-            	ControlBox.controlBox.computePositions(worldState);
+            	ControlBox.controlBox.computeShot(worldState);
                 target = ControlBox.controlBox.getShootingPosition();
                 System.out.println("Ball attacker CB");
             } else {
