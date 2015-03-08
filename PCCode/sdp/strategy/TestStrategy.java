@@ -85,7 +85,7 @@ public class TestStrategy extends GeneralStrategy {
         //String message = String.valueOf(ballInEnemyAttackerArea);
         //RobotDebugWindow.messageDefender.setMessage(message);
         
-        if(/*!ballCaughtDefender &&*/ ballInDefenderArea){
+        if(!ballCaughtDefender && ballInDefenderArea){
         	//System.out.print("I am after the ball. ");
             //target = new Point2(ballX, ballY);  
             dx = ballX - defenderRobotX;
@@ -126,12 +126,12 @@ public class TestStrategy extends GeneralStrategy {
 			if(saveBall){
 				RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) 300;
+				controlThread.operation.travelDistance = (int) targetDistance;
 			}
 			else if(alignWithEnemyAttacker){
 				RobotDebugWindow.messageAttacker.setMessage("ALIGN");
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int)targetDistance;
+				controlThread.operation.travelDistance = (int) targetDistance;
 			}
 		}
 	}

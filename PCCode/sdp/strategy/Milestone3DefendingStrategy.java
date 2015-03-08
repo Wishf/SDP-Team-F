@@ -102,7 +102,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         }
 
         
-        if(Math.abs(angleDifference) > 10.0 ) {
+        if(Math.abs(angleDifference) > 20.0 ) {
         	
             rotate = true;
         }
@@ -116,7 +116,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         boolean move_robot = false;
         boolean ballInEnemyAttackerArea = false;
 		boolean alignWithEnemyAttacker = false;
-		
+		double angleToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attackerRobotX, attackerRobotY);
 		
 		
         if(worldState.weAreShootingRight){        	
@@ -145,7 +145,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	////System.out.println("I've lost the ball!");
         	ballCaughtDefender = false;
         }
-        else if(ballCaughtDefender && !kicked){
+        else if(ballCaughtDefender && angleToTeamMate < 25){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;
             
@@ -173,9 +173,9 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         synchronized (this.controlThread) {
             this.controlThread.operation.op = Operation.Type.DO_NOTHING;
-            if(alignWithEnemyAttacker){
+            if(alignWithEnemyAttacker ){
             	this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-                controlThread.operation.travelDistance = (int) targetDistance;
+                controlThread.operation.travelDistance = (int) (300);
                 RobotDebugWindow.messageDefender.setMessage("ALIGN");
             }
             else if (rotate) {
@@ -190,6 +190,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                 //System.out.println("Kick");
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
                 RobotDebugWindow.messageDefender.setMessage("KICK!");
+                
             } else if (uncatch) {
                 //System.out.println("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
