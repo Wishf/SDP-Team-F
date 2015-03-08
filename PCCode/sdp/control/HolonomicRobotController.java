@@ -132,7 +132,7 @@ public DrivePacket travelSideways(double distance){
     	//System.out.println("Travel sideways: "+distance);
     	
     	
-    	double a = 0.5, b = 50;
+    	double a = 0.7, b = 90;
     	double power = a*distance +b;
     	power = Math.min(255, power);
     	
@@ -140,7 +140,7 @@ public DrivePacket travelSideways(double distance){
     	double arcCorrectionCoef = 0.1;
     	
     	byte motor1power = (byte) (power*arcCorrectionCoef);
-    	byte motor2power = (byte) (power*arcCorrectionCoef);
+    	byte motor2power = (byte) (0.05*arcCorrectionCoef - 70);
     	byte motor3power = (byte) power;
     	
     	//System.out.println(motor3power);

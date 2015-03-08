@@ -1,9 +1,9 @@
 package sdp.comms;
 
-import sdp.comms.packets.AttackerPacket;
-import sdp.comms.packets.DefenderPacket;
+//import sdp.comms.packets.AttackerPacket;
+//import sdp.comms.packets.DefenderPacket;
 import sdp.comms.packets.Packet;
-import sdp.comms.packets.PositionPacket;
+//import sdp.comms.packets.PositionPacket;
 //import sun.nio.cs.Surrogate;
 
 import java.io.IOException;
@@ -58,8 +58,8 @@ public class BrickCommServer implements PacketListener {
         }
         comm = new SingletonRadio(serialPorts[portNum]);
         comm.addListener(this);
-        PositionPacket whatPosition = new PositionPacket();
-        comm.sendPacket(whatPosition);
+        //PositionPacket whatPosition = new PositionPacket();
+       // comm.sendPacket(whatPosition);
     }
 
     public void connect() {
@@ -71,7 +71,7 @@ public class BrickCommServer implements PacketListener {
     public boolean isConnected() {
         return connected;
     }
-    public boolean isAttacker() { return playerType instanceof AttackerPacket; }
+    //public boolean isAttacker() { return playerType instanceof AttackerPacket; }
     public boolean isIdentified() { return playerType != null; }
 
     private void setConnected(boolean connected) {
@@ -129,9 +129,9 @@ public class BrickCommServer implements PacketListener {
 
     @Override
     public void packetArrived(Packet p) {
-        if(p instanceof AttackerPacket || p instanceof DefenderPacket){
+        //if(p instanceof AttackerPacket || p instanceof DefenderPacket){
             this.playerType = p;
-        }
+        //}
     }
     
 

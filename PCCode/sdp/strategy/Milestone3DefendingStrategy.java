@@ -6,6 +6,7 @@ import java.util.Deque;
 import sdp.comms.BrickCommServer;
 import sdp.comms.RobotCommand;
 import sdp.vision.Vector2f;
+import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
@@ -68,22 +69,22 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         float ball_dx = ballX - defenderRobotX;
         float ball_dy = ballY - defenderRobotY;
         
-        if(!ballCaughtDefender){
+        if(!ballCaughtDefender && ballInDefenderArea){
         	//System.out.print("I am after the ball. ");
-            target = new Point2(ballX, ballY);
-        
+            //target = new Point2(ballX, ballY);  
+            dx = ballX - defenderRobotX;
+            dy = ballY - defenderRobotY;
+        }else {        	
+            //target = new Point2(ourGoalY[1], defenderRobotX);
+        	dy = ourGoalY[1] - defenderRobotY;
         }
-        else {
-        	//System.out.print("I am after some other target.");
-            target = our_goal;
-        }
         
-        dx = target.getX() - defenderRobotX;
-        dy = target.getY() - defenderRobotY;
+        
+        
 
         targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
-        ////System.out.println("My rotation angle is " + targetAngle);
+        
         if(targetAngle < 0){
         	
             targetAngle += 360;
@@ -91,7 +92,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         double angleDifference = (targetAngle - defenderOrientation) % 360;
 
-       // //System.out.println(angleDifference);
+       
         if(angleDifference < 0) {
             angleDifference += 360;
         }
@@ -100,25 +101,43 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             angleDifference -= 360;
         }
 
-        ////System.out.println("Ball position " + ballX + " - " + ballY);
+        
         if(Math.abs(angleDifference) > 10.0 ) {
-        	//System.out.print("At" + targetAngle + " Ao" + attackerOrientation);
+        	
             rotate = true;
         }
 
         double ballDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
-        double targetDistance = Math.sqrt(dx*dx + dy*dy);
+        
         double catchThreshold = 35;
         boolean catch_ball = false;
         boolean kick_ball = false;
         boolean uncatch = false;
-
-       // System.out.print("D"+targetDistance);
-       // System.out.print("R"+attackerRobotX);
+        boolean move_robot = false;
+        boolean ballInEnemyAttackerArea = false;
+		boolean alignWithEnemyAttacker = false;
+		
+		
+		
+        if(worldState.weAreShootingRight){        	
+        	ballInEnemyAttackerArea = ballX > defenderCheck && ballX < leftCheck;
+        }else{
+        	ballInEnemyAttackerArea = ballX < defenderCheck && ballX > rightCheck;
+        }
+             
+        
+        if(ballInEnemyAttackerArea){
+        	alignWithEnemyAttacker = true;        	
+        	if(enemyAttackerRobotY - defenderRobotY < 0 ){        
+        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
+        	}else {
+        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
+        	}
+        }
+        double targetDistance = Math.sqrt(dx*dx + dy*dy);
  
         if(ballDistance < catchThreshold && !ballCaughtDefender) {
-            catch_ball = true;
-            ////System.out.println("L");
+            catch_ball = true;            
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
@@ -129,17 +148,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         else if(ballCaughtDefender && !kicked){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;
-            ////System.out.println("K");
+            
         }
-
-        boolean move_robot = false;
+             
 
         if( (!ballCaughtDefender && ballInDefenderArea && ballDistance > 25) 
         		|| (targetDistance > 25)) {
-            move_robot = true;
-           // //System.out.println("M");
-           ////System.out.println("Need to move the robot since dY=" + ballDistance);
+            move_robot = true;          
         }
+        
 
 
         /*
@@ -156,25 +173,31 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         synchronized (this.controlThread) {
             this.controlThread.operation.op = Operation.Type.DO_NOTHING;
-
-            if (rotate) {
+            if(alignWithEnemyAttacker){
+            	this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+                controlThread.operation.travelDistance = (int) targetDistance;
+                RobotDebugWindow.messageDefender.setMessage("ALIGN");
+            }
+            else if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 controlThread.operation.rotateBy = (int) (angleDifference);
+                RobotDebugWindow.messageDefender.setMessage("Rotate: " + angleDifference);
             } else if (catch_ball) {
                 //System.out.println("Catch");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
+                RobotDebugWindow.messageDefender.setMessage("Catch Ball");
             } else if (kick_ball) {
                 //System.out.println("Kick");
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
+                RobotDebugWindow.messageDefender.setMessage("KICK!");
             } else if (uncatch) {
                 //System.out.println("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
-            } else if (catch_ball) {
-                //System.out.println("Catch");
-                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+                RobotDebugWindow.messageDefender.setMessage("UNCATCH");
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
                 controlThread.operation.travelDistance = (int) targetDistance;
+                RobotDebugWindow.messageDefender.setMessage("MOVE: " + targetDistance);
             }
         }
 

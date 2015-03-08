@@ -7,6 +7,7 @@ import java.util.Deque;
 import sdp.comms.BrickCommServer;
 import sdp.comms.RobotCommand;
 import sdp.vision.Vector2f;
+import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
@@ -53,6 +54,8 @@ public class TestStrategy extends GeneralStrategy {
 		double dy = ballY - attackerRobotY;	
 		double targetAngle = calcTargetAngle(dx, dy);
 		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
+		boolean ballInDefenderArea = false;
+		boolean saveBall = false;
 		
 		/*if(Math.abs(angleDifference) < 10)
 		{
@@ -62,25 +65,73 @@ public class TestStrategy extends GeneralStrategy {
 			angleDifference = -angleDifference*0.3;
 		}*/
 			
-		double targetDistance = Math.sqrt(dx*dx+dy*dy);
+		
 		boolean move_robot = false;
 		
 		
-		if(Math.abs(targetDistance) > 15) {
+		
+		boolean ballInEnemyAttackerArea = false;
+		boolean alignWithEnemyAttacker = false;
+		
+		
+		if (ballX < defenderCheck == worldState.weAreShootingRight) {
+            ballInDefenderArea = true;            
+        }
+        if(worldState.weAreShootingRight){        	
+        	ballInEnemyAttackerArea = ballX > defenderCheck && ballX < leftCheck;
+        }else{
+        	ballInEnemyAttackerArea = ballX < defenderCheck && ballX > rightCheck;
+        }
+        //String message = String.valueOf(ballInEnemyAttackerArea);
+        //RobotDebugWindow.messageDefender.setMessage(message);
+        
+        if(/*!ballCaughtDefender &&*/ ballInDefenderArea){
+        	//System.out.print("I am after the ball. ");
+            //target = new Point2(ballX, ballY);  
+            dx = ballX - defenderRobotX;
+            dy = ballY - defenderRobotY;
+            saveBall = true;            
+        }else {        	
+            //target = new Point2(ourGoalY[1], defenderRobotX);
+        	dy = ourGoalY[1] - defenderRobotY;
+        }
+        
+        
+        if(ballInEnemyAttackerArea){
+        	alignWithEnemyAttacker = true;
+        	//System.out.println("ALIGN");
+        	//RobotDebugWindow.messageDefender.setMessage("ALIGN");
+        	if(enemyAttackerRobotY - defenderRobotY < 0 ){        
+        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
+        	}else {
+        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
+        	}
+        }
+        double targetDistance = Math.sqrt(dx*dx + dy*dy);
+        if(Math.abs(targetDistance) > 15) {
 			move_robot = true;
 			
-			System.out.println("Need to move the robot since dY=" + targetDistance);
-		}//else if(targetDistance )
-		
+			//System.out.println("Need to move the robot since dY=" + targetDistance);
+		}
 		
 		synchronized (this.controlThread) {
-			if(Math.abs(angleDifference )> 0) {
+			/*if(Math.abs(angleDifference )> 0) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) angleDifference;
 			} else if(move_robot) {
 				////System.out.println("A: ");
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
+			}*/
+			if(saveBall){
+				RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int) 300;
+			}
+			else if(alignWithEnemyAttacker){
+				RobotDebugWindow.messageAttacker.setMessage("ALIGN");
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int)targetDistance;
 			}
 		}
 	}

@@ -48,11 +48,11 @@ public class StrategyController implements WorldStateReceiver {
         this.bcsDefender = new BrickCommServer("defender");
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
-		if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
+		//if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
 			bcsTemp = bcsAttacker;
 			bcsAttacker = bcsDefender;
 			bcsDefender = (BrickCommServer) bcsTemp;
-		}
+		//}
         //System.out.println();
 	}
 
@@ -138,7 +138,7 @@ public class StrategyController implements WorldStateReceiver {
             ats.startControlThread();
             break;
         case MILESTONE_TWO_B:
-            ats = new TestStrategy(this.bcsAttacker);
+            ats = new TestStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
             
