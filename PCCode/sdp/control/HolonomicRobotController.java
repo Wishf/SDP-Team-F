@@ -56,13 +56,13 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	// Turning circle circumference
     	double circumference = Math.PI * (WHEEL_LEFT_DIST + WHEEL_RIGHT_DIST);
+    	// How far we want each wheel to travel
     	double arcLength = (Math.abs(angle) / 360) * circumference;
     	
     	double a = 0.7, b = 90;
     	double power = a*arcLength + b;
     	power = Math.min(255, power);
-    	
-    	//TODO: calculate the speed actually
+    
     	byte motor1Power = (byte) power;
     	byte motor2Power = (byte) power;
     	
