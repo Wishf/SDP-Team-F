@@ -84,7 +84,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 		// 1. Check if the robot needs to rotate
 		
 		////System.out.println("Orientation " + defenderOrientation + "; " + attackerOrientation);
-		boolean isTeamMateReady = ControlBox.controlBox.isDefenderReady();
+		boolean isTeamMateReady = ControlBox.controlBox.isAttackerReady();
 		boolean rotate = false;
 		double targetAngle;		
 		boolean facingTeamMate;

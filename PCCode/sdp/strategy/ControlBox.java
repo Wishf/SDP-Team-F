@@ -20,7 +20,7 @@ public class ControlBox implements WorldStateControlBox {
 	private double shotAngle = 0.0;
 	private boolean comp = false;
 	// /////////////////DEBUG//////////////////////////
-	private boolean DEBUG = false;
+	private boolean DEBUG = true;
 
 	// ///////////////////////////////////////////////
 

@@ -12,6 +12,10 @@ import sdp.world.oldmodel.WorldState;
 import sdp.strategy.interfaces.WorldStateControlBox;
 import sdp.strategy.ControlBox;
 
+enum Direction {
+	CLOCKWISE, COUNTERCLOCKWISE, NONE
+};
+
 public class Milestone3AttackingStrategy extends GeneralStrategy {
 
 
@@ -19,12 +23,28 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     private ControlThread controlThread;
     private Deque<Vector2f> ballPositions = new ArrayDeque<Vector2f>();
     private boolean kicked;
+    private RotateDirection rotateDirection;
+    private double FUCKING_ANGLE;
 
     public Milestone3AttackingStrategy(BrickCommServer brick) {
         this.brick = brick;
         this.controlThread = new ControlThread();
+        rotateDirection = new RotateDirection(Direction.NONE);
         //System.out.println("Starting.");
     }
+	
+	public class RotateDirection {
+		
+		private Direction direction;
+		public RotateDirection(Direction direction_) {
+			direction = direction_;
+		}
+		
+		public Direction getDirection() {
+			return direction;
+		}
+		
+	}
 
     @Override
     public void stopControlThread() {
@@ -36,40 +56,41 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         this.controlThread.start();
     }
 
+    public boolean isBallInDefenderArea(WorldState worldState) {
+    	 return ballX < defenderCheck == worldState.weAreShootingRight;
+    }
+    
+    public boolean isBallInEnemyDefenderArea(WorldState worldState) {
+    	return (ballX > rightCheck && worldState.weAreShootingRight) || (ballX < leftCheck && !worldState.weAreShootingRight);
+    }
+    
+    public boolean isBallInEnemyAttackerArea(WorldState worldState) {
+    	return (ballX > defenderCheck && ballX < leftCheck && worldState.weAreShootingRight)
+        		|| (ballX > rightCheck && ballX < defenderCheck && !worldState.weAreShootingRight);
+    }
+    
+    public boolean isBallInAttackerArea(WorldState worldState) {
+    	return (ballX > leftCheck && ballX < rightCheck);
+    }
     @Override
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
 
         MovingObject ball = worldState.getBall();
 
-        boolean ballInAttackerArea = false;
-
         ballPositions.addLast(new Vector2f(ball.x, ball.y));
         if (ballPositions.size() > 3)
             ballPositions.removeFirst();
 
-        boolean ballInDefenderArea = false;
-        boolean ballInEnemyDefenderArea = false;
-        boolean ballInEnemyAttackerArea = false;
+        boolean ballInAttackerArea = isBallInAttackerArea(worldState);
+        boolean ballInDefenderArea = isBallInDefenderArea(worldState);
+        boolean ballInEnemyDefenderArea = isBallInEnemyDefenderArea(worldState);
+        boolean ballInEnemyAttackerArea = isBallInEnemyAttackerArea(worldState);
         boolean catch_ball = false;
         boolean kick_ball = false;
         boolean uncatch = false;
-
-        if (ballX < defenderCheck == worldState.weAreShootingRight) {
-            ballInDefenderArea = true;
-        }
-
-        if((ballX > rightCheck && worldState.weAreShootingRight) || (ballX > leftCheck && !worldState.weAreShootingRight)) {
-            ballInEnemyDefenderArea = true;
-        }
-
-        if (ballX > leftCheck && ballX < rightCheck) {
-            ballInAttackerArea = true;
-        }
-
-        if(!ballInAttackerArea && !ballInEnemyDefenderArea && !ballInDefenderArea) {
-            ballInEnemyAttackerArea = true;
-        }
+        boolean rotate = false;
+        boolean travel_sideways = false;
 
         /*
         If ball in attacker area -> catch it and attack
@@ -84,7 +105,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 1. Catch the ball
             // 2. Ask the control box where to go.
             if(ballCaughtAttacker) {
-            	ControlBox.controlBox.computeShot(worldState);
+            	ControlBox.controlBox.computePositions(worldState);
                 target = ControlBox.controlBox.getShootingPosition();
                 System.out.println("Ball attacker CB");
             } else {
@@ -111,11 +132,10 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         
         if(ballInEnemyDefenderArea) {
             // Follow the defender.
-            target = new Point2(attackerRobotX, enemyAttackerRobotY);
+            target = new Point2(attackerRobotX, ballY);
             System.out.println("Ball enemy defender");
         }
 
-        boolean rotate = false;
         double targetAngle;
         double dx = 0;
         double dy = 0;
@@ -123,8 +143,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         //Vector2f ball3FramesAgo = ballPositions.getFirst();
         //float ballX1 = ball3FramesAgo.x, ballY1 = ball3FramesAgo.y;
         //float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
-
-        System.out.println("Going to " + target);
+       
         float ball_dx = ballX - attackerRobotX;
         float ball_dy = ballY - attackerRobotY;
         
@@ -138,27 +157,43 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         boolean move_robot = false;
 
         targetAngle = calcTargetAngle(dx,dy);
+        
+        if(ballInEnemyDefenderArea) {
+        	if(worldState.weAreShootingRight) {
+        		targetAngle = 0;
+        	} else {
+        		targetAngle = 180;
+        	}
+        	
+        }
 
         double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 
-        ////System.out.println("Ball position " + ballX + " - " + ballY);
         if(Math.abs(angleDifference) > 10.0 ) {
-        	//System.out.print("At" + targetAngle + " Ao" + attackerOrientation);
-            rotate = true;
+        	rotate = true;
         }
-
-        if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
-        		|| (targetDistance > 25)) {
-            move_robot = true;
-        } 
         
-        if(!move_robot && ballCaughtAttacker && ballInAttackerArea) {
-        	angleDifference = calcAngleDiff(attackerOrientation, ControlBox.controlBox.getShootingAngle());
-        	// If we dont have to move the robot anymore (it is in the shooting position)
-        	// we can try to rotate it to the shooting angle.
-        	if(Math.abs(angleDifference) > 10.0 ) {
-                rotate = true;
-            }
+        if(ballInEnemyDefenderArea) {
+        	if(targetDistance > 25) {
+        		travel_sideways = true;
+        		targetDistance = attackerRobotY - ballY;
+        		//System.out.println(attackerRobotX )
+        	}
+        } else {
+	
+	        if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
+	        		|| (targetDistance > 25)) {
+	            move_robot = true;
+	        } 
+        
+	        if(!move_robot && ballCaughtAttacker && ballInAttackerArea) {
+	        	angleDifference = calcAngleDiff(attackerOrientation, ControlBox.controlBox.getShootingAngle());
+	        	// If we dont have to move the robot anymore (it is in the shooting position)
+	        	// we can try to rotate it to the shooting angle.
+	        	if(Math.abs(angleDifference) > 10.0 ) {
+	                rotate = true;
+	            }
+	        }
         }
  
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {
@@ -174,8 +209,37 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             kick_ball = true;
         }
 
+        if(move_robot) {
+        	 System.out.println("Going to " + target + " Current position " + new Point2(attackerRobotX, attackerRobotY));
+        }
+        
+        if(rotate) {
+        	/*if(angleDifference > 0) {
+        		if(rotateDirection.getDirection() == Direction.NONE) {
+        			rotateDirection = new RotateDirection(Direction.CLOCKWISE);
+        		}
+        	} else {
+        		if(rotateDirection.getDirection() == Direction.NONE) {
+        			rotateDirection = new RotateDirection(Direction.COUNTERCLOCKWISE);
+        		}
+        	}*/
+        	
+        	 System.out.println("Rotating by " + angleDifference);
+        	 
+        }
         
         
+        if(catch_ball) {
+        	 System.out.println("Catching FIRE");
+        }
+        
+        if(kick_ball) {
+        	System.out.println("Kicking the ball");        
+        }
+        
+        if(travel_sideways) {
+        	System.out.println("Travel sideways by " + targetDistance);
+        }
 
         synchronized (this.controlThread) {
             this.controlThread.operation.op = Operation.Type.DO_NOTHING;
@@ -198,6 +262,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
                 controlThread.operation.travelDistance = (int) targetDistance;
+            } else if(travel_sideways) {
+            	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+            	controlThread.operation.travelDistance = (int) targetDistance;
             }
         }
 
@@ -220,6 +287,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	
             try {
                 while (true) {
+                	System.out.println("!!!");
                     Operation.Type op;
                     int rotateBy, travelDist;
                     

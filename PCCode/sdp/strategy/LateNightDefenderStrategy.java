@@ -171,7 +171,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 		boolean kick_ball = false;
 		boolean uncatch = false;
 		double angleTollerance = 15;
-		boolean isTeamMateReady = ControlBox.controlBox.isDefenderReady();
+		boolean isTeamMateReady = ControlBox.controlBox.isAttackerReady();
 		////System.out.println("bds "+ballDistanceSq);
 		if(ballInDefenderArea && (targetDistance < catchThreshold) && !ballCaughtDefender) {
             ////System.out.println("Catching: "+ballDistance);
