@@ -61,8 +61,8 @@ public class ControlBox implements WorldStateControlBox {
 	public void computePositions(WorldState ws) {
 		if (comp) {
 			if (DEBUG) {
-				System.out
-						.println("CONTROL BOX: Values are ready for use, won't recompute.");
+				//System.out
+				//		.println("CONTROL BOX: Values are ready for use, won't recompute.");
 			}
 			return;
 		}

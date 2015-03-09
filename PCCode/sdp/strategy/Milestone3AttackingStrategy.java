@@ -24,12 +24,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     private Deque<Vector2f> ballPositions = new ArrayDeque<Vector2f>();
     private boolean kicked;
     private RotateDirection rotateDirection;
-    private double FUCKING_ANGLE;
+    private boolean hasBall;
 
     public Milestone3AttackingStrategy(BrickCommServer brick) {
         this.brick = brick;
         this.controlThread = new ControlThread();
-        rotateDirection = new RotateDirection(Direction.NONE);
+        hasBall = false;
         //System.out.println("Starting.");
     }
 	
@@ -106,12 +106,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 2. Ask the control box where to go.
             if(ballCaughtAttacker) {
             	ControlBox.controlBox.computePositions(worldState);
-                target = ControlBox.controlBox.getShootingPosition();
-                System.out.println("Ball attacker CB");
+                //System.out.println("Ball attacker CB");
             } else {
                 target = new Point2(ballX, ballY);
-                System.out.println("Ball attacker b");
+                //System.out.println("Ball attacker b");
             }
+            //uncatch = true;
 
         }
         
@@ -119,21 +119,21 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // Rotate to face the defender and ask the control box what to do.
         	ControlBox.controlBox.computePositions(worldState);
         	target = ControlBox.controlBox.getAttackerPosition();
-            System.out.println("Ball defender");
+            //System.out.println("Ball defender");
             //Need to make sure we can catch the ball.
             uncatch = true;
         }
         
         if(ballInEnemyAttackerArea) {
             // Rotate to face the defender?
-        	System.out.println("Ball enemy attacker");
+        	//System.out.println("Ball enemy attacker");
         	target = new Point2(attackerRobotX, attackerRobotY);
         }
         
         if(ballInEnemyDefenderArea) {
             // Follow the defender.
             target = new Point2(attackerRobotX, ballY);
-            System.out.println("Ball enemy defender");
+            //System.out.println("Ball enemy defender");
         }
 
         double targetAngle;
@@ -164,8 +164,22 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	} else {
         		targetAngle = 180;
         	}
-        	
         }
+        
+        if(ballInDefenderArea) {
+        	if(worldState.weAreShootingRight) {
+        		targetAngle = 180;
+        	} else {
+        		targetAngle = 0;
+        	}
+        }
+        
+        if(ballInAttackerArea) {
+        	if(ballCaughtAttacker) {
+        		targetAngle = ControlBox.controlBox.getShootingAngle();
+        	}
+        }
+        	
 
         double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
         
@@ -177,15 +191,25 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	}
         } else {
 	
-	        if( (!ballCaughtAttacker && ballInAttackerArea && ballDistance > 25) 
+	        if( (!hasBall && ballInAttackerArea && ballDistance > 25) 
 	        		|| (targetDistance > 25)) {
 	            move_robot = true;
 	        } 
         
-	        if(!move_robot && ballCaughtAttacker && ballInAttackerArea) {
+	        if(!move_robot && hasBall) {
 	        	angleDifference = calcAngleDiff(attackerOrientation, ControlBox.controlBox.getShootingAngle());
 	        	// If we dont have to move the robot anymore (it is in the shooting position)
 	        	// we can try to rotate it to the shooting angle.
+	        }
+	        
+	        if(ballInDefenderArea) {
+	        	
+	        	targetDistance = target.getY() - attackerRobotY;
+	        	System.out.println("TargetY" + target.getY());
+	        	if(targetDistance > 25) {
+	        		travel_sideways = true;
+	        		move_robot = false;
+	        	}
 	        }
         }
         
@@ -199,76 +223,61 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	rotate = false;
         }
  
-        if(ballDistance < catchThreshold && !ballCaughtAttacker) {
+        if(ballDistance < catchThreshold && !hasBall) {
             catch_ball = true;
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
-        if(ballCaughtAttacker && ballDistance > 5*catchThreshold) {
-        	ballCaughtAttacker = false;
+        if(hasBall && ballDistance > 5*catchThreshold) {
+        	hasBall = false;
         }
-        else if(ballCaughtAttacker && !kicked && !move_robot && !rotate){
+        else if(hasBall && !kicked && !move_robot && !rotate){
         	// We kick once we're ready. We don't need to wait for anyone.
             kick_ball = true;
         }
 
-        if(move_robot) {
+        if(rotate) {
+        	 System.out.println("Rotating by " + angleDifference);
+        } else if(catch_ball) {
+       	     System.out.println("Catching FIRE");
+        } else if(move_robot) {
         	 System.out.println("Going to " + target + " Current position " + new Point2(attackerRobotX, attackerRobotY));
         }
         
-        if(rotate) {
-        	/*if(angleDifference > 0) {
-        		if(rotateDirection.getDirection() == Direction.NONE) {
-        			rotateDirection = new RotateDirection(Direction.CLOCKWISE);
-        		}
-        	} else {
-        		if(rotateDirection.getDirection() == Direction.NONE) {
-        			rotateDirection = new RotateDirection(Direction.COUNTERCLOCKWISE);
-        		}
-        	}*/
-        	
-        	 System.out.println("Rotating by " + angleDifference);
-        	 
-        }
-        
-        
-        if(catch_ball) {
-        	 System.out.println("Catching FIRE");
-        }
         
         if(kick_ball) {
-        	System.out.println("Kicking the ball");        
+        	//System.out.println("Kicking the ball");        
         }
         
         if(travel_sideways) {
-        	System.out.println("Travel sideways by " + targetDistance);
+        	//System.out.println("Travel sideways by " + targetDistance);
         }
 
         synchronized (this.controlThread) {
             this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 
-            if (rotate) {
+           if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 controlThread.operation.rotateBy = (int) (angleDifference);
-            } else if (catch_ball) {
-                //System.out.println("Catch");
-                this.controlThread.operation.op = Operation.Type.DEFCATCH;
-            } else if (kick_ball) {
-                //System.out.println("Kick");
-                this.controlThread.operation.op = Operation.Type.DEFKICK;
-            } else if (uncatch) {
-                //System.out.println("Uncatch");
-                this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
-            } else if (catch_ball) {
-                //System.out.println("Catch");
-                this.controlThread.operation.op = Operation.Type.DEFCATCH;
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
                 controlThread.operation.travelDistance = (int) targetDistance;
             } else if(travel_sideways) {
             	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
             	controlThread.operation.travelDistance = (int) targetDistance;
-            }
+            } else if (uncatch) {
+                System.out.println("Uncatch");
+                this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
+            } else if (catch_ball) {
+                System.out.println("Catch");
+                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+            } else if (kick_ball) {
+                System.out.println("Kick");
+                this.controlThread.operation.op = Operation.Type.DEFKICK;
+            } else if (catch_ball) {
+                System.out.println("Catch");
+                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+            } 
         }
 
     }
@@ -290,7 +299,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	
             try {
                 while (true) {
-                	System.out.println("!!!");
                     Operation.Type op;
                     int rotateBy, travelDist;
                     
@@ -303,6 +311,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                     switch (op) {
                         case DEFROTATE:
                             if (rotateBy != 0) {
+                            	System.out.println("Rotate by "+ rotateBy);
                                 brick.executeSync(new RobotCommand.Rotate(
                                         rotateBy));
                             }
@@ -311,6 +320,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                             if (travelDist != 0) {
                                 brick.execute(new RobotCommand.Trave(
                                         travelDist));
+                                System.out.println("Travel by " + travelDist);
                             }
                             break;
                         case DESIDEWAYS:
@@ -330,7 +340,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
 
                                 brick.execute(new RobotCommand.Catch());
-                                ballCaughtAttacker = true;
+                                hasBall = true;
                                 caughtTime = System.currentTimeMillis();
                                 kicked = false;
                             }
@@ -351,6 +361,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                             break;
                         case DEFUNCATCH:
                             brick.execute(new RobotCommand.ResetCatcher());
+                            System.out.println("Uncatch");
                             break;
                         default:
                             break;
