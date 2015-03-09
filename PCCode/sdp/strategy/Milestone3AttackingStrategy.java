@@ -168,10 +168,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         }
 
         double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
-
-        if(Math.abs(angleDifference) > 10.0 ) {
-        	rotate = true;
-        }
         
         if(ballInEnemyDefenderArea) {
         	if(targetDistance > 25) {
@@ -190,10 +186,17 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 	        	angleDifference = calcAngleDiff(attackerOrientation, ControlBox.controlBox.getShootingAngle());
 	        	// If we dont have to move the robot anymore (it is in the shooting position)
 	        	// we can try to rotate it to the shooting angle.
-	        	if(Math.abs(angleDifference) > 10.0 ) {
-	                rotate = true;
-	            }
 	        }
+        }
+        
+        double angleThreshold = 10d;
+        
+        if(Math.abs(angleDifference) > angleThreshold && rotate != true) {
+        	rotate = true;
+        }
+        
+        if(Math.abs(angleDifference) < angleThreshold) {
+        	rotate = false;
         }
  
         if(ballDistance < catchThreshold && !ballCaughtAttacker) {

@@ -51,25 +51,22 @@ public class HolonomicRobotController extends BaseRobotController {
     
     //speed in degrees per second
     public DrivePacket rotate(double angle){
-    	//System.out.println("Rotate:............... "+angle);
+    	// We want to turn the full angle in about n seconds
+    	int turnDuration = 10000; // 1.5s in ms
     	
-    	angle = -angle;
+    	// Turning circle circumference
+    	double circumference = Math.PI * (WHEEL_LEFT_DIST + WHEEL_RIGHT_DIST);
+    	double arcLength = (Math.abs(angle) / 360) * circumference;
     	
-    	double a = 0.50;
-    	double b = 90;
-    	double turnAngle = a*Math.abs(angle) + b;
-    	   
-    	turnAngle = Math.min( 230,  turnAngle);
-    		   	
-    	//double powerScale = 0.9;//Math.min(1, angle+90/180);
-    	
-    	
+    	double a = 0.7, b = 90;
+    	double power = a*arcLength + b;
+    	power = Math.min(255, power);
     	
     	//TODO: calculate the speed actually
-    	byte motor1power = (byte) 200;
-    	byte motor2power = (byte) 200;
-    	byte motor3power = (byte) 200;
-    	//System.out.println("power:"+motor1power);
+    	byte motor1Power = (byte) power;
+    	byte motor2Power = (byte) power;
+    	
+    	byte motor3Power = 0;
         
     	
     	DriveDirection leftMotorDir;
@@ -82,13 +79,13 @@ public class HolonomicRobotController extends BaseRobotController {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	}
-    	RobotDebugWindow.messageAttacker.setMessage(motor1power + " ");
-    	System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
-    			"motor3power:" +motor3power);
+
+    	
+    	RobotDebugWindow.messageAttacker.setMessage("Powers are: " + motor1Power + ", " + motor2Power);
     	return new DrivePacket(
-    			motor1power, leftMotorDir, 
-    			motor2power, rightMotorDir, 
-    			motor3power, leftMotorDir,
+    			motor1Power, leftMotorDir, 
+    			motor2Power, rightMotorDir, 
+    			motor3Power, rightMotorDir,
                 150);
     	
     }
@@ -131,23 +128,16 @@ public class HolonomicRobotController extends BaseRobotController {
     
 public DrivePacket travelSideways(double distance){
     	
-    	//System.out.println("Travel sideways: "+distance);
-    	
 		double absDistance = Math.abs(distance);
     	
     	double a = 0.7, b = 90;
     	double power = a*absDistance +b;
     	power = Math.min(255, power);
     	
-    	
-    	
     	double arcCorrectionCoef = 0.1;
     	
     	byte motor1power = (byte) (power*arcCorrectionCoef);
-    	byte motor2power = (byte) (0.05*arcCorrectionCoef - 70);
     	byte motor3power = (byte) power;
-    	
-    	//System.out.println(motor3power);
     	
     	DriveDirection leftMotorDir = DriveDirection.FORWARD;
     	DriveDirection rightMotorDir = DriveDirection.FORWARD;
@@ -162,9 +152,6 @@ public DrivePacket travelSideways(double distance){
         	rightMotorDir = DriveDirection.FORWARD;
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
-    	
-    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power+
-    			//"motor3power:" +motor3power);
 
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
