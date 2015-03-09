@@ -50,24 +50,18 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     //speed in degrees per second
-    public DrivePacket rotate(double angle){
-    	// We want to turn the full angle in about n seconds
-    	int turnDuration = 10000; // 1.5s in ms
-    	
+    public DrivePacket rotate(double angle){    	
     	// Turning circle circumference
     	double circumference = Math.PI * (WHEEL_LEFT_DIST + WHEEL_RIGHT_DIST);
     	// How far we want each wheel to travel
     	double arcLength = (Math.abs(angle) / 360) * circumference;
     	
-    	double a = 0.7, b = 90;
+    	double a = 0.6, b = 90;
     	double power = a*arcLength + b;
     	power = Math.min(255, power);
     
     	byte motor1Power = (byte) power;
-    	byte motor2Power = (byte) power;
-    	
-    	byte motor3Power = 0;
-        
+    	byte motor2Power = (byte) power;  
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
@@ -85,7 +79,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	return new DrivePacket(
     			motor1Power, leftMotorDir, 
     			motor2Power, rightMotorDir, 
-    			motor3Power, rightMotorDir,
+    			(byte)0, rightMotorDir,
                 150);
     	
     }

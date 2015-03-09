@@ -189,7 +189,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 	        }
         }
         
-        double angleThreshold = 10d;
+        double angleThreshold = 25d;
         
         if(Math.abs(angleDifference) > angleThreshold && rotate != true) {
         	rotate = true;
