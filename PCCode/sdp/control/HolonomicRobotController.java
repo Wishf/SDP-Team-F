@@ -56,17 +56,22 @@ public class HolonomicRobotController extends BaseRobotController {
     	// How far we want each wheel to travel
     	double arcLength = (Math.abs(angle) / 360) * circumference;
     	
-    	double a = 0.6, b = 90;
+    	double a = 0.4, b = 90;
     	double power = a*arcLength + b;
     	power = Math.min(255, power);
-    
+    	
     	byte motor1Power = (byte) power;
-    	byte motor2Power = (byte) power;  
+    	byte motor2Power = (byte) power; 
+    	
+    
+    		
+    	
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
     	
     	if(angle > 0){
+    		
     		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {

@@ -41,16 +41,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
         
-        ControlBox.controlBox.computePositions(worldState);
-        Point2 our_goal = ControlBox.controlBox.getDefenderPosition();
-        ControlBox.controlBox.reset();
+        //ControlBox.controlBox.computePositions(worldState);
+        //Point2 our_goal = ControlBox.controlBox.getDefenderPosition();
+        //ControlBox.controlBox.reset();
         MovingObject ball = worldState.getBall();
 
         boolean ballInDefenderArea = false;
-        /*boolean ballNearDefenderArea = ballX + 10 < defenderCheck == worldState.weAreShootingRight 
-         *  
-         */
         double angleToDefCheck = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
+        
+        
         ballPositions.addLast(new Vector2f(ball.x, ball.y));
         if (ballPositions.size() > 3)
             ballPositions.removeFirst();
@@ -68,9 +67,6 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         float ballX1 = ball3FramesAgo.x, ballY1 = ball3FramesAgo.y;
         float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
 
-        Point2 target;
-        float ball_dx = ballX - defenderRobotX;
-        float ball_dy = ballY - defenderRobotY;
         
         if(!ballCaughtDefender && ballInDefenderArea){
         	//System.out.print("I am after the ball. ");
@@ -81,15 +77,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             //target = new Point2(ourGoalY[1], defenderRobotX);
         	dy = ourGoalY[1] - defenderRobotY;
         }
-        
+        boolean tooClose = Math.abs(defenderRobotY - botOfPitch) < 30 || Math.abs(topOfPitch - defenderRobotY) < 30
+        		|| Math.abs(ourGoalX - defenderRobotX) < 30;
         
         
 
         targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
         
-        if(targetAngle < 0){
-        	
+        if(targetAngle < 0){       	
             targetAngle += 360;
         }
 
@@ -109,46 +105,47 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             rotate = true;
         }
 
-        double ballDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
-        
+       
         double catchThreshold = 35;
         boolean catch_ball = false;
         boolean kick_ball = false;
         boolean uncatch = false;
         boolean move_robot = false;
-        boolean ballInEnemyAttackerArea = false;
-		boolean alignWithEnemyAttacker = false;
+        //boolean ballInEnemyAttackerArea = false;
+		//boolean alignWithEnemyAttacker = false;
 		double angleToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attackerRobotX, attackerRobotY);
 		
 		
-        if(worldState.weAreShootingRight){        	
+        /*if(worldState.weAreShootingRight){        	
         	ballInEnemyAttackerArea = ballX > defenderCheck && ballX < leftCheck;
         }else{
         	ballInEnemyAttackerArea = ballX < defenderCheck && ballX > rightCheck;
-        }
+        }*/
              
         
         if(!ballInDefenderArea){
-        	alignWithEnemyAttacker = true;
+        	//alignWithEnemyAttacker = true;
         	if(Math.abs(angleToDefCheck) > 15){
         		rotate = true;
         		angleDifference = angleToDefCheck;
         	}
         	else if(enemyAttackerRobotY - defenderRobotY < 0 ){        
-        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
+        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);        	
         	}else {
-        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
+        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);      	
         	}
         }
         double targetDistance = Math.sqrt(dx*dx + dy*dy);
         
-        if(ballDistance < catchThreshold && !ballCaughtDefender) {
+      
+        
+        if(targetDistance < catchThreshold && !ballCaughtDefender) {
             catch_ball = true;            
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
         if(ballCaughtDefender){
-        	if(ballDistance > 5*catchThreshold) {       
+        	if(targetDistance > 5*catchThreshold) {       
         	////System.out.println("I've lost the ball!");
         	ballCaughtDefender = false;
         	}
@@ -160,15 +157,13 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         		rotate = true;
         		angleDifference = angleToTeamMate;
         	}
-        }        
-             
+        }            
 
-        if( (ballInDefenderArea && ballDistance > 25) 
-        		|| (targetDistance > 25)) {
+        if(  (targetDistance > 25)) {
             move_robot = true;          
         }
         
-
+        
 
         /*
         double slope = (ballY2 - ballY1) / ((ballX2 - ballX1) + 0.0001);
@@ -183,11 +178,11 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         
 
         synchronized (this.controlThread) {
-            this.controlThread.operation.op = Operation.Type.DO_NOTHING;
-            if(alignWithEnemyAttacker ){
-            	this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-                controlThread.operation.travelDistance = (int) (300);
-                RobotDebugWindow.messageDefender.setMessage("ALIGN");
+            //this.controlThread.operation.op = Operation.Type.DO_NOTHING;
+            if(rotate){
+            	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
+                 controlThread.operation.rotateBy = (int) (angleDifference);
+                 RobotDebugWindow.messageDefender.setMessage("Rotate: " + angleDifference);
             }
             else if (catch_ball) {
                 //System.out.println("Catch");
@@ -198,11 +193,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
                 RobotDebugWindow.messageDefender.setMessage("KICK!");
                 
-            } else if (rotate) {
-                this.controlThread.operation.op = Operation.Type.DEFROTATE;
-                controlThread.operation.rotateBy = (int) (angleDifference);
-                RobotDebugWindow.messageDefender.setMessage("Rotate: " + angleDifference);
-            } else if (uncatch) {
+            } else if (catch_ball) {
+                System.out.println("Catch");
+                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+            } /*else if (alignWithEnemyAttacker) {            	
+                this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+                controlThread.operation.travelDistance = (int) targetDistance;
+                RobotDebugWindow.messageAttacker.setMessage("" + targetDistance);
+                RobotDebugWindow.messageDefender.setMessage("ALIGN");
+            } */else if (uncatch) {
                 //System.out.println("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
                 RobotDebugWindow.messageDefender.setMessage("UNCATCH");

@@ -29,10 +29,10 @@ public class GeneralStrategy implements Strategy {
 	protected int leftCheck;
 	protected int rightCheck;
 	protected int defenderCheck;
-	protected int topOfPitch;
-	protected int botOfPitch;
+	protected static int topOfPitch;
+	protected static int botOfPitch;
 	protected float goalX;
-	protected float ourGoalX;
+	protected static float ourGoalX;
 	protected float[] goalY;
 	protected float[] ourGoalY;
 	protected float[] ourGoalEdges = new float[3];
@@ -51,6 +51,7 @@ public class GeneralStrategy implements Strategy {
 	protected boolean scoringAttackerHasArrived;
 	protected boolean enemyDefenderNotOnPitch;
 	protected boolean attackerNotOnPitch;
+	protected static boolean weAreShootingRight;
 	private int BOUNCE_SHOT_DISTANCE = 50;
 
 	@Override
@@ -565,6 +566,7 @@ public class GeneralStrategy implements Strategy {
 		botOfPitch = PitchConstants.getPitchOutlineBottom();
 		attackerNotOnPitch = worldState.attackerNotOnPitch;
 		if (worldState.weAreShootingRight) {
+			weAreShootingRight = worldState.weAreShootingRight;
 			leftCheck = worldState.dividers[1];
 			rightCheck = worldState.dividers[2];
 			defenderCheck = worldState.dividers[0];
@@ -610,6 +612,37 @@ public class GeneralStrategy implements Strategy {
 		while (ang1 < -Math.PI)
 			ang1 += 2 * Math.PI;
 		return Math.toDegrees(ang1);
+	}
+	public static double calculateDistance(float robotX, float robotY, float targetX, float targetY){
+		double dx = robotX - targetX;
+		double dy = robotY - targetY;
+		double distance = Math.sqrt(dx*dx + dy*dy);
+		return distance;
+	}
+	
+	public static double distanceFromLine(float pointOneX, float pointOneY, float pointTwoX, float pointTwoY, float X, float Y){
+		double distance = Math.abs((pointTwoY - pointOneY)*X - (pointTwoX - pointOneX)*Y + pointTwoX*pointOneY - pointOneX*pointTwoY)
+				/Math.sqrt((pointTwoY - pointOneY)*(pointTwoY - pointOneY) + (pointTwoX - pointOneX)*(pointTwoX - pointOneX));
+		return distance;
+	}
+	
+	public static boolean isRobotTooClose(float robotX, float robotY){
+		double distance;
+		if (weAreShootingRight){
+			distance = Math.min(distanceFromLine(PitchConstants.getPitchOutline()[0].getX(),PitchConstants.getPitchOutline()[0].getY(),
+					PitchConstants.getPitchOutline()[7].getX(),PitchConstants.getPitchOutline()[7].getY(), robotX, robotY),
+					distanceFromLine(PitchConstants.getPitchOutline()[5].getX(),PitchConstants.getPitchOutline()[5].getY(),
+							PitchConstants.getPitchOutline()[6].getX(),PitchConstants.getPitchOutline()[6].getY(), robotX, robotY)); 
+		}else{
+			distance = Math.min(distanceFromLine(PitchConstants.getPitchOutline()[1].getX(),PitchConstants.getPitchOutline()[1].getY(),
+					PitchConstants.getPitchOutline()[2].getX(),PitchConstants.getPitchOutline()[2].getY(), robotX, robotY),
+					distanceFromLine(PitchConstants.getPitchOutline()[3].getX(),PitchConstants.getPitchOutline()[3].getY(),
+							PitchConstants.getPitchOutline()[4].getX(),PitchConstants.getPitchOutline()[4].getY(), robotX, robotY));
+		}
+		if(distance < 30 || Math.abs(robotY - botOfPitch) < 30 || Math.abs(topOfPitch - robotY) < 30
+        		|| Math.abs(ourGoalX - robotX) < 30 )
+			return true;
+		return false;
 	}
 
 }
