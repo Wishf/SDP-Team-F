@@ -61,11 +61,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	power = Math.min(255, power);
     	
     	byte motor1Power = (byte) power;
-    	byte motor2Power = (byte) power; 
-    	
-    
-    		
-    	
+    	byte motor2Power = (byte) power;
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
@@ -188,6 +184,11 @@ public DrivePacket travelSideways(double distance){
     			(byte) 0, DriveDirection.FORWARD,
                 millis);
     	
+    }
+    
+    
+    public Packet openCatcher(){
+    	return new DisengageCatcherPacket();
     }
     
     

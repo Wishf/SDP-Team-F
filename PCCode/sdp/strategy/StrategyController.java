@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 3000;
+	public static final int STRATEGY_TICK = 140;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {

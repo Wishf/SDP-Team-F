@@ -65,7 +65,6 @@ public class GeneralStrategy implements Strategy {
 	}
 
 	class ControlThread extends Thread {
-
 		public ControlThread() {
 			super("Robot control thread");
 			setDaemon(true);

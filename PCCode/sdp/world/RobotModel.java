@@ -10,8 +10,8 @@ public class RobotModel {
 	
 	public static final RobotModel GENERIC_ROBOT = new RobotModel(
 			new Rectangle(-35, -30, 80, 80),
-			new Rectangle(-60, -60, 120, 120),
-			null);
+			new Rectangle(-50, -90, 100, 140),
+			new Rectangle(-35, -80, 70, 35));
 
 
 	private Rectangle plate; // Origin is robot position

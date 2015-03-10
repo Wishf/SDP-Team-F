@@ -258,9 +258,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
            if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
-                //controlThread.operation.rotateBy = (int) (angleDifference); original code
-           if (rotate) {
-                this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 //controlThread.operation.rotateBy = (int) angleDifference //original code
                 if ((int)angleDifference > 30) { //new code requested by konrad, implemented by Patrick
                     controlThread.operation.rotateBy = 10;
@@ -293,7 +290,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
     }
 
-    protected class ControlThread extends Thread {
+    class ControlThread extends Thread {
         public Operation operation = new Operation();
         private ControlThread controlThread;
         private long kickTime;
