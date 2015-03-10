@@ -259,10 +259,16 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
            if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 //controlThread.operation.rotateBy = (int) (angleDifference); original code
-                if ((int) angleDifference > 0) { //requested code by Konrad implemented by Patrick
+           if (rotate) {
+                this.controlThread.operation.op = Operation.Type.DEFROTATE;
+                //controlThread.operation.rotateBy = (int) angleDifference //original code
+                if ((int)angleDifference > 30) { //new code requested by konrad, implemented by Patrick
                     controlThread.operation.rotateBy = 10;
-                } else {
+                    System.out.println("Rotating by 10 and angle difference is " + angleDifference);
+                    
+                } else if ((int)angleDifference < -30) {
                     controlThread.operation.rotateBy = -10;
+                    System.out.println("Rotating by -10 and angle difference is " + angleDifference);
                 }
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
