@@ -80,7 +80,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	}
 
     	
-    	RobotDebugWindow.messageAttacker.setMessage("Powers are: " + motor1Power + ", " + motor2Power);
+    	//RobotDebugWindow.messageAttacker.setMessage("Powers are: " + motor1Power + ", " + motor2Power);
     	return new DrivePacket(
     			motor1Power, leftMotorDir, 
     			motor2Power, rightMotorDir, 

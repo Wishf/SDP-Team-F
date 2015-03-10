@@ -113,7 +113,8 @@ public class TestStrategy extends GeneralStrategy {
 			
 			//System.out.println("Need to move the robot since dY=" + targetDistance);
 		}
-		
+		boolean check = isRobotTooClose(defenderRobotX, defenderRobotY);
+		RobotDebugWindow.messageAttacker.setMessage("" + check);
 		synchronized (this.controlThread) {
 			/*if(Math.abs(angleDifference )> 0) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
@@ -123,16 +124,18 @@ public class TestStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
 			}*/
-			if(saveBall){
-				RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
+			if(check){
+				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+				controlThread.operation.rotateBy = (int) 120;
+			}
+			/*else if(alignWithEnemyAttacker){
+				
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
 				controlThread.operation.travelDistance = (int) targetDistance;
-			}
-			else if(alignWithEnemyAttacker){
-				RobotDebugWindow.messageAttacker.setMessage("ALIGN");
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) targetDistance;
-			}
+			}*/
+			
+			
 		}
 	}
 	

@@ -42,7 +42,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
 
-		
+		 
 		ballPositions.addLast(new Vector2f(worldState.getBall().x, worldState
 				.getBall().y));
 		if (ballPositions.size() > 3)
@@ -67,6 +67,8 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				double rad = enemyAttackerOrientation * Math.PI/180;
 				targetY = (float) Math.tan(rad)*(defenderRobotX-enemyAttackerRobotX) + defenderRobotY;
 				//RobotDebugWindow.messageAttacker.setMessage(""+targetY);
+			}else{
+				targetY = ourGoalY[1];
 			}
 		}
 		if (targetY > ourGoalEdges[2]) {
