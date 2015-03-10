@@ -81,7 +81,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		//targetY += defenderOffset;
 		
 		float dist = targetY - defenderRobotY;
-		RobotDebugWindow.messageDefender.setMessage("Enemy_angle:"+enemyAttackerOrientation+" Aim at:"+targetY+" Defender needs move:"+dist);
+		System.out.println("Enemy_angle:"+enemyAttackerOrientation+" Aim at:"+targetY+" Defender needs move:"+dist);
 		
 		boolean move_sideways = false;
 		

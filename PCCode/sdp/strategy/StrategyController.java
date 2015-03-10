@@ -225,7 +225,7 @@ public class StrategyController implements WorldStateReceiver {
 				changeToStrategy(StrategyType.ATTACKING);
 				break;
 			case DEFENDER:
-				changeToStrategy(StrategyType.PASSING);
+				changeToStrategy(StrategyType.MILESTONE_THREE_B);
 				break;
 			case ENEMY_ATTACKER:
 				changeToStrategy(StrategyType.DEFENDING);

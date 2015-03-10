@@ -74,8 +74,8 @@ public class ControlBox implements WorldStateControlBox {
 			attPos = new Point2((int) (ws.getAttackerRobot().x), (int)getCenterY());
 			comp = true;
 			if (DEBUG) {
-				System.out
-						.println("CONTROL BOX: No need to avoid obstacle as per set flag, returning	 middle of pitch.");
+				//System.out
+					//	.println("CONTROL BOX: No need to avoid obstacle as per set flag, returning	 middle of pitch.");
 			}
 			return;
 		}
@@ -84,9 +84,9 @@ public class ControlBox implements WorldStateControlBox {
 			defPos = new Point2((int) (ws.getDefenderRobot().x), ypos);
 			attPos = new Point2((int) (ws.getAttackerRobot().x), ypos);
 			if (DEBUG) {
-				System.out
-						.println("CONTROL BOX: Passing orthogonally at same x, and at y: "
-								+ ypos);
+				//System.out
+					//	.println("CONTROL BOX: Passing orthogonally at same x, and at y: "
+						//		+ ypos);
 			}
 		} else {
 			/*
@@ -95,7 +95,7 @@ public class ControlBox implements WorldStateControlBox {
 			 * updated for this to work.
 			 */
 			if (DEBUG) {
-				System.out.println("CONTROL BOX: Passing at non-orthogonal");
+				//System.out.println("CONTROL BOX: Passing at non-orthogonal");
 			}
 		}
 		comp = true;
@@ -134,14 +134,12 @@ public class ControlBox implements WorldStateControlBox {
 	public boolean canPass(WorldState ws) {
 		if (orth) {
 			if (DEBUG) {
-				System.out
-						.println("CONTROL BOX: Checking if orthogonal pass is possible");
+				//System.out.println("CONTROL BOX: Checking if orthogonal pass is possible");
 			}
 			return canPassOrth(ws);
 		} else {
 			if (DEBUG) {
-				System.out
-						.println("CONTROL BOX: Checking if line between defender and attacker is empty.");
+				//System.out.println("CONTROL BOX: Checking if line between defender and attacker is empty.");
 			}
 			return lineClear(ws);
 		}
@@ -167,8 +165,8 @@ public class ControlBox implements WorldStateControlBox {
 		double oppAngle = calcTargetAngle(Math.abs(defX - oppX),
 				Math.abs(defY - oppY));
 		if (DEBUG) {
-			System.out.println("CONTROL BOX: Angle between obstacle: "
-					+ oppAngle + " Angle between our robots: " + attAngle);
+			//System.out.println("CONTROL BOX: Angle between obstacle: "
+				//	+ oppAngle + " Angle between our robots: " + attAngle);
 		}
 		double ballSize = Pitch.BALL_RADIUS;
 		double robotSize = ballSize * 6;
@@ -176,15 +174,15 @@ public class ControlBox implements WorldStateControlBox {
 		double margin = calcMargin(ws.getDefenderRobot(),
 				ws.getEnemyAttackerRobot(), oppAngle - attAngle);
 		if (DEBUG) {
-			System.out.println("CONTROL BOX: Required margin: " + neededMargin
-					+ " Margin at current pos: " + margin);
+			//System.out.println("CONTROL BOX: Required margin: " + neededMargin
+				//	+ " Margin at current pos: " + margin);
 		}
 		return margin > neededMargin;
 	}
 
 	public void reset() {
 		if (DEBUG) {
-			System.out.println("CONTROL BOX: Reset.");
+			//System.out.println("CONTROL BOX: Reset.");
 		}
 		comp = false;
 		isAttackerReady = false;
