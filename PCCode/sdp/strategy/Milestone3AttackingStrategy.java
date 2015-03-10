@@ -127,7 +127,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         if(ballInEnemyAttackerArea) {
             // Rotate to face the defender?
         	//System.out.println("Ball enemy attacker");
-        	target = new Point2(attackerRobotX, attackerRobotY);
+        	target = new Point2(attackerRobotX, ballY);
         }
         
         if(ballInEnemyDefenderArea) {
@@ -184,10 +184,14 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
         
         if(ballInEnemyDefenderArea) {
-        	if(targetDistance > 25) {
+        	if(Math.abs(targetDistance) > 25) {
         		travel_sideways = true;
         		targetDistance = attackerRobotY - ballY;
-        		//System.out.println(attackerRobotX )
+        	}
+        } else if(ballInEnemyAttackerArea) {
+        	if(Math.abs(targetDistance) > 25) {
+        		travel_sideways = true;
+        		targetDistance = ballY - attackerRobotY;
         	}
         } else {
 	
@@ -205,7 +209,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 	        if(ballInDefenderArea) {
 	        	
 	        	targetDistance = target.getY() - attackerRobotY;
-	        	System.out.println("TargetY" + target.getY());
+	        	System.out.println("TargetY" + target.getY() + " My Y is " + attackerRobotY);
 	        	if(targetDistance > 25) {
 	        		travel_sideways = true;
 	        		move_robot = false;
@@ -259,14 +263,14 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
            if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 //controlThread.operation.rotateBy = (int) angleDifference //original code
-                if ((int)angleDifference > 30) { //new code requested by konrad, implemented by Patrick
-                    controlThread.operation.rotateBy = 10;
-                    System.out.println("Rotating by 10 and angle difference is " + angleDifference);
+                //if ((int)angleDifference > 30) { //new code requested by konrad, implemented by Patrick
+                controlThread.operation.rotateBy = (int) angleDifference / 3;
+                    //System.out.println("Rotating by 10 and angle difference is " + angleDifference);
                     
-                } else if ((int)angleDifference < -30) {
-                    controlThread.operation.rotateBy = -10;
-                    System.out.println("Rotating by -10 and angle difference is " + angleDifference);
-                }
+                //} else if ((int)angleDifference < -30) {
+                //    controlThread.operation.rotateBy = -10;
+               //     System.out.println("Rotating by -10 and angle difference is " + angleDifference);
+               // }
             } else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
                 controlThread.operation.travelDistance = (int) targetDistance;
