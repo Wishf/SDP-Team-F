@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 140;
+	public static final int STRATEGY_TICK = 3000;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
@@ -113,7 +113,7 @@ public class StrategyController implements WorldStateReceiver {
 			break;
         case MILESTONE_THREE_A:
             // Without the obstacle, simple version
-        	ControlBox.controlBox.avoidObstacle(false);
+        	//ControlBox.controlBox.avoidObstacle(false);
         	Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
         	StrategyController.currentStrategies.add(m3as);
         	m3as.startControlThread();
@@ -121,7 +121,7 @@ public class StrategyController implements WorldStateReceiver {
         	
         case MILESTONE_THREE_B:
             // With the obstacle, extended version
-        	ControlBox.controlBox.avoidObstacle(false);
+        	//ControlBox.controlBox.avoidObstacle(false);
         	Strategy m3ds = new Milestone3DefendingStrategy(this.bcsDefender);
         	StrategyController.currentStrategies.add(m3ds);
         	m3ds.startControlThread();

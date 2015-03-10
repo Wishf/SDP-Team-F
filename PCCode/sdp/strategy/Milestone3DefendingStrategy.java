@@ -66,6 +66,8 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         Vector2f ball3FramesAgo = ballPositions.getFirst();
         float ballX1 = ball3FramesAgo.x, ballY1 = ball3FramesAgo.y;
         float ballX2 = worldState.getBall().x, ballY2 = worldState.getBall().y;
+        ControlBox.controlBox.computePositions(worldState);
+        //System.out.println("ROBOT: " + worldState.getEnemyAttackerRobot().y);
 
         
         if(!ballCaughtDefender && ballInDefenderArea){

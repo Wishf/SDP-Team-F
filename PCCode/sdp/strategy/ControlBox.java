@@ -2,6 +2,8 @@ package sdp.strategy;
 
 import sdp.strategy.*;
 import sdp.strategy.interfaces.WorldStateControlBox;
+import sdp.vision.PitchConstants;
+import sdp.vision.Position;
 import sdp.world.Pitch;
 import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
@@ -31,7 +33,7 @@ public class ControlBox implements WorldStateControlBox {
 	// If not, compute a new one based on the position of the enemies attacker.
 	public int getOrthogonal(WorldState ws) {
 		float oppY = ws.getEnemyAttackerRobot().y;
-		float pitchY = ws.getPitch().getPitchHeight();
+		float pitchY = (float) (getCenterY()*2);
 		if (oppY > pitchY / 2.0) {
 			return (int) (oppY / 2);
 		} else {
@@ -67,9 +69,9 @@ public class ControlBox implements WorldStateControlBox {
 			return;
 		}
 		if (!avoid) {
-			float pitchY = ws.getPitch().getPitchHeight();
-			defPos = new Point2((int) (ws.getDefenderRobot().x), pitchY / 2);
-			attPos = new Point2((int) (ws.getAttackerRobot().x), pitchY / 2);
+			//float pitchY = ws.getPitch().getPitchHeight();
+			defPos = new Point2((int) (ws.getDefenderRobot().x), (int)getCenterY());
+			attPos = new Point2((int) (ws.getAttackerRobot().x), (int)getCenterY());
 			comp = true;
 			if (DEBUG) {
 				System.out
@@ -245,5 +247,14 @@ public class ControlBox implements WorldStateControlBox {
 		//Find furthest corner.
 		//Get the angle from our position.
 		return 0.0;
+	}
+	
+	private double getCenterY(){
+		double sum = 0.0;
+		for(Position p : PitchConstants.getPitchOutline()){
+			sum += p.getY();
+		}
+		sum /= (double)PitchConstants.getPitchOutline().length;
+		return sum;
 	}
 }
