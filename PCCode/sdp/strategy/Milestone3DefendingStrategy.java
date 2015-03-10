@@ -147,20 +147,27 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         if(ballCaughtDefender){
         	dy = our_goal.getY() - defenderRobotY;
         	dx = our_goal.getX() - defenderRobotX;
+        	targetDistance = Math.sqrt(dx*dx + dy*dy);
+        	angleDifference = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, our_goal.getX(), our_goal.getY());
+        	
         	if(!worldState.ballNotOnPitch && targetDistance > 5*catchThreshold) {       
-        	////System.out.println("I've lost the ball!");
-        	ballCaughtDefender = false;
-        	}
-        	else if(angleToTeamMate < 25){
+            	////System.out.println("I've lost the ball!");
+            	ballCaughtDefender = false;            	
+            }        	
+        	else if(targetDistance < 35 && angleToTeamMate < 25){
             // Here: need to check if the defender is ready and we don't need to move any further
             kick_ball = true;       
-        	}
-        	else if(angleToTeamMate > 25){
+        	}        	
+        	else if(targetDistance < 25 && angleToTeamMate > 25 ){
         		rotate = true;
         		angleDifference = angleToTeamMate;
         	}
+        	else if(targetDistance > 25 && angleDifference>25  ){
+        		rotate = true;
+        	}
+        	
         } 
-        targetDistance = Math.sqrt(dx*dx + dy*dy);
+        //targetDistance = Math.sqrt(dx*dx + dy*dy);
         
         if(targetDistance < catchThreshold && !ballCaughtDefender) {
             catch_ball = true;            
@@ -188,9 +195,14 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             //this.controlThread.operation.op = Operation.Type.DO_NOTHING;
             if(rotate){
             	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
-                 controlThread.operation.rotateBy = (int) (angleDifference);
+            	 if (angleDifference > 59){
+            		 controlThread.operation.rotateBy = (int) (angleDifference* 0.3);
+            	 }else{
+            		 controlThread.operation.rotateBy = (int) (angleDifference);
+            	 }
+            	 
                  RobotDebugWindow.messageAttacker.setMessage("DEF");
-                 RobotDebugWindow.messageDefender.setMessage("Rotate: " + angleDifference);
+                 RobotDebugWindow.messageDefender.setMessage("Rotate: " + 0.3 * angleDifference);
             }
             else if (catch_ball) {
                 //System.out.println("Catch");
