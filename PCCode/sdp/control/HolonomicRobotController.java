@@ -55,7 +55,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	double circumference = Math.PI * (WHEEL_LEFT_DIST + WHEEL_RIGHT_DIST);
     	// How far we want each wheel to travel
     	double arcLength = (Math.abs(angle) / 360) * circumference;
-    	
+    	angle = -angle;
     	double a = 0.4, b = 90;
     	double power = a*arcLength + b;
     	power = Math.min(255, power);

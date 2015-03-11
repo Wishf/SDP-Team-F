@@ -33,7 +33,7 @@ public class ControlBox implements WorldStateControlBox {
 	// If not, compute a new one based on the position of the enemies attacker.
 	public int getOrthogonal(WorldState ws) {
 		float oppY = ws.getEnemyAttackerRobot().y;
-		float pitchY = (float) (getCenterY()*2);
+		float pitchY = (float) (getCenterY(ws)*2);
 		if (oppY > pitchY / 2.0) {
 			return (int) (oppY / 2);
 		} else {
@@ -70,8 +70,8 @@ public class ControlBox implements WorldStateControlBox {
 		}
 		if (!avoid) {
 			//float pitchY = ws.getPitch().getPitchHeight();
-			defPos = new Point2((int) (ws.getDefenderRobot().x), (int)getCenterY());
-			attPos = new Point2((int) (ws.getAttackerRobot().x), (int)getCenterY());
+			defPos = new Point2((int) (ws.getDefenderRobot().x), (int)getCenterY(ws));
+			attPos = new Point2((int) (ws.getAttackerRobot().x), (int)getCenterY(ws));
 			comp = true;
 			if (DEBUG) {
 				//System.out
@@ -247,12 +247,13 @@ public class ControlBox implements WorldStateControlBox {
 		return 0.0;
 	}
 	
-	private double getCenterY(){
+	private double getCenterY(WorldState ws){
 		double sum = 0.0;
 		for(Position p : PitchConstants.getPitchOutline()){
 			sum += p.getY();
 		}
 		sum /= (double)PitchConstants.getPitchOutline().length;
-		return sum;
+		double centerY = ws.leftGoal[1];
+		return centerY;
 	}
 }
