@@ -111,7 +111,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		if (Math.abs(dist) >20) {
 			move_sideways = true;
 		}
-		else {
+		/*else {
 			if(worldState.weAreShootingRight && defenderOrientation > 180){
 				angle = 360 - defenderOrientation;
 			}
@@ -125,7 +125,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		if (Math.abs(angle) >20) {
 			rotate  = true;
-		}
+		}*/
 		
 		//RobotDebugWindow.messageDefender.setMessage("E("+enemyAttackerRobotX+","+enemyAttackerRobotY+")"+"D("+defenderRobotX+","+defenderRobotY+") "+"Enemy_angle:"+enemyAttackerOrientation+" Aim at:"+targetY+" Defender needs move:"+dist);
 		
@@ -135,11 +135,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
 				controlThread.operation.travelDistance = (int) dist;
 			}
-			else if(rotate) {
+			/*else if(rotate) {
 				 System.out.println("Rotate: " + angle);
 			     this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				 controlThread.operation.rotateBy = (int) (angle);
-				}
+				}*/
 		}
 	}
 	
