@@ -61,7 +61,8 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         boolean rotate = false;
         boolean faceDefCheck = false;
-        double targetAngle;
+        double targetAngle = 0;
+        double angleDifference = 0;
         double dx = 0;
         double dy = 0;
 
@@ -77,10 +78,12 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             //target = new Point2(ballX, ballY);  
             dx = ballX - defenderRobotX;
             dy = ballY - defenderRobotY;
+            angleDifference = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, ballX, ballY);
         }else if (Math.abs(angleToDefCheck) > 15 && !ballInDefenderArea) {        	
             //target = new Point2(ourGoalY[1], defenderRobotX);
         	System.out.println("rotateToDefCheck");        	
         	rotate = true;
+        	angleDifference = angleToDefCheck;
         	faceDefCheck = true;
         }
         boolean tooClose = Math.abs(defenderRobotY - botOfPitch) < 30 || Math.abs(topOfPitch - defenderRobotY) < 30
@@ -88,14 +91,14 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         
         
        
-        targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
+        //targetAngle = Math.toDegrees(Math.atan2(dy, dx)) % 360;
 
         
         if(targetAngle < 0){       	
             targetAngle += 360;
         }
 
-        double angleDifference = (targetAngle - defenderOrientation) % 360;
+        //angleDifference = (targetAngle - defenderOrientation) % 360;
 
        
         if(angleDifference < 0) {
@@ -186,7 +189,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             move_robot = true;          
         }
         
-        if(!ballInDefenderArea && Math.abs(angleToDefCheck) < 15){
+        if(!ballInDefenderArea && Math.abs(angleToDefCheck) < 15 && !ballCaughtDefender){
         	rotate = false;
         	System.out.println("NO NEED TO ROTATE");
         }
