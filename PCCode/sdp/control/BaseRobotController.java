@@ -15,17 +15,16 @@ public abstract class BaseRobotController implements PacketListener {
     public BaseRobotController(Radio radio, boolean initialCatcher) {
         catcherEngaged = initialCatcher;
         this.radio = radio;
-        //radio.addListener(this);
     }
 
     public boolean sendCommand(RobotCommand command) {
-        if(command.canQueue()){
+        /*if(command.canQueue()){
             Maneuver m = (Maneuver) command;
             radio.sendPacket(m.toPacket());
             return true;
-        }
+        }*/
 
-        radio.sendPacket(command.toPacket());
+        //radio.sendPacket(command);
         return true;
     }
 

@@ -109,7 +109,7 @@ public class ArduinoWrapper implements Runnable {
             speed_r = (byte) 255; //163
         }
        
-        rad.sendPacket(new EnqueueMotionPacket(speed_l, dir, speed_r, dir, stop, dir, time));
+        rad.sendPacket(new DrivePacket(speed_l, dir, speed_r, dir, stop, dir, time));
         debugWindow.addDebugInfo("Going " + Integer.toString(cm) + "cm forward. Will take " + Integer.toString(time) + "ms");
         //rad.sendPacket(new DrivePacket(speed_l, dir_l, speed_r, dir_r));
         //PacketLifeTime plt = new PacketLifeTime(new DrivePacket(stop, stop, stop, stop), time);

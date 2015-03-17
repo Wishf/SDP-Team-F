@@ -1,5 +1,6 @@
 package sdp.control;
 
+import sdp.comms.RobotCommand;
 import sdp.util.DriveDirection;
 
 /**
@@ -12,7 +13,6 @@ public abstract class Maneuver extends RobotCommand {
 
     public abstract int getDuration();
 
-    @Override
     public boolean canQueue(){
         return true;
     }
