@@ -113,7 +113,7 @@ public class StrategyController implements WorldStateReceiver {
 			break;
         case MILESTONE_THREE_A:
             // Without the obstacle, simple version
-        	//ControlBox.controlBox.avoidObstacle(false);
+        	ControlBox.controlBox.avoidObstacle(true);
         	Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
         	StrategyController.currentStrategies.add(m3as);
         	m3as.startControlThread();
