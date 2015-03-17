@@ -124,10 +124,10 @@ public class TestStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
 			}*/
-			if(check){
+			if(true){
 				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
-				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) 120;
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int) 220;
 			}
 			/*else if(alignWithEnemyAttacker){
 				
@@ -170,7 +170,7 @@ public class TestStrategy extends GeneralStrategy {
 						break;
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Trave(travelDist));
+							brick.execute(new RobotCommand.Travel(travelDist));
 						}
 						break;
 					case DESIDEWAYS:

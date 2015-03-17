@@ -60,35 +60,47 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		boolean rotate = false;
 		
 		float targetY = ourGoalEdges[1];
-		
+		double angleToDefCheck = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		// convert true to worldState.ballNotOnPitch if playing games
-		if (worldState.ballNotOnPitch) {
-			alignWithEnemyAttacker = true;
+		//System.out.println("Angle: " + angleToDefCheck);
+		if(Math.abs(angleToDefCheck) > 15){
+			rotate = true;
+			
+		}
+		alignWithEnemyAttacker = false;
 			// Get equation of line through enemyAttacker along its orientation
 			if(worldState.weAreShootingRight){
 				if (enemyAttackerOrientation<270 && enemyAttackerOrientation >90) { 
-				double rad = enemyAttackerOrientation * Math.PI/180;
-				targetY = -(float) Math.tan(rad)*(enemyAttackerRobotX -defenderRobotX) + enemyAttackerRobotY;
-			}else{
-				targetY = 210;
+					alignWithEnemyAttacker = true;
+					double rad = enemyAttackerOrientation * Math.PI/180;
+					targetY = -(float) Math.tan(rad)*(enemyAttackerRobotX -defenderRobotX) + enemyAttackerRobotY;
+				
+				}else{
+					targetY = worldState.leftGoal[1];
 				}
 			}
 			else{
 				if (enemyAttackerOrientation<90 || enemyAttackerOrientation >270) { 
 					double rad = enemyAttackerOrientation * Math.PI/180;
+					alignWithEnemyAttacker = true;
 					targetY = (float) Math.tan(rad)*(defenderRobotX-enemyAttackerRobotX) + enemyAttackerRobotY;
 				}
 				else{
-					targetY = 210;
-					}
+					targetY = worldState.leftGoal[1];
+				}
 			}
-		}
 		
+		boolean faceEnemyAttacker = false;
+		double angleToEnemyAttacker = 0;
 		
 		if (targetY > 260) {
 			targetY = (int) 260;
+			faceEnemyAttacker = true;
+			angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );
 		} else if (targetY < 140) {
 			targetY = (int) 140;
+			faceEnemyAttacker = true;
+			angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );			
 		}
 		
 		// Correct for defender plate not being in centre of robot
@@ -98,7 +110,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		//if move to right = negative, move to left = positive
 		// if we are shooting right and we need to move right sideways, the distance is positive so convert it to be negative.
-		if(worldState.weAreShootingRight) {
+		if(!worldState.weAreShootingRight) {
 			dist = -dist;
 		}
 		
@@ -108,9 +120,10 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		boolean move_sideways = false;
 		
-		if (Math.abs(dist) >20) {
+		if (Math.abs(dist) >25) {
 			move_sideways = true;
 		}
+		//System.out.println("Distance: " + dist);
 		/*else {
 			if(worldState.weAreShootingRight && defenderOrientation > 180){
 				angle = 360 - defenderOrientation;
@@ -130,16 +143,33 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		//RobotDebugWindow.messageDefender.setMessage("E("+enemyAttackerRobotX+","+enemyAttackerRobotY+")"+"D("+defenderRobotX+","+defenderRobotY+") "+"Enemy_angle:"+enemyAttackerOrientation+" Aim at:"+targetY+" Defender needs move:"+dist);
 		
 		synchronized (this.controlThread) {
-			if(move_sideways){
-				System.out.println("move_sideways: " + dist);
+			if(rotate){
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+           	 	System.out.println("DEFCHECK" + angleToDefCheck);
+           	 	if (angleToDefCheck > 59){
+           		 controlThread.operation.rotateBy = (int) (angleToDefCheck* 0.3);
+           	 	}else if(angleToDefCheck > 30){
+           		 controlThread.operation.rotateBy = (int) (angleToDefCheck * 0.6);
+           	 	}else{
+           		 controlThread.operation.rotateBy = (int) (angleToDefCheck  );
+           	 	}
+				
+			}
+			else if(move_sideways) {
+				System.out.println("MOVE" + dist);
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
 				controlThread.operation.travelDistance = (int) dist;
+			}else if (faceEnemyAttacker){
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+	           	System.out.println("ENEMY" + angleToEnemyAttacker);
+	           	if (angleToDefCheck > 59){
+	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker* 0.3);
+	           	}else if(angleToDefCheck > 30){
+	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker * 0.6);
+	           	}else{
+	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker );
+	           	}
 			}
-			/*else if(rotate) {
-				 System.out.println("Rotate: " + angle);
-			     this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				 controlThread.operation.rotateBy = (int) (angle);
-				}*/
 		}
 	}
 	

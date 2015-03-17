@@ -125,11 +125,11 @@ public DrivePacket travelSideways(double distance){
     	
 		double absDistance = Math.abs(distance);
     	
-    	double a = 0.7, b = 90;
+    	double a = 0.5, b = 80;
     	double power = a*absDistance +b;
     	power = Math.min(255, power);
     	
-    	double arcCorrectionCoef = 0.1;
+    	double arcCorrectionCoef = 0.06;
     	
     	byte motor1power = (byte) (power*arcCorrectionCoef);
     	byte motor3power = (byte) power;

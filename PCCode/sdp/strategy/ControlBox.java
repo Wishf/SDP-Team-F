@@ -32,12 +32,15 @@ public class ControlBox implements WorldStateControlBox {
 	// If it has already been computed and still works, just return the value.
 	// If not, compute a new one based on the position of the enemies attacker.
 	public int getOrthogonal(WorldState ws) {
-		float oppY = ws.getEnemyAttackerRobot().y;
-		float pitchY = (float) (getCenterY(ws)*2);
-		if (oppY > pitchY / 2.0) {
-			return (int) (oppY / 2);
+		double oppY = ws.getEnemyAttackerRobot().y;
+		double pitchY = (double) (getCenterY(ws));
+		double top = PitchConstants.getPitchOutlineTop();
+		double bot = PitchConstants.getPitchOutlineBottom();
+		System.out.println("Top: " + top + " Bot: " + bot + " OppY: " + oppY + " PitchY: " + pitchY);
+		if (oppY > pitchY) {
+			return (int) (top + (oppY - top) / 2.0);
 		} else {
-			return (int) (pitchY - (oppY / 2));
+			return (int) (oppY + (bot - oppY)/2.0);
 		}
 
 	}
@@ -74,8 +77,8 @@ public class ControlBox implements WorldStateControlBox {
 			attPos = new Point2((int) (ws.getAttackerRobot().x), (int)getCenterY(ws));
 			comp = true;
 			if (DEBUG) {
-				//System.out
-					//	.println("CONTROL BOX: No need to avoid obstacle as per set flag, returning	 middle of pitch.");
+				System.out
+						.println("CONTROL BOX: No need to avoid obstacle as per set flag, returning	 middle of pitch. ");
 			}
 			return;
 		}
@@ -84,9 +87,9 @@ public class ControlBox implements WorldStateControlBox {
 			defPos = new Point2((int) (ws.getDefenderRobot().x), ypos);
 			attPos = new Point2((int) (ws.getAttackerRobot().x), ypos);
 			if (DEBUG) {
-				//System.out
-					//	.println("CONTROL BOX: Passing orthogonally at same x, and at y: "
-						//		+ ypos);
+				System.out
+						.println("CONTROL BOX: Passing orthogonally at same x, and at y: "
+								+ ypos);
 			}
 		} else {
 			/*
@@ -95,7 +98,7 @@ public class ControlBox implements WorldStateControlBox {
 			 * updated for this to work.
 			 */
 			if (DEBUG) {
-				//System.out.println("CONTROL BOX: Passing at non-orthogonal");
+				System.out.println("CONTROL BOX: Passing at non-orthogonal");
 			}
 		}
 		comp = true;
@@ -238,13 +241,36 @@ public class ControlBox implements WorldStateControlBox {
 	}
 
 	private double computeStaticAngle(WorldState ws) {
-		//Get positions.
-		MovingObject att = ws.getAttackerRobot();
-		MovingObject opp = ws.getEnemyDefenderRobot();
-		//ws.getPitch().
+		
 		//Find furthest corner.
+		double x,y = 0.0;
+		if(ws.weAreShootingRight){
+			double topY = PitchConstants.getPitchOutline()[2].getY();
+			double botY = PitchConstants.getPitchOutline()[3].getY();
+			double goalY = (topY + botY)/2.0;
+			double oppY = ws.getEnemyDefenderRobot().y;
+			if(oppY > goalY){
+				y = topY;
+				x = PitchConstants.getPitchOutline()[2].getX();
+			} else {
+				y = botY;
+				x = PitchConstants.getPitchOutline()[3].getX();
+			}
+		} else {
+			double topY = PitchConstants.getPitchOutline()[7].getY();
+			double botY = PitchConstants.getPitchOutline()[6].getY();
+			double goalY = (topY + botY)/2.0;
+			double oppY = ws.getEnemyDefenderRobot().y;
+			if(oppY > goalY){
+				y = topY;
+				x = PitchConstants.getPitchOutline()[7].getX();
+			} else {
+				y = botY;
+				x = PitchConstants.getPitchOutline()[6].getX();
+			}
+		}
 		//Get the angle from our position.
-		return 0.0;
+		return calcTargetAngle(ws.getAttackerRobot().x - x, ws.getDefenderRobot().y - y);
 	}
 	
 	private double getCenterY(WorldState ws){
@@ -253,7 +279,6 @@ public class ControlBox implements WorldStateControlBox {
 			sum += p.getY();
 		}
 		sum /= (double)PitchConstants.getPitchOutline().length;
-		double centerY = ws.leftGoal[1];
-		return centerY;
+		return sum;
 	}
 }

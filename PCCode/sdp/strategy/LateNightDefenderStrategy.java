@@ -285,7 +285,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 						break;
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Trave(
+							brick.execute(new RobotCommand.Travel(
 									travelDist));
 						}
 						break;
@@ -297,7 +297,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 						break;
 					case DEBACK:
 						if (travelDist != 0) {
-							brick.execute(new RobotCommand.Trave(
+							brick.execute(new RobotCommand.Travel(
 									travelDist));
 						}
 						break;

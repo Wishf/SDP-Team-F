@@ -42,10 +42,10 @@ public class BrickControlGUI extends JFrame implements KeyListener {
 		RobotCommand.Command command = null;
 		switch (key.getKeyCode()) {
 		case KeyEvent.VK_UP:
-			command = new RobotCommand.Trave(10000);
+			command = new RobotCommand.Travel(10000);
 			break;
 		case KeyEvent.VK_DOWN:
-			command = new RobotCommand.Trave(-10000);
+			command = new RobotCommand.Travel(-10000);
 			break;
 		case KeyEvent.VK_SPACE:
 			command = new RobotCommand.Kick();

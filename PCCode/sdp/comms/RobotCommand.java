@@ -69,10 +69,10 @@ public class RobotCommand {
 		}
 	}
 
-	public static class Trave extends GenericCommand {
+	public static class Travel extends GenericCommand {
 		private double displacement;
 		
-		public Trave(double displacement) {
+		public Travel(double displacement) {
 			this.displacement = displacement;
 		}
 		
