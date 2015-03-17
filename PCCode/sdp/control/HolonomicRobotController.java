@@ -57,19 +57,36 @@ public class HolonomicRobotController extends BaseRobotController {
 
     }
     
+    public DrivePacket stop(){
+    	byte zero = 0;
+    	
+    	return new DrivePacket(
+    			zero, leftMotorDir, 
+    			zero, rightMotorDir, 
+    			zero, rearMotorDir,
+    			PACKET_LIFETIME);
+    }
     
     
     
     public DrivePacket rotate(double angle){    	
     	
-    	double a = 0.4, b = 90;
+    	double a = 0.7, minPower = 100;
     	
-    	double power = a*Math.abs(angle) + b;
-    	power = Math.min(254, power);
+    	double maxPower = 200;
+    	
+    	double rearMotorCoef = 0.5;
+    	
+    	
+    	double power = a*Math.abs(angle) + minPower;
+    	
+    	power = Math.min(maxPower, power);
+    	
+    	//RobotDebugWindow.messageAttacker.setMessage("Rotating power: "+power);
     	
     	leftMotorPower = (byte) power;
     	rightMotorPower = (byte) power;
-    	rearMotorPower = 0;
+    	rearMotorPower = (byte) (power * rearMotorCoef);
     	
     	
     	
@@ -81,7 +98,7 @@ public class HolonomicRobotController extends BaseRobotController {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	}
-    	rearMotorDir = DriveDirection.FORWARD;
+    	rearMotorDir = rightMotorDir;
 
     	
     	return new DrivePacket(
@@ -129,16 +146,17 @@ public class HolonomicRobotController extends BaseRobotController {
     
 public DrivePacket travelSideways(double displacement){
     	
-		double a = 0.5, b = 80;
-    	double power = a*Math.abs(displacement) +b;   	
+		double a = 3, minPower = 150;
+    	double power = a*Math.abs(displacement) +minPower;   	
     	
     	power = Math.min(254, power);
     	
     	
-    	double arcCorrectionCoef = 0.06;
+    	double arcCorrectionCoef = 0.2;
+    	byte arcCorrectionPower = 100;
     	
-    	leftMotorPower = (byte) (power*arcCorrectionCoef);
-    	rightMotorPower = (byte) (power*arcCorrectionCoef);
+    	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
+    	rightMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
     	rearMotorPower = (byte) power;
     	
     	

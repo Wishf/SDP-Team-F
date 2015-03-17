@@ -197,7 +197,7 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			*/
 		    if(rotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) (angleDifference);
+				controlThread.operation.angleDifference = (int) (angleDifference);
 				rotate = false;
 			}
 			
@@ -247,11 +247,12 @@ public class LateNightAttackerStrategy extends GeneralStrategy {
 			try {
 				while (true) {
 					Operation.Type op;
-					int rotateBy, travelDist;
+					double rotateBy;
+					double travelDist;
 					double dX, dY, dA;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 						
 						

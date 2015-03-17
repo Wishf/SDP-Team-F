@@ -73,9 +73,9 @@ public class AttackerStrategy extends GeneralStrategy {
 					}
 					if (justCaught && fromSide) {
 						controlThread.operation.op = Operation.Type.ATKROTATE;
-						controlThread.operation.rotateBy = (int) calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, leftCheck, attackerRobotY);
+						controlThread.operation.angleDifference = (int) calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, leftCheck, attackerRobotY);
 						controlThread.operation.rotateSpeed = 50;
-						if (Math.abs(controlThread.operation.rotateBy) < 10) {
+						if (Math.abs(controlThread.operation.angleDifference) < 10) {
 							controlThread.operation.op = Operation.Type.DO_NOTHING;
 						}
 						if (controlThread.operation.op == Operation.Type.DO_NOTHING) {
@@ -109,12 +109,15 @@ public class AttackerStrategy extends GeneralStrategy {
 			try {
 //				Operation.Type prevOp = null;
 				while (!stopControlThread) {
-					int travelDist, rotateBy, rotateSpeed, travelSpeed;
+					double travelDist;
+					double rotateBy;
+					double rotateSpeed;
+					double travelSpeed;
 					Operation.Type op;
 					double radius;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						rotateSpeed = this.operation.rotateSpeed;
 						travelDist = this.operation.travelDistance;
 						travelSpeed = this.operation.travelSpeed;

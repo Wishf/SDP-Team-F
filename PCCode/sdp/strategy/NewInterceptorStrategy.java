@@ -147,11 +147,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
            	 	System.out.println("DEFCHECK" + angleToDefCheck);
            	 	if (angleToDefCheck > 59){
-           		 controlThread.operation.rotateBy = (int) (angleToDefCheck* 0.3);
+           		 controlThread.operation.angleDifference = (int) (angleToDefCheck* 0.3);
            	 	}else if(angleToDefCheck > 30){
-           		 controlThread.operation.rotateBy = (int) (angleToDefCheck * 0.6);
+           		 controlThread.operation.angleDifference = (int) (angleToDefCheck * 0.6);
            	 	}else{
-           		 controlThread.operation.rotateBy = (int) (angleToDefCheck  );
+           		 controlThread.operation.angleDifference = (int) (angleToDefCheck  );
            	 	}
 				
 			}
@@ -163,11 +163,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 	           	System.out.println("ENEMY" + angleToEnemyAttacker);
 	           	if (angleToDefCheck > 59){
-	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker* 0.3);
+	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker* 0.3);
 	           	}else if(angleToDefCheck > 30){
-	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker * 0.6);
+	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker * 0.6);
 	           	}else{
-	           		controlThread.operation.rotateBy = (int) (angleToEnemyAttacker );
+	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker );
 	           	}
 			}
 		}
@@ -188,10 +188,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			try {
 				while (true) {
 					Operation.Type op;
-					int rotateBy, travelDist;
+					double rotateBy;
+					double travelDist;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 					}
 					//System.out.println("operation: " + op);

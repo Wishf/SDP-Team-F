@@ -356,11 +356,11 @@ public class PassingStrategy extends GeneralStrategy {
 									}
 									if (Math.abs(angToBall) > 4) {
 										this.controlThread.operation.op = Operation.Type.DEFROTATE;
-										this.controlThread.operation.rotateBy = (int) (angToBall / 2.8);
-										if (this.controlThread.operation.rotateBy > 0) {
-											this.controlThread.operation.rotateBy = this.controlThread.operation.rotateBy + 3;
+										this.controlThread.operation.angleDifference = (int) (angToBall / 2.8);
+										if (this.controlThread.operation.angleDifference > 0) {
+											this.controlThread.operation.angleDifference = this.controlThread.operation.angleDifference + 3;
 										} else {
-											this.controlThread.operation.rotateBy = this.controlThread.operation.rotateBy - 3;
+											this.controlThread.operation.angleDifference = this.controlThread.operation.angleDifference - 3;
 										}
 									} else if (Math.abs(distanceToBall) > 40) {
 										this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
@@ -383,20 +383,20 @@ public class PassingStrategy extends GeneralStrategy {
 										if (ballIsOnSideEdge || ballIsOnSlopeEdge) {
 											if (worldState.weAreShootingRight) {
 												if (ballY < 220) {
-													this.controlThread.operation.rotateBy = 100;
+													this.controlThread.operation.angleDifference = 100;
 												} else {
-													this.controlThread.operation.rotateBy = -100;
+													this.controlThread.operation.angleDifference = -100;
 												}
 											} else {
 												if (ballY < 220) {
-													this.controlThread.operation.rotateBy = -100;
+													this.controlThread.operation.angleDifference = -100;
 												} else {
-													this.controlThread.operation.rotateBy = 100;
+													this.controlThread.operation.angleDifference = 100;
 												}
 											}
 										}
 										if (ballIsOnGoalLine) {
-											this.controlThread.operation.rotateBy = -(int) calculateAngle(
+											this.controlThread.operation.angleDifference = -(int) calculateAngle(
 													defenderRobotX, defenderRobotY,
 													defenderOrientation,
 													defenderRobotX, defenderRobotY - 50) / 3;
@@ -436,7 +436,7 @@ public class PassingStrategy extends GeneralStrategy {
 			}
 			if ((ballCaughtDefender && worldState.ballNotOnPitch)) {
 				controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) calculateAngle(
+				controlThread.operation.angleDifference = (int) calculateAngle(
 						defenderRobotX, defenderRobotY, defenderOrientation,
 						worldState.dividers[1], (PitchConstants
 								.getPitchOutlineBottom() - PitchConstants
@@ -477,12 +477,15 @@ public class PassingStrategy extends GeneralStrategy {
 		public void run() {
 			try {
 				while (!stopControlThread) {
-					int travelDist, rotateBy, travelSpeed, rotateSpeed;
+					double travelDist;
+					double travelSpeed;
+					double rotateSpeed;
+					double rotateBy;
 					double radius;
 					Operation.Type op;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 						travelSpeed = this.operation.travelSpeed;
 						rotateSpeed = this.operation.rotateSpeed;

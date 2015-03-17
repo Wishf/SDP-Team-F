@@ -77,9 +77,9 @@ public class InterceptorStrategy extends GeneralStrategy {
 					needReset = false;
 				}
 			} else {
-			controlThread.operation.rotateBy = (int) ang1;
+			controlThread.operation.angleDifference = (int) ang1;
 			controlThread.operation.travelDistance = (int) (dist * 0.8);
-			if (Math.abs(controlThread.operation.rotateBy) > 10) {
+			if (Math.abs(controlThread.operation.angleDifference) > 10) {
 				controlThread.operation.op = Operation.Type.DEFROTATE;
 			} else {
 				controlThread.operation.op = Operation.Type.DEFTRAVEL;
@@ -104,10 +104,11 @@ public class InterceptorStrategy extends GeneralStrategy {
 			try {
 				while (true) {
 					Operation.Type op;
-					int rotateBy, travelDist;
+					double rotateBy;
+					double travelDist;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 					}
 					

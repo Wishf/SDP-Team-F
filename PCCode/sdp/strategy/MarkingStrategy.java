@@ -80,7 +80,7 @@ public class MarkingStrategy extends GeneralStrategy {
 				//Decide if we need to go in a straight line or arc to the target
 				if (Math.abs(robotToTargetAngle) > 45) {
 					controlThread.operation.op = Operation.Type.ATKROTATE;
-					controlThread.operation.rotateBy = (int) -robotToTargetAngle;
+					controlThread.operation.angleDifference = (int) -robotToTargetAngle;
 				}
 				else if (Math.abs(robotToTargetAngle) > 150 || Math.abs(robotToTargetAngle) < 10) {
 					//Go in a straight line
@@ -107,19 +107,19 @@ public class MarkingStrategy extends GeneralStrategy {
 			} else {
 				if (robotO >= 0 && robotO <= 85) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
-					this.controlThread.operation.rotateBy = (int) (90 - robotO);
+					this.controlThread.operation.angleDifference = (int) (90 - robotO);
 				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 95 && robotO <= 179) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
-					this.controlThread.operation.rotateBy = (int) -(90 - robotO);
+					this.controlThread.operation.angleDifference = (int) -(90 - robotO);
 				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 180 && robotO <= 265) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
-					this.controlThread.operation.rotateBy = (int) (270 - robotO);
+					this.controlThread.operation.angleDifference = (int) (270 - robotO);
 				//	//System.out.println("Rotating to align");
 				} else if (robotO >= 275 && robotO <= 360) {
 					this.controlThread.operation.op = Operation.Type.ATKROTATE;
-					this.controlThread.operation.rotateBy = (int) -(270 - robotO);
+					this.controlThread.operation.angleDifference = (int) -(270 - robotO);
 				//	//System.out.println("Rotating to align");
 				} else {
 					this.controlThread.operation.op = Operation.Type.DO_NOTHING;
@@ -145,12 +145,14 @@ public class MarkingStrategy extends GeneralStrategy {
 		public void run() {
 			try {
 				while (true) {
-					int travelDist, rotateBy, travelSpeed;
+					double travelDist;
+					double travelSpeed;
+					double rotateBy;
 					Operation.Type op;
 					double radius;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 						travelSpeed = this.operation.travelSpeed;
 						radius = this.operation.radius;

@@ -104,6 +104,25 @@ public class GeneralStrategy implements Strategy {
 		return angleDifference;
 	}
 	
+	
+	public boolean isBallInDefenderArea(WorldState worldState) {
+	   	 return ballX < defenderCheck == worldState.weAreShootingRight;
+	   }
+	   
+	   public boolean isBallInEnemyDefenderArea(WorldState worldState) {
+	   	return (ballX > rightCheck && worldState.weAreShootingRight) || (ballX < leftCheck && !worldState.weAreShootingRight);
+	   }
+	   
+	   public boolean isBallInEnemyAttackerArea(WorldState worldState) {
+	   	return (ballX > defenderCheck && ballX < leftCheck && worldState.weAreShootingRight)
+	       		|| (ballX > rightCheck && ballX < defenderCheck && !worldState.weAreShootingRight);
+	   }
+	   
+	   public boolean isBallInAttackerArea(WorldState worldState) {
+	   	return (ballX > leftCheck && ballX < rightCheck);
+	   }
+	
+	
 
 	public Operation catchBall(RobotType robot) {
 		defenderHasArrived = false;
@@ -158,7 +177,7 @@ public class GeneralStrategy implements Strategy {
 			} else if (isBallCatchable) {
 				if (Math.abs(angToBall) > 2) {
 					toExecute.op = Operation.Type.ATKROTATE;
-					toExecute.rotateBy = (int) (isAttacker ? angToBall
+					toExecute.angleDifference = (int) (isAttacker ? angToBall
 							: angToBall / 3);
 				} else if (Math.abs(distanceToBall) > catchDist) {
 					toExecute.op = Operation.Type.ATKTRAVEL;
@@ -289,7 +308,7 @@ public class GeneralStrategy implements Strategy {
 				// 2 degree threshold seems to work best.
 				if (Math.abs(ang1) > 2) {
 					toExecute.op = Operation.Type.ATKROTATE;
-					toExecute.rotateBy = (int) ang1;
+					toExecute.angleDifference = (int) ang1;
 					toExecute.rotateSpeed = (int) (Math.abs(ang1) * 1.5);
 				}
 			}
@@ -321,7 +340,7 @@ public class GeneralStrategy implements Strategy {
 					} else {
 						ang1 = -(-180 - ang1);
 					}
-					toExecute.rotateBy = (int) (isAttacker ? ang1 : ang1 / 3);
+					toExecute.angleDifference = (int) (isAttacker ? ang1 : ang1 / 3);
 					toExecute.rotateSpeed = (int) Math.abs(ang1);
 				} else if (Math.abs(dist) > distThresh) {
 					toExecute.op = isAttacker ? Operation.Type.ATKTRAVEL
@@ -335,7 +354,7 @@ public class GeneralStrategy implements Strategy {
 				if (Math.abs(ang1) > 15) {
 					toExecute.op = isAttacker ? Operation.Type.ATKROTATE
 							: Operation.Type.DEFROTATE;
-					toExecute.rotateBy = (int) (isAttacker ? ang1 : ang1 / 3);
+					toExecute.angleDifference = (int) (isAttacker ? ang1 : ang1 / 3);
 					toExecute.rotateSpeed = (int) Math.abs(ang1);
 				} else if (Math.abs(dist) > distThresh) {
 					toExecute.op = isAttacker ? Operation.Type.ATKTRAVEL
@@ -366,7 +385,7 @@ public class GeneralStrategy implements Strategy {
 			if (Math.abs(ang1) > 10) {
 				toExecute.op = isAttacker ? Operation.Type.ATKROTATE
 						: Operation.Type.DEFROTATE;
-				toExecute.rotateBy = (int) (isAttacker ? ang1 : ang1 / 3);
+				toExecute.angleDifference = (int) (isAttacker ? ang1 : ang1 / 3);
 				toExecute.rotateSpeed = (int) Math.abs(ang1) + 15;
 			} else if (Math.abs(dist) > distThresh) {
 				toExecute.op = isAttacker ? Operation.Type.ATKTRAVEL
@@ -397,8 +416,8 @@ public class GeneralStrategy implements Strategy {
 		if (Math.abs(ang1) > 30) {
 			toExecute.op = isAttacker ? Operation.Type.ATKROTATE
 					: Operation.Type.DEFROTATE;
-			toExecute.rotateBy = (int) (isAttacker ? ang1 : (ang1 / 3));
-			toExecute.rotateSpeed = Math.abs(toExecute.rotateBy);
+			toExecute.angleDifference = (int) (isAttacker ? ang1 : (ang1 / 3));
+			toExecute.rotateSpeed = Math.abs(toExecute.angleDifference);
 		} else if (!haveArrived) {
 			toExecute.travelSpeed = isAttacker ? (int) (Math.abs(dist) * 1.5)
 					+ ATTACKER_SPEED_CONSTANT : (int) (Math.abs(dist) / 2.5)
@@ -494,7 +513,7 @@ public class GeneralStrategy implements Strategy {
 			if (attackerNotOnPitch) {
 				toExecute.op = Operation.Type.DEFROTATE;
 				if (Math.abs(angleToPass) > 3) {
-					toExecute.rotateBy = (int) angleToPass / 3;
+					toExecute.angleDifference = (int) angleToPass / 3;
 				} else
 					toExecute.op = Operation.Type.DEFKICKSTRONG;
 			} else {
@@ -502,13 +521,13 @@ public class GeneralStrategy implements Strategy {
 				toExecute.travelSpeed = (int) (dist * 3);
 				if (Math.abs(attackerAngle) > 15 && !passingAttackerHasArrived) {
 					toExecute.op = Operation.Type.ATKROTATE;
-					toExecute.rotateBy = -(int) attackerAngle;
+					toExecute.angleDifference = -(int) attackerAngle;
 				} else {
 
 					if (Math.abs(angleToPass) > 5) {
-						toExecute.rotateBy = (int) angleToPass / 3;
+						toExecute.angleDifference = (int) angleToPass / 3;
 					} else {
-						toExecute.rotateBy = 0;
+						toExecute.angleDifference = 0;
 					}
 					if (Math.abs(dist) > 30 && !passingAttackerHasArrived) {
 						toExecute.travelDistance = (int) (dist);
@@ -516,7 +535,7 @@ public class GeneralStrategy implements Strategy {
 						passingAttackerHasArrived = true;
 						if (Math.abs(attackerAngleToDefender) > 10) {
 							toExecute.op = Operation.Type.ATKROTATE;
-							toExecute.rotateBy = -(int) attackerAngleToDefender;
+							toExecute.angleDifference = -(int) attackerAngleToDefender;
 						} // XXX: CHANGED THIS ELSE IF TO AN IF.
 						if (Math.abs(angleToPass) < 4) {
 							toExecute.travelDistance = 0;

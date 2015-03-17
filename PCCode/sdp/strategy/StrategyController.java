@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 140;
+	public static final int STRATEGY_TICK = 100;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
@@ -31,7 +31,7 @@ public class StrategyController implements WorldStateReceiver {
 	private BallLocation ballLocation;
 	private StrategyType currentStrategy = StrategyType.DO_NOTHING;
 	private boolean pauseStrategyController = true;
-	private TestStrategy ats;
+	private Strategy ats;
 	
 	// Advanced Tactics flags
 	public static boolean confusionEnabled = false;
@@ -128,17 +128,13 @@ public class StrategyController implements WorldStateReceiver {
             break;
             
         case MILESTONE_TWO_A:
-        	//radio.sendPacket(new DisengageCatcherPacket());
-            Strategy ics = new DefenderStrategy(this.bcsDefender);
-        	//Strategy ics = new LateNightDefenderStrategy(this.bcsDefender);
-        	Strategy ats = new LateNightAttackerStrategy(this.bcsAttacker);
-            StrategyController.currentStrategies.add(ics);
+        	ats = new SidewaysTestStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ats);
-            ics.startControlThread();
             ats.startControlThread();
+            
             break;
         case MILESTONE_TWO_B:
-            ats = new TestStrategy(this.bcsDefender);
+            ats = new RotateTestStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
             

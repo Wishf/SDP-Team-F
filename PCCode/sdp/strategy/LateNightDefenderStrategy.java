@@ -224,7 +224,7 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			 if(rotate) {
 				 ////System.out.println("Roatet: " + angleDifference);
 					this.controlThread.operation.op = Operation.Type.DEFROTATE;
-					controlThread.operation.rotateBy = (int) (angleDifference);
+					controlThread.operation.angleDifference = (int) (angleDifference);
 				}
 				else if(catch_ball){
 					////System.out.println("Catch");
@@ -269,10 +269,11 @@ public class LateNightDefenderStrategy extends GeneralStrategy {
 			try {
 				while (true) {
 					Operation.Type op;
-					int rotateBy, travelDist;
+					double rotateBy;
+					double travelDist;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 					}
 					

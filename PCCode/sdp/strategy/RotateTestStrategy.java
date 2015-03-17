@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class TestStrategy extends GeneralStrategy {
+public class RotateTestStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class TestStrategy extends GeneralStrategy {
 	
 	
 
-	public TestStrategy(BrickCommServer brick) {
+	public RotateTestStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -54,16 +54,23 @@ public class TestStrategy extends GeneralStrategy {
 		double dy = ballY - attackerRobotY;	
 		double targetAngle = calcTargetAngle(dx, dy);
 		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
+		
+		
+		boolean rotate = false;
+		if(Math.abs(angleDifference) > 15)
+		{
+			rotate = true;
+		}
+		
+		
+		
+		
+		/*
+		
 		boolean ballInDefenderArea = false;
 		boolean saveBall = false;
 		
-		/*if(Math.abs(angleDifference) < 10)
-		{
-			angleDifference = 0;
-		}
-		if (Math.abs(angleDifference) < 30){
-			angleDifference = -angleDifference*0.3;
-		}*/
+		
 			
 		
 		boolean move_robot = false;
@@ -114,22 +121,41 @@ public class TestStrategy extends GeneralStrategy {
 			//System.out.println("Need to move the robot since dY=" + targetDistance);
 		}
 		boolean check = isRobotTooClose(defenderRobotX, defenderRobotY);
-		RobotDebugWindow.messageAttacker.setMessage("" + check);
+		RobotDebugWindow.messageAttacker.setMessage("" + check);*/
+		
+		
+		
 		synchronized (this.controlThread) {
-			/*if(Math.abs(angleDifference )> 0) {
+			
+			
+			
+			if(rotate){
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+				controlThread.operation.angleDifference = angleDifference;
+				
+				
+			}
+			else{
+				this.controlThread.operation.op = Operation.Type.STOP;
+				
+			}
+			
+			
+			/*
+			 * if(Math.abs(angleDifference )> 0) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.rotateBy = (int) angleDifference;
 			} else if(move_robot) {
 				////System.out.println("A: ");
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
-			}*/
-			if(true){
+			}
+			else if(true){
 				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
 				controlThread.operation.travelDistance = (int) 220;
 			}
-			/*else if(alignWithEnemyAttacker){
+			else if(alignWithEnemyAttacker){
 				
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
 				controlThread.operation.travelDistance = (int) targetDistance;
@@ -154,30 +180,27 @@ public class TestStrategy extends GeneralStrategy {
 			try {
 				while (true) {
 					Operation.Type op;
-					int rotateBy, travelDist;
+					double rotateBy, travelDist;
 					synchronized (this) {
 						op = this.operation.op;
-						rotateBy = this.operation.rotateBy;
+						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 					}
 					//System.out.println("operation: " + op);
 					switch (op) {
+					case STOP:
+						brick.execute(new RobotCommand.Stop());
+						RobotDebugWindow.messageAttacker.setMessage("STOP");
+						break;
 					case DEFROTATE:
-						if (rotateBy != 0) {
-						brick.executeSync(new RobotCommand.Rotate(
-								rotateBy));
-						}
+						brick.executeSync(new RobotCommand.Rotate(rotateBy));
+						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:
-						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(travelDist));
-						}
+						 brick.execute(new RobotCommand.Travel(travelDist));
 						break;
 					case DESIDEWAYS:
-						if (travelDist != 0) {
-							brick.execute(new RobotCommand.TravelSideways(
-									travelDist));
-						}
+						brick.execute(new RobotCommand.TravelSideways(travelDist));
 						break;
 					/*case DEBACK:
 						if (travelDist != 0) {

@@ -227,11 +227,11 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
             	 //System.out.println("Rotate" + angleDifference);
             	 if (angleDifference > 59){
-            		 controlThread.operation.rotateBy = (int) (angleDifference* 0.3);
+            		 controlThread.operation.angleDifference = (int) (angleDifference* 0.3);
             	 }else if(angleDifference > 30){
-            		 controlThread.operation.rotateBy = (int) (angleDifference);
+            		 controlThread.operation.angleDifference = (int) (angleDifference);
             	 }else{
-            		 controlThread.operation.rotateBy = (int) (angleDifference * 1.3);
+            		 controlThread.operation.angleDifference = (int) (angleDifference * 1.3);
             	 }
             	 
                 
@@ -291,7 +291,8 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             try {
                 while (true) {
                     Operation.Type op;
-                    int rotateBy, travelDist;
+                    double rotateBy;
+					double travelDist;
                     
                 	if(!start){
                 		start = true;
@@ -302,7 +303,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                 	else {
 	                    synchronized (this) {
 	                        op = this.operation.op;
-	                        rotateBy = this.operation.rotateBy;
+	                        rotateBy = this.operation.angleDifference;
 	                        travelDist = this.operation.travelDistance;
 	                    }
                 	}

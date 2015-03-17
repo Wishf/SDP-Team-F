@@ -144,8 +144,8 @@ public class StrategySelectorTool implements GUITool {
 		//private JButton marStrat = new JButton("Marking");
 		private JButton nullStrat = new JButton("Deactivate");
 		private JButton actStrat = new JButton("Activate");
-        private JButton mstAStrat = new JButton("Milestone 2 - Interceptor");
-        private JButton mstBStrat = new JButton("Milestone 2 - Score");
+        private JButton mstAStrat = new JButton("Test - Attacker sideways");
+        private JButton mstBStrat = new JButton("Test - Attacker rotate");
         private JButton ms3AStrat = new JButton("MILESTONE 3 - Pass task 1");
         private JButton ms3BStrat = new JButton("MILESTONE 3 - Pass task 2");
 		private JButton pauseController = new JButton("Pause");
