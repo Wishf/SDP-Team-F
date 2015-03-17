@@ -53,6 +53,10 @@ public class DrivePacket extends Packet {
     public byte getID() {
         return ID;
     }
+    
+    public byte getPower(int motor){
+    	return motorPowers[motor*2];
+    }
 
     @Override
     public void writePacket(SerialPort sendPort) throws SerialPortException {

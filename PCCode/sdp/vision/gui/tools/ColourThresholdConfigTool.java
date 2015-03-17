@@ -70,11 +70,11 @@ public class ColourThresholdConfigTool implements GUITool {
 			case VisionSettingsPanel.MOUSE_MODE_PITCH_BOUNDARY:
 
 				selectionActive = true;
-				System.out.println("Initialised anchor");
+				//System.out.println("Initialised anchor");
 				// Pitch dimension selector
 				anchor = e.getPoint();
-				System.out.println(anchor.x);
-				System.out.println(anchor.y);
+				//System.out.println(anchor.x);
+				//System.out.println(anchor.y);
 				this.selection = new Rectangle(anchor);
 				break;
 			case VisionSettingsPanel.MOUSE_MODE_PITCH_TOP_BOTTOM:
@@ -148,7 +148,7 @@ public class ColourThresholdConfigTool implements GUITool {
 
 					// If option wasn't Cancel and the dialog wasn't closed
 					if (pitchNum != 2 && pitchNum != JOptionPane.CLOSED_OPTION) {
-						System.out.println(pitchNum);
+						//System.out.println(pitchNum);
 						int top = b;
 						int bottom = b + d;
 						int left = a;
@@ -161,11 +161,11 @@ public class ColourThresholdConfigTool implements GUITool {
 									c, d));
 							pitchConstants.saveConstants(pitchNum);
 						} else {
-							System.out.println("Pitch selection NOT succesful");
+							//System.out.println("Pitch selection NOT succesful");
 						}
 					} else if (pitchNum == JOptionPane.CLOSED_OPTION
 							|| pitchNum == 2) {
-						System.out.println("Closed option picked");
+						//System.out.println("Closed option picked");
 						a = pitchConstants.getPitchLeft();
 						b = pitchConstants.getPitchTop();
 						c = pitchConstants.getPitchWidth();
@@ -174,23 +174,23 @@ public class ColourThresholdConfigTool implements GUITool {
 				}
 				break;
 			case VisionSettingsPanel.MOUSE_MODE_PITCH_TOP_BOTTOM:
-				System.out.println("Pitch outline selection.");
+				//System.out.println("Pitch outline selection.");
 				pitchConstants.getPitchOutline()[currentPitchOutline] = new Position(e.getX(),e.getY());
 				currentPitchOutline = (currentPitchOutline + 1) % 8;
 				break;
 			case VisionSettingsPanel.MOUSE_MODE_LEFT_GOAL:
-				System.out.println("Left goal selection mode");
+				//System.out.println("Left goal selection mode");
 				pitchConstants.getLeftGoal()[currentLeftGoal] = e.getY();
 				currentLeftGoal = (currentLeftGoal + 1) % 3;
 				break;
 			case VisionSettingsPanel.MOUSE_MODE_RIGHT_GOAL:
-				System.out.println("Right goal selection mode");
+				//System.out.println("Right goal selection mode");
 
 				pitchConstants.getRightGoal()[currentRightGoal] = e.getY();
 				currentRightGoal = (currentRightGoal + 1) % 3;
 				break;
 			case VisionSettingsPanel.MOUSE_MODE_DIVISIONS:
-				System.out.println("Division selection mode");
+				//System.out.println("Division selection mode");
 				pitchConstants.getDividers()[currentDivider] = e.getX();
 				currentDivider = (currentDivider + 1) % 3;
 				break;

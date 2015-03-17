@@ -2,23 +2,16 @@ package sdp.vision.gui.tools;
 
 import java.awt.Container;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import sdp.comms.BrickCommServer;
-import sdp.comms.RobotCommand;
 import sdp.strategy.StrategyController;
-import sdp.strategy.StrategyController.StrategyType;
 import sdp.vision.gui.GUITool;
 import sdp.vision.gui.VisionGUI;
 
@@ -91,10 +84,6 @@ public class RobotDebugWindow implements GUITool {
 
 	@SuppressWarnings("serial")
 	public class DebugWindow extends JPanel {
-		//private JButton atkStrat = new JButton("Attacking");
-		//private JButton defStrat = new JButton("Defending");
-		//private JButton passStrat = new JButton("Passing");
-		//private JButton marStrat = new JButton("Marking");
 		private JLabel label = new JLabel();
 		private JTextField field = new JTextField("Robot says hi!");
 

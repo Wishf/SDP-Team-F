@@ -124,8 +124,8 @@ public class DefenderStrategy extends GeneralStrategy {
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
 					}
-//					System.out.println("operation: " + op + " rotateBy: "
-//							 + rotateBy + " travelDist: " + travelDist);
+//					
+					/*
 					switch (op) {
 					case DEFCATCH :
 						brick.execute(new RobotCommand.Catch());
@@ -138,9 +138,8 @@ public class DefenderStrategy extends GeneralStrategy {
 						break;
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(
-									travelDist / 3,
-									Math.abs(travelDist) * 3 + 25));
+							brick.execute(new RobotCommand.Trave(
+									travelDist));
 						}
 						break;
 					case DEFKICK:
@@ -153,6 +152,7 @@ public class DefenderStrategy extends GeneralStrategy {
 					default:
 						break;
 					}
+					*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch (InterruptedException e) {

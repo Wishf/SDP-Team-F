@@ -3,6 +3,7 @@ package sdp.control;
 import sdp.comms.Radio;
 import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
+import sdp.vision.gui.tools.RobotDebugWindow;
 
 /**
  * Created by Matthew on 09/02/2015.
@@ -49,56 +50,49 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     //speed in degrees per second
-    public DrivePacket rotate(int angle, int speed){
-    	System.out.println("Rotate: "+angle);
-    	
+    public DrivePacket rotate(double angle){    	
+    	// Turning circle circumference
+    	double circumference = Math.PI * (WHEEL_LEFT_DIST + WHEEL_RIGHT_DIST);
+    	// How far we want each wheel to travel
+    	double arcLength = (Math.abs(angle) / 360) * circumference;
     	angle = -angle;
+    	double a = 0.4, b = 90;
+    	double power = a*arcLength + b;
+    	power = Math.min(255, power);
     	
-    	double a = 0.8;
-    	double b = 60;
-    	double turnAngle = a*Math.abs(angle) + b;
-    	
-    	turnAngle = Math.min(255, turnAngle);
-    		   	
-    	//double powerScale = 0.9;//Math.min(1, angle+90/180);
-    	
-    	
-    	
-    	//TODO: calculate the speed actually
-    	byte motor1power = (byte) turnAngle;
-    	byte motor2power = (byte) turnAngle;
-    	byte motor3power = (byte) turnAngle;
-    	System.out.println("power:"+motor1power);
-        
+    	byte motor1Power = (byte) power;
+    	byte motor2Power = (byte) power;
     	
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
     	
     	if(angle > 0){
-    		leftMotorDir = DriveDirection.FORWARD;
+    		
+    		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	}
+
     	
-    	//System.out.println("motor1power:"+motor1power+" leftMotorDir:"+leftMotorDir+" motor2power:"+motor2power
-    			//+" rightMotorDir:"+rightMotorDir+" motor3power:"+motor3power+" rightMotorDir:"+rightMotorDir);
+    	//RobotDebugWindow.messageAttacker.setMessage("Powers are: " + motor1Power + ", " + motor2Power);
     	return new DrivePacket(
-    			motor1power, leftMotorDir, 
-    			motor2power, rightMotorDir, 
-    			motor3power, rightMotorDir,
+    			motor1Power, leftMotorDir, 
+    			motor2Power, rightMotorDir, 
+    			(byte)0, rightMotorDir,
                 150);
+    	
     }
     
     
     
-    public DrivePacket travel(int distance){
+    public DrivePacket travel(double displacement){
     	
-    	System.out.println("Travel: "+distance);
+    	//System.out.println("Travel: "+distance);
     	
-    	double a = 0.5, b = 50;
-    	double power = a*distance +b;
+    	double a = 1.5, b = 50;
+    	double power = a*displacement +b;
     	power = Math.min(255, power);
     	
     	//TODO: calculate the speed actually
@@ -108,13 +102,15 @@ public class HolonomicRobotController extends BaseRobotController {
     	DriveDirection leftMotorDir;
     	DriveDirection rightMotorDir;
     	
-    	if(distance > 0){
+    	if(displacement > 0){
     		leftMotorDir = DriveDirection.FORWARD;
     		rightMotorDir = DriveDirection.FORWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
     		rightMotorDir = DriveDirection.BACKWARD;
     	}
+    	
+    	//System.out.println("motor1power:"+motor1power+"motor2power:"+motor2power);
 
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
@@ -125,23 +121,18 @@ public class HolonomicRobotController extends BaseRobotController {
     }
     
     
-public DrivePacket travelSideways(int distance){
+public DrivePacket travelSideways(double distance){
     	
-    	System.out.println("Travel sideways: "+distance);
+		double absDistance = Math.abs(distance);
     	
-    	
-    	double a = 0.5, b = 50;
-    	double power = a*distance +b;
+    	double a = 0.5, b = 80;
+    	double power = a*absDistance +b;
     	power = Math.min(255, power);
     	
-    	
-    	double arcCorrectionCoef = 0.1;
+    	double arcCorrectionCoef = 0.06;
     	
     	byte motor1power = (byte) (power*arcCorrectionCoef);
-    	byte motor2power = (byte) (power*arcCorrectionCoef);
     	byte motor3power = (byte) power;
-    	
-    	System.out.println(motor3power);
     	
     	DriveDirection leftMotorDir = DriveDirection.FORWARD;
     	DriveDirection rightMotorDir = DriveDirection.FORWARD;
@@ -159,7 +150,7 @@ public DrivePacket travelSideways(int distance){
 
     	return new DrivePacket(
     			motor1power, leftMotorDir, 
-    			motor2power, rightMotorDir, 
+    			motor1power, rightMotorDir, 
     			motor3power, rearMotorDir,
                 500);
     	
@@ -196,36 +187,23 @@ public DrivePacket travelSideways(int distance){
     }
     
     
-    public DrivePacket move(double dX, double dY, double dA){
-    	
-    	double c1 = 1;
-    	double c2 = 1;
-    	double c3 = 1;
-    	
-    	double vX = Math.min(1, Math.max(-1, Math.pow(dX*c1, 3)));
-    	double vY = Math.min(1, Math.max(-1, Math.pow(dY*c2, 3)));
-    	double vA = Math.min(1, Math.max(-1, Math.pow(dA*c3, 3)));
-    	
-    	
-    	double v1 = vX + vA;
-    	double v2 = vY + vA;
-    	double v3 = vX + vA;
-    	
-    	
-    	
-    	byte motor1power, motor2power, motor3power;
-    	DriveDirection motor1dir, motor2dir, motor3dir;
-    	
-    	
-    	
-    	return null;
-    	
-    	/*
-    	return new DrivePacket(
-    			motor1power, motor1dir, 
-    			motor2power, motor2dir,
-    			motor3power, motor3dir);
-    			*/
+    public Packet openCatcher(){
+    	return new DisengageCatcherPacket();
     }
+    
+    
+    
+    
+    
+    /**
+     * Not yet implemented posibly never will be, don't account for it
+     * @param angle
+     * @param distance
+     * @return
+     */
+	public Packet travelDiagonally(double angle, double distance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

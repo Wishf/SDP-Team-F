@@ -1,9 +1,9 @@
 package sdp.comms;
 
-import sdp.comms.packets.AttackerPacket;
-import sdp.comms.packets.DefenderPacket;
+//import sdp.comms.packets.AttackerPacket;
+//import sdp.comms.packets.DefenderPacket;
 import sdp.comms.packets.Packet;
-import sdp.comms.packets.PositionPacket;
+//import sdp.comms.packets.PositionPacket;
 //import sun.nio.cs.Surrogate;
 
 import java.io.IOException;
@@ -46,8 +46,9 @@ public class BrickCommServer implements PacketListener {
         executor = Executors.newSingleThreadExecutor(EXECUTOR_FACTORY);
         //comm = new Radio("COM3");
         String[] serialPorts = Radio.getPortNames();
+        
         //Now get an input from the user as to which port they want to use.
-        System.out.println("Enter the number for the port you want to use for "+name+" connection: ");
+        System.out.println(name+" port: ");
         Scanner userChoiceInput = new Scanner(System.in);
         int portNum = userChoiceInput.nextInt();
         while (!(portNum >= 0 && portNum < serialPorts.length)) {
@@ -57,8 +58,8 @@ public class BrickCommServer implements PacketListener {
         }
         comm = new SingletonRadio(serialPorts[portNum]);
         comm.addListener(this);
-        PositionPacket whatPosition = new PositionPacket();
-        comm.sendPacket(whatPosition);
+        //PositionPacket whatPosition = new PositionPacket();
+       // comm.sendPacket(whatPosition);
     }
 
     public void connect() {
@@ -70,7 +71,7 @@ public class BrickCommServer implements PacketListener {
     public boolean isConnected() {
         return connected;
     }
-    public boolean isAttacker() { return playerType instanceof AttackerPacket; }
+    //public boolean isAttacker() { return playerType instanceof AttackerPacket; }
     public boolean isIdentified() { return playerType != null; }
 
     private void setConnected(boolean connected) {
@@ -128,85 +129,11 @@ public class BrickCommServer implements PacketListener {
 
     @Override
     public void packetArrived(Packet p) {
-        if(p instanceof AttackerPacket || p instanceof DefenderPacket){
+        //if(p instanceof AttackerPacket || p instanceof DefenderPacket){
             this.playerType = p;
-        }
+        //}
     }
-
-    // Legacy methods
-
-	/*@Deprecated
-    public void robotKick(int speed) throws IOException {
-		brickOutput.writeInt(RobotOpcode.KICK);
-		brickOutput.writeInt(speed);
-		brickOutput.flush();
-	}
-
-	@Deprecated
-	public void robotCatch() throws IOException {
-		brickOutput.writeInt(RobotOpcode.CATCH);
-		brickOutput.flush();
-	}
-
-	@Deprecated
-	public void robotRotateBy(int angle, double speed) throws IOException {
-		brickOutput.writeInt(RobotOpcode.ROTATE_BY);
-		brickOutput.writeInt(angle);
-		brickOutput.writeDouble(speed);
-		brickOutput.flush();
-	}
-
-	@Deprecated
-	public void robotArcForwards(double arcRadius, int distance, int speed)
-			throws IOException {
-		brickOutput.writeInt(RobotOpcode.ARC_FORWARDS);
-		brickOutput.writeDouble(arcRadius);
-		brickOutput.writeInt(distance);
-		brickOutput.writeInt(speed);
-		brickOutput.flush();
-	}
-
-	@Deprecated
-	public void robotTravel(int distance, int travelSpeed) throws IOException {
-		brickOutput.writeInt(RobotOpcode.TRAVEL);
-		brickOutput.writeInt(distance);
-		brickOutput.writeInt(travelSpeed);
-		brickOutput.flush();
-
-	}
-
-	public boolean robotTest() throws IOException {
-		brickOutput.writeInt(RobotOpcode.TEST);
-		brickOutput.flush();
-		boolean robotReceived = brickInput.readBoolean();
-		return robotReceived;
-	}
-
-	public boolean robotTestINT(int param) throws IOException {
-		brickOutput.writeInt(RobotOpcode.TESTINT);
-		brickOutput.writeInt(param);
-		brickOutput.flush();
-		boolean robotReceived = brickInput.readBoolean();
-		return robotReceived;
-	}
-
-	public boolean robotTestDOUBLE(double param) throws IOException {
-		brickOutput.writeInt(RobotOpcode.TESTDOUBLE);
-		brickOutput.writeDouble(param);
-		brickOutput.flush();
-		boolean robotReceived = brickInput.readBoolean();
-		return robotReceived;
-	}
-
-	public boolean robotTestINTANDDOUBLE(int paramInt, double paramDouble)
-			throws IOException {
-		brickOutput.writeInt(RobotOpcode.TESTINTANDDOUBLE);
-		brickOutput.writeDouble(paramDouble);
-		brickOutput.writeInt(paramInt);
-		brickOutput.flush();
-		boolean robotReceived = brickInput.readBoolean();
-		return robotReceived;
-	}*/
+    
 
     public interface StateChangeListener {
         void stateChanged();

@@ -110,9 +110,8 @@ public class InterceptorStrategy extends GeneralStrategy {
 						rotateBy = this.operation.rotateBy;
 						travelDist = this.operation.travelDistance;
 					}
-					System.out.println("operation: " + op + " rotateBy: "
-							 + rotateBy + " travelDist: " + travelDist);
-					switch (op) {
+					
+					/*switch (op) {
 					case DEFROTATE:
 						if (rotateBy != 0) {
 						brick.executeSync(new RobotCommand.Rotate(
@@ -121,9 +120,8 @@ public class InterceptorStrategy extends GeneralStrategy {
 						break;
 					case DEFTRAVEL:
 						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Travel(
-									travelDist / 3,
-									Math.abs(travelDist) * 3 + 25));
+							brick.execute(new RobotCommand.Trave(
+									travelDist ));
 						}
 						break;
 					case DEFKICK:
@@ -135,7 +133,7 @@ public class InterceptorStrategy extends GeneralStrategy {
 						break;
 					default:
 						break;
-					}
+					}*/
 					Thread.sleep(StrategyController.STRATEGY_TICK); // TODO: Test lower values for this and
 										// see where it breaks.
 				}

@@ -123,14 +123,14 @@ public class AttackerStrategy extends GeneralStrategy {
 
 //					if (prevOp != null) {
 //						if (!op.equals(prevOp)){
-//							System.out.println("justCaught: " + justCaught + " op: " + op.toString() + " rotateBy: "
+//							//System.out.println("justCaught: " + justCaught + " op: " + op.toString() + " rotateBy: "
 //								+ rotateBy + " travelDist: " + travelDist
 //								+ "radius: " + radius);
 //						}
 //					}
 //					prevOp = op;
-
-					switch (op) {
+					
+					/*witch (op) {
 					case DO_NOTHING:
 						break;
 					case ATKCATCH:
@@ -142,7 +142,7 @@ public class AttackerStrategy extends GeneralStrategy {
 						break;
 					case ATKMOVEKICK:
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
-							brick.execute(new RobotCommand.Travel(100, 10000));
+							brick.execute(new RobotCommand.Trave(100));
 							brick.execute(new RobotCommand.Kick(100));
 							ballCaughtAttacker = false;
 							lastKickerEventTime = System.currentTimeMillis();
@@ -159,7 +159,7 @@ public class AttackerStrategy extends GeneralStrategy {
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
 							brick.execute(new RobotCommand.Rotate(75, 100, false));
 							brick.execute(new RobotCommand.Rotate(-100, 1000, false));
-							brick.execute(new RobotCommand.Travel(100, 10000));
+							brick.execute(new RobotCommand.Trave(100));
 							brick.execute(new RobotCommand.Kick(100));
 							ballCaughtAttacker = false;
 							lastKickerEventTime = System.currentTimeMillis();
@@ -169,7 +169,7 @@ public class AttackerStrategy extends GeneralStrategy {
 						if (System.currentTimeMillis() - lastKickerEventTime > 1000) {
 							brick.execute(new RobotCommand.Rotate(-75, 100, false));
 							brick.execute(new RobotCommand.Rotate(100, 1000, false));
-							brick.execute(new RobotCommand.Travel(100, 10000));
+							brick.execute(new RobotCommand.Trave(100));
 							brick.execute(new RobotCommand.Kick(100));
 							ballCaughtAttacker = false;
 							lastKickerEventTime = System.currentTimeMillis();
@@ -180,8 +180,7 @@ public class AttackerStrategy extends GeneralStrategy {
 								rotateSpeed));
 						break;
 					case ATKTRAVEL:
-						brick.execute(new RobotCommand.Travel(travelDist,
-								travelSpeed));
+						brick.execute(new RobotCommand.Trave(travelDist));
 						break;
 					case ATKARC_LEFT:
 						brick.execute(new RobotCommand.TravelArc(radius,
@@ -193,7 +192,7 @@ public class AttackerStrategy extends GeneralStrategy {
 						break;
 					default:
 						break;
-					}
+					}*/
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
 			} catch (InterruptedException e) {
