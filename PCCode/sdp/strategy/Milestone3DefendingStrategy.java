@@ -309,7 +309,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                     //System.out.println("operation: " + op);
                     switch (op) {
                         case DEFROTATE:
-                        	if(System.currentTimeMillis() - caughtTime < 1000)
+                        	if(System.currentTimeMillis() - caughtTime < 1500)
                         	{
                         		brick.execute(new RobotCommand.Stop());
                         	}
@@ -360,6 +360,10 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFKICK:
+                        	if(System.currentTimeMillis() - caughtTime < 2000)
+                        	{
+                        		brick.execute(new RobotCommand.Stop());
+                        	}
                             if((System.currentTimeMillis() - caughtTime > 1000)){
                                 //System.out.println("Kicking");
 
