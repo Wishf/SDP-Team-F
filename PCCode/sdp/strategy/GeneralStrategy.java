@@ -613,7 +613,7 @@ public class GeneralStrategy implements Strategy {
 		}
 		attackerResetY = (PitchConstants.getPitchOutlineBottom() + PitchConstants.getPitchOutlineTop())/2;
 		defenderResetY = (PitchConstants.getPitchOutlineBottom() + PitchConstants.getPitchOutlineTop())/2;
-
+		
 	}
 
 	public static double calculateAngle(float robotX, float robotY,

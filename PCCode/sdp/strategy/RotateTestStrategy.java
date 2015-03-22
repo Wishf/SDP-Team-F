@@ -48,6 +48,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
 		
 		
 		double dx = ballX - attackerRobotX;
@@ -65,69 +66,13 @@ public class RotateTestStrategy extends GeneralStrategy {
 		
 		
 		
-		/*
 		
-		boolean ballInDefenderArea = false;
-		boolean saveBall = false;
-		
-		
-			
-		
-		boolean move_robot = false;
-		
-		
-		
-		boolean ballInEnemyAttackerArea = false;
-		boolean alignWithEnemyAttacker = false;
-		
-		
-		if (ballX < defenderCheck == worldState.weAreShootingRight) {
-            ballInDefenderArea = true;            
-        }
-        if(worldState.weAreShootingRight){        	
-        	ballInEnemyAttackerArea = ballX > defenderCheck && ballX < leftCheck;
-        }else{
-        	ballInEnemyAttackerArea = ballX < defenderCheck && ballX > rightCheck;
-        }
-        //String message = String.valueOf(ballInEnemyAttackerArea);
-        //RobotDebugWindow.messageDefender.setMessage(message);
-        
-        if(!ballCaughtDefender && ballInDefenderArea){
-        	//System.out.print("I am after the ball. ");
-            //target = new Point2(ballX, ballY);  
-            dx = ballX - defenderRobotX;
-            dy = ballY - defenderRobotY;
-            saveBall = true;            
-        }else {        	
-            //target = new Point2(ourGoalY[1], defenderRobotX);
-        	dy = ourGoalY[1] - defenderRobotY;
-        }
-        
-        
-        if(ballInEnemyAttackerArea){
-        	alignWithEnemyAttacker = true;
-        	//System.out.println("ALIGN");
-        	//RobotDebugWindow.messageDefender.setMessage("ALIGN");
-        	if(enemyAttackerRobotY - defenderRobotY < 0 ){        
-        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
-        	}else {
-        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
-        	}
-        }
-        double targetDistance = Math.sqrt(dx*dx + dy*dy);
-        if(Math.abs(targetDistance) > 15) {
-			move_robot = true;
-			
-			//System.out.println("Need to move the robot since dY=" + targetDistance);
-		}
-		boolean check = isRobotTooClose(defenderRobotX, defenderRobotY);
-		RobotDebugWindow.messageAttacker.setMessage("" + check);*/
 		
 		
 		
 		synchronized (this.controlThread) {
 			
-			
+			//this.controlThread.worldState = worldState;
 			
 			if(rotate){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
@@ -140,32 +85,14 @@ public class RotateTestStrategy extends GeneralStrategy {
 				
 			}
 			
-			
-			/*
-			 * if(Math.abs(angleDifference )> 0) {
-				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) angleDifference;
-			} else if(move_robot) {
-				////System.out.println("A: ");
-				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
-			}
-			else if(true){
-				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) 220;
-			}
-			else if(alignWithEnemyAttacker){
-				
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) targetDistance;
-			}*/
+		
 			
 			
 		}
 	}
 	
 	protected class ControlThread extends Thread {
+		public WorldState worldState;
 		public Operation operation = new Operation();
 		private ControlThread controlThread;
 
@@ -181,19 +108,25 @@ public class RotateTestStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					double rotateBy, travelDist;
+					WorldState worldState;
 					synchronized (this) {
 						op = this.operation.op;
 						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
+						
+						worldState = this.worldState;
 					}
+					
+					
+					
 					//System.out.println("operation: " + op);
 					switch (op) {
 					case STOP:
-						brick.execute(new RobotCommand.Stop());
-						RobotDebugWindow.messageAttacker.setMessage("STOP");
+						brick.robotController.stop();
+						//RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
-						brick.executeSync(new RobotCommand.Rotate(rotateBy));
+						brick.robotController.rotate(rotateBy);
 						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:

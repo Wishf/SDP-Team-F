@@ -3,6 +3,7 @@ package sdp.comms;
 //import sdp.comms.packets.AttackerPacket;
 //import sdp.comms.packets.DefenderPacket;
 import sdp.comms.packets.Packet;
+import sdp.control.HolonomicRobotController;
 //import sdp.comms.packets.PositionPacket;
 //import sun.nio.cs.Surrogate;
 
@@ -29,9 +30,12 @@ public class BrickCommServer implements PacketListener {
 
     private ExecutorService executor;
     private List<StateChangeListener> stateChangeListeners;
-
+    public HolonomicRobotController robotController;
+    public String name = "";
+    
     private final static ThreadFactory EXECUTOR_FACTORY = new ThreadFactory() {
-
+    	
+    	
         @Override
         public Thread newThread(Runnable runnable) {
             Thread t = new Thread(runnable, "BrickCommServer executor");
@@ -41,6 +45,7 @@ public class BrickCommServer implements PacketListener {
     };
 
     public BrickCommServer(String name) {
+    	this.name = name;
         stateChangeListeners = new ArrayList<BrickCommServer.StateChangeListener>();
         connected = false;
         executor = Executors.newSingleThreadExecutor(EXECUTOR_FACTORY);
@@ -60,6 +65,11 @@ public class BrickCommServer implements PacketListener {
         comm.addListener(this);
         //PositionPacket whatPosition = new PositionPacket();
        // comm.sendPacket(whatPosition);
+        
+        if(name.equals("defender"))
+        	robotController = new HolonomicRobotController(comm, (byte)'d');
+        else
+        	robotController = new HolonomicRobotController(comm, (byte)'a');
     }
 
     public void connect() {
@@ -120,7 +130,7 @@ public class BrickCommServer implements PacketListener {
      */
     public void executeSync(RobotCommand.Command command) {
         try {
-            command.sendToBrick(comm);
+            command.sendToBrick(comm, robotController);
         } catch (IOException e) {
             e.printStackTrace();
             close();

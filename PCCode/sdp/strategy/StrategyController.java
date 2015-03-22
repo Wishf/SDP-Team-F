@@ -19,7 +19,7 @@ public class StrategyController implements WorldStateReceiver {
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
-		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B
+		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B, CALIBRATION
 	}
 	
 	public enum BallLocation{
@@ -31,7 +31,7 @@ public class StrategyController implements WorldStateReceiver {
 	private BallLocation ballLocation;
 	private StrategyType currentStrategy = StrategyType.DO_NOTHING;
 	private boolean pauseStrategyController = true;
-	private Strategy ats;
+	private Strategy ats, dfs;
 	
 	// Advanced Tactics flags
 	public static boolean confusionEnabled = false;
@@ -48,11 +48,11 @@ public class StrategyController implements WorldStateReceiver {
         this.bcsDefender = new BrickCommServer("defender");
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
-		//if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
+		/*if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
 			bcsTemp = bcsAttacker;
 			bcsAttacker = bcsDefender;
 			bcsDefender = (BrickCommServer) bcsTemp;
-		//}
+		}*/
         //System.out.println();
 	}
 
@@ -137,6 +137,15 @@ public class StrategyController implements WorldStateReceiver {
             ats = new RotateTestStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
+            
+            break;
+        case CALIBRATION:
+            ats = new CalibrationStrategy(this.bcsAttacker);
+            dfs = new CalibrationStrategy(this.bcsDefender);
+            StrategyController.currentStrategies.add(ats);
+            StrategyController.currentStrategies.add(dfs);
+            ats.startControlThread();
+            dfs.startControlThread();
             
             break;
 		case DO_NOTHING:

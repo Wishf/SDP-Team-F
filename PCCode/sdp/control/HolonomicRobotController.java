@@ -32,7 +32,11 @@ public class HolonomicRobotController extends BaseRobotController {
     private static final double WHEEL_RATIO = GROUP9_WHEEL_DIAMETER / (double)WHEEL_DIAMETER;*/
     
     
-    
+    private byte ARC_POWER = 100;
+    private double ROTATE_REAR_COEF = 0.5;
+    public double ROTATE_MIN = 100;
+    public double TRAVEL_MIN = 150;
+    public double SIDEWAYS_MIN = 200;
     
     private static final int PACKET_LIFETIME = 200;
     
@@ -48,8 +52,12 @@ public class HolonomicRobotController extends BaseRobotController {
 	DriveDirection rearMotorDir;    
     
 
-    public HolonomicRobotController(Radio radio, boolean initialCatcher){
-        super(radio, initialCatcher);
+    public HolonomicRobotController(Radio radio, byte position){
+        super(radio, position);
+        
+        leftMotorDir = DriveDirection.FORWARD;
+        rightMotorDir = DriveDirection.FORWARD;
+        rearMotorDir = DriveDirection.FORWARD;
     }
 
     @Override
@@ -57,32 +65,34 @@ public class HolonomicRobotController extends BaseRobotController {
 
     }
     
-    public DrivePacket stop(){
+    public boolean stop(){
     	byte zero = 0;
     	
-    	return new DrivePacket(
+    	return this.sendCommand(new DrivePacket(
     			zero, leftMotorDir, 
     			zero, rightMotorDir, 
     			zero, rearMotorDir,
-    			PACKET_LIFETIME);
+    			PACKET_LIFETIME));
     }
     
     
     
-    public DrivePacket rotate(double angle){    	
+    public boolean rotate(double angle){    	
     	
-    	double a = 0.7, minPower = 100;
+    	double a = 0.1, minPower = ROTATE_MIN, c = 0;
     	
-    	double maxPower = 200;
+    	double maxPower = 254;
     	
-    	double rearMotorCoef = 0.5;
+    	double rearMotorCoef = ROTATE_REAR_COEF;
     	
     	
-    	double power = a*Math.abs(angle) + minPower;
+    	double vp = Math.min(1, Math.abs(this.angularVelocity)/this.maxAngularVelocity);
+    	
+    	double power = a*Math.abs(angle) + minPower - vp*c;
     	
     	power = Math.min(maxPower, power);
     	
-    	//RobotDebugWindow.messageAttacker.setMessage("Rotating power: "+power);
+    	System.out.println("Rotating power: "+power);
     	
     	leftMotorPower = (byte) power;
     	rightMotorPower = (byte) power;
@@ -101,19 +111,19 @@ public class HolonomicRobotController extends BaseRobotController {
     	rearMotorDir = rightMotorDir;
 
     	
-    	return new DrivePacket(
+    	return this.sendCommand(new DrivePacket(
     			leftMotorPower, leftMotorDir, 
     			rightMotorPower, rightMotorDir, 
     			rearMotorPower, rearMotorDir,
-    			PACKET_LIFETIME);
+    			PACKET_LIFETIME));
     	
     }
     
     
     
-    public DrivePacket travel(double displacement){
+    public boolean travel(double displacement){
     	
-    	double a = 1.5, b = 50;
+    	double a = 1.5, b = TRAVEL_MIN;
     	
     	double power = a*Math.abs(displacement) +b;
     	power = Math.min(254, power);
@@ -135,25 +145,25 @@ public class HolonomicRobotController extends BaseRobotController {
     	rearMotorDir = DriveDirection.FORWARD;
     	
 
-    	return new DrivePacket(
+    	return this.sendCommand(new DrivePacket(
     			leftMotorPower, leftMotorDir, 
     			rightMotorPower, rightMotorDir, 
     			rearMotorPower, rearMotorDir,
-    			PACKET_LIFETIME);
+    			PACKET_LIFETIME));
     	
     }
     
-    
-public DrivePacket travelSideways(double displacement){
+  
+public boolean travelSideways(double displacement){
     	
-		double a = 3, minPower = 150;
+		double a = 3, minPower = SIDEWAYS_MIN;
     	double power = a*Math.abs(displacement) +minPower;   	
     	
     	power = Math.min(254, power);
     	
     	
     	double arcCorrectionCoef = 0.2;
-    	byte arcCorrectionPower = 100;
+    	byte arcCorrectionPower = (byte)ARC_POWER;
     	
     	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
     	rightMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
@@ -171,19 +181,97 @@ public DrivePacket travelSideways(double displacement){
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
 
-    	return new DrivePacket(
+    	return this.sendCommand(new DrivePacket(
     			leftMotorPower, leftMotorDir, 
     			rightMotorPower, rightMotorDir, 
     			rearMotorPower, rearMotorDir,
-    			PACKET_LIFETIME);
+    			PACKET_LIFETIME));
     }
     
     
-    
-    public Packet openCatcher(){
-    	return new DisengageCatcherPacket();
+	public void travelAtPower(int power){
+		leftMotorPower = (byte) Math.abs(power);
+    	rightMotorPower = (byte) Math.abs(power);
+    	rearMotorPower = 0;
+    	
+
+    	
+    	if(power > 0){
+    		leftMotorDir = DriveDirection.FORWARD;
+    		rightMotorDir = DriveDirection.FORWARD;
+    	} else {
+    		leftMotorDir = DriveDirection.BACKWARD;
+    		rightMotorDir = DriveDirection.BACKWARD;
+    	}
+    	rearMotorDir = DriveDirection.FORWARD;
+    	
+
+    	this.sendCommand(new DrivePacket(
+    			leftMotorPower, leftMotorDir, 
+    			rightMotorPower, rightMotorDir, 
+    			rearMotorPower, rearMotorDir,
+    			PACKET_LIFETIME));
+	}
+	
+	public void rotateAtPower(byte power){
+		leftMotorPower = (byte) Math.abs(power);
+    	rightMotorPower = (byte) Math.abs(power);
+    	rearMotorPower = (byte)(Math.abs(power) * ROTATE_REAR_COEF);
+    	
+
+    	
+    	if(power > 0){    		
+    		leftMotorDir = DriveDirection.FORWARD;			
+    		rightMotorDir = DriveDirection.BACKWARD;
+    	} else {
+    		leftMotorDir = DriveDirection.BACKWARD;
+    		rightMotorDir = DriveDirection.FORWARD;
+    	}
+    	rearMotorDir = rightMotorDir;
+
+    	
+    	this.sendCommand(new DrivePacket(
+    			leftMotorPower, leftMotorDir, 
+    			rightMotorPower, rightMotorDir, 
+    			rearMotorPower, rearMotorDir,
+    			PACKET_LIFETIME));
+	}
+	
+	public void travelSideways(byte power){
+		leftMotorPower = (byte) ARC_POWER;//(power*arcCorrectionCoef);
+    	rightMotorPower = (byte) ARC_POWER;//(power*arcCorrectionCoef);
+    	rearMotorPower = (byte) Math.abs(power);
+    	
+    	
+    	
+    	if(power > 0){
+    		leftMotorDir = DriveDirection.FORWARD;
+        	rightMotorDir = DriveDirection.BACKWARD;
+    		rearMotorDir = DriveDirection.FORWARD;
+    	} else {
+    		leftMotorDir = DriveDirection.BACKWARD;
+        	rightMotorDir = DriveDirection.FORWARD;
+    		rearMotorDir = DriveDirection.BACKWARD;
+    	}
+
+    	this.sendCommand(new DrivePacket(
+    			leftMotorPower, leftMotorDir, 
+    			rightMotorPower, rightMotorDir, 
+    			rearMotorPower, rearMotorDir,
+    			PACKET_LIFETIME));
+	}
+	
+    public boolean openCatcher(){
+    	return this.sendCommand(new DisengageCatcherPacket());
     }
     
+    public boolean closeCatcher(){
+    	return this.sendCommand(new EngageCatcherPacket());
+    }
+    
+    public boolean kick(){
+    	return this.sendCommand(new KickPacket());
+    }
     
     
     
