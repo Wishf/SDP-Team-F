@@ -289,6 +289,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         public ControlThread() {
             super("Robot control thread");
             setDaemon(true);
+            System.out.println("Hello");
         }
         @Override
 
@@ -306,7 +307,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                         rotateBy = this.operation.angleDifference;
                         travelDist = this.operation.travelDistance;
                     }
-                    //RobotDebugWindow.messageAttacker.setMessage("operation: " + op);
+                    RobotDebugWindow.messageAttacker.setMessage("operation: " + op);
                     switch (op) {
                         case DEFROTATE:
                             if (rotateBy != 0) {
@@ -338,7 +339,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                                 //RobotDebugWindow.messageAttacker.setMessage("Catching");
 
 
-                                brick.execute(new RobotCommand.Catch());
+                                brick.execute(new RobotCommand.ResetCatcher());
                                 hasBall = true;
                                 caughtTime = System.currentTimeMillis();
                                 kicked = false;
@@ -350,7 +351,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 
                                 brick.execute(new RobotCommand.Kick());
                                 Thread.sleep(500);
-                                brick.execute(new RobotCommand.ResetCatcher());
+                                brick.execute(new RobotCommand.Catch());
 
                                 kicked = true;
                                 ballCaughtAttacker = false;
@@ -359,7 +360,8 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFUNCATCH:
-                            brick.execute(new RobotCommand.ResetCatcher());
+                            brick.execute(new RobotCommand.Catch());
+                            hasBall = false;
                             RobotDebugWindow.messageAttacker.setMessage("Uncatch");
                             break;
                         default:
