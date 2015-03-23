@@ -141,11 +141,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         targetAngle = calcTargetAngle(dx,dy);
         
         if(ballInEnemyDefenderArea) {
-        	if(worldState.weAreShootingRight) {
-        		targetAngle = 0;
-        	} else {
-        		targetAngle = 180;
-        	}
+        	targetAngle = 0;
+        	//if(worldState.weAreShootingRight) {
+        	//	targetAngle = 0;
+        	//} else {
+        	//	targetAngle = 360;
+        	//}
         }
         
         if(ballInDefenderArea) {
