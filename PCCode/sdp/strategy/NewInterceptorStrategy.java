@@ -215,32 +215,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 							brick.execute(new RobotCommand.TravelSideways(travelDist));
 						}
 						break;
-					/*case DEBACK:
-						if (travelDist != 0) {
-							brick.execute(new RobotCommand.Trave(
-									travelDist));
-						}
-						break;*/
-/*					case DEFCATCH:
-						if((System.currentTimeMillis() - kickTime > 3000)){
-							brick.execute(new RobotCommand.Catch());
-							ballCaught = true;
-							caughtTime = System.currentTimeMillis();
-							kicked = false;
-						}
-						break;
-					case DEFKICK:
-						if((System.currentTimeMillis() - caughtTime > 1000)){
-							brick.execute(new RobotCommand.Kick());
-							
-							kicked = true;
-							ballCaught = false;
-							kickTime = System.currentTimeMillis();
-						}
-						break;
-					case DEFUNCATCH:
-						brick.execute(new RobotCommand.ResetCatcher());
-						break;*/
+					
 					default:
 						break;
 					}

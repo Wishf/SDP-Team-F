@@ -92,6 +92,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 2. Ask the control box where to go.
             if(ballCaughtAttacker) {
             	ControlBox.controlBox.computePositions(worldState);
+            	target = ControlBox.controlBox.getAttackerPosition();
                 //RobotDebugWindow.messageAttacker.setMessage("Ball attacker CB");
             } else {
                 target = new Point2(ballX, ballY);
@@ -110,11 +111,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             uncatch = true;
         }
         
-        if(ballInEnemyAttackerArea) {
-            // Rotate to face the defender?
-        	//RobotDebugWindow.messageAttacker.setMessage("Ball enemy attacker");
-        	target = new Point2(attackerRobotX, ballY);
-        }
         
         if(ballInEnemyDefenderArea) {
             // Follow the defender.

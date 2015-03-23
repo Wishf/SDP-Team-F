@@ -168,6 +168,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 	protected class ControlThread extends Thread {
 		public Operation operation = new Operation();
 		private ControlThread controlThread;
+		 private boolean start = false;
 
 		public ControlThread() {
 			super("Robot control thread");
@@ -181,11 +182,19 @@ public class RotateTestStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					double rotateBy, travelDist;
-					synchronized (this) {
-						op = this.operation.op;
-						rotateBy = this.operation.angleDifference;
-						travelDist = this.operation.travelDistance;
-					}
+					if(!start){
+                		start = true;
+                		op = Operation.Type.DEFUNCATCH;
+                		rotateBy = 0;
+                		travelDist = 0;
+                	}
+                	else {
+	                    synchronized (this) {
+	                        op = this.operation.op;
+	                        rotateBy = this.operation.angleDifference;
+	                        travelDist = this.operation.travelDistance;
+	                    }
+                	}
 					//System.out.println("operation: " + op);
 					switch (op) {
 					case STOP:
@@ -210,7 +219,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						break;*/
 					case DEFCATCH:
 						if((System.currentTimeMillis() - kickTime > 3000)){
-							brick.execute(new RobotCommand.Catch());
+							brick.execute(new RobotCommand.ResetCatcher());
 							ballCaught = true;
 							caughtTime = System.currentTimeMillis();
 							kicked = false;
@@ -226,7 +235,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						}
 						break;
 					case DEFUNCATCH:
-						brick.execute(new RobotCommand.ResetCatcher());
+						brick.execute(new RobotCommand.Catch());
 						break;
 					default:
 						break;
