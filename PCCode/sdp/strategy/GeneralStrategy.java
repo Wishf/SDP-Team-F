@@ -56,7 +56,9 @@ public class GeneralStrategy implements Strategy {
 
 	@Override
 	public void stopControlThread() {
-		controlThread.stop();
+		if(controlThread != null){
+			controlThread.stop();
+		}
 	}
 
 	@Override

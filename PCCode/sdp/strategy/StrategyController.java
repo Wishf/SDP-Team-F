@@ -49,9 +49,9 @@ public class StrategyController implements WorldStateReceiver {
         //Check which one is the attacker and defender and assign appropriately
 		// TODO: Devise a non-hanging way of doing this
 		//if (bcsAttacker.isAttacker() == false || bcsDefender.isAttacker() == true) {
-			bcsTemp = bcsAttacker;
-			bcsAttacker = bcsDefender;
-			bcsDefender = (BrickCommServer) bcsTemp;
+			//bcsTemp = bcsAttacker;
+			//bcsAttacker = bcsDefender;
+			//bcsDefender = (BrickCommServer) bcsTemp;
 		//}
         //System.out.println();
 	}
