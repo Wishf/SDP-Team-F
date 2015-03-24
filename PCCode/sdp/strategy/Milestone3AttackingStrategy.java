@@ -26,11 +26,15 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     private boolean kicked;
     private RotateDirection rotateDirection;
     private boolean hasBall;
+    private boolean catcherReleased;
+    private boolean initialized;
+    private int control;
 
     public Milestone3AttackingStrategy(BrickCommServer brick) {
         this.brick = brick;
         this.controlThread = new ControlThread();
         hasBall = false;
+        control = 0;
         //RobotDebugWindow.messageAttacker.setMessage("Starting.");
     }
 	
@@ -55,6 +59,19 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     @Override
     public void startControlThread() {
         this.controlThread.start();
+    }
+    
+    public float correctX() {
+    	if(weAreShootingRight) {		
+    		return attackerRobotX;
+    	} else {
+    		if(attackerRobotX - leftCheck < 10 || rightCheck - attackerRobotX < 10) {
+    			return 250;
+    		} else {
+    			return attackerRobotX;
+    		}
+    	}
+    	//return attackerRobotX;
     }
 
     
@@ -85,16 +102,16 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         If ball in enemy attacker area -> do nothing. They won't pass it back.
          */
 
-        Point2 target = new Point2(attackerRobotX, attackerRobotY);
+        Point2 target = new Point2(correctX(), attackerRobotY);
 
         if(ballInAttackerArea) {
             // 1. Catch the ball
             // 2. Ask the control box where to go.
             if(!hasBall) {
-                target = new Point2(ballX, ballY);
+                target = new Point2(ballX-5, ballY-5);
                 RobotDebugWindow.messageAttacker.setMessage("Ball attacker b");
+                uncatch = true;
             }
-            uncatch = true;
 
         }
         
@@ -110,14 +127,14 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         
         if(ballInEnemyDefenderArea) {
             // Follow the defender.
-            target = new Point2(attackerRobotX, ballY);
+            target = new Point2(correctX(), ballY);
             uncatch = true;
             //RobotDebugWindow.messageAttacker.setMessage("Ball enemy defender");
         }
         
         if(ballInEnemyAttackerArea) {
         	//Go to the middle
-        	target = new Point2(attackerRobotX, 240);
+        	target = new Point2(correctX(), 240);
         }
 
         double targetAngle;
@@ -134,7 +151,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         dx = target.getX() - attackerRobotX;
         dy = target.getY() - attackerRobotY;
         
-        double ballDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
+        double ballXYDistance = Math.sqrt(ball_dx*ball_dx+ball_dy*ball_dy);
         double targetDistance = Math.sqrt(dx*dx + dy*dy);
         double catchThreshold = 35;
         
@@ -150,7 +167,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	 }
         }
         
-        if(ballInDefenderArea) {
+        if(ballInDefenderArea || ballInEnemyAttackerArea) {
         	if(worldState.weAreShootingRight) {
         		targetAngle = 180;
         	} else {
@@ -159,9 +176,10 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         }
         
         if(ballInAttackerArea && hasBall) {
+        	ControlBox.controlBox.computeShot(worldState);
         	targetAngle = ControlBox.controlBox.getShootingAngle();
-        	System.out.println("Potato hasBall");
         }
+        
         double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
         
         if(ballInEnemyDefenderArea) {
@@ -177,7 +195,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	}
         } else {
 	
-	        if( (!hasBall && ballInAttackerArea && ballDistance > 25) 
+	        if( (!hasBall && ballInAttackerArea && ballXYDistance > 25) 
 	        		|| (targetDistance > 25)) {
 	            move_robot = true;
 	            uncatch = true;
@@ -204,17 +222,18 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	rotate = false;
         }
  
-        if(!hasBall) {
-        	System.out.println("Doesn't have the ball");
-        }
-        if(ballDistance < catchThreshold && !hasBall) {
+        //if(!hasBall) {
+        //	System.out.println("Doesn't have the ball");
+        //}
+        if(ballXYDistance < catchThreshold && !hasBall) {
             catch_ball = true;
             System.out.println("Catching");
         }
         
         // If the ball slips from the catching area we can guess we did not catch it.
-        if(hasBall && ballDistance > 5*catchThreshold) {
+        if(ballXYDistance > catchThreshold) {
         	hasBall = false;
+        	uncatch = true;
         }
         else if(hasBall && !kicked && !move_robot && !rotate){
         	// We kick once we're ready. We don't need to wait for anyone.
@@ -237,11 +256,24 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         if(travel_sideways) {
         	RobotDebugWindow.messageAttacker.setMessage("Travel sideways by " + targetDistance);
         }
+        
+        if(!initialized) {
+        	catch_ball = false;
+        	rotate = false;
+        	move_robot = false;
+        	travel_sideways = false;
+        	uncatch = true;
+        	initialized = true;
+        	catcherReleased = true;
+        }
 
         synchronized (this.controlThread) {
             this.controlThread.operation.op = Operation.Type.DO_NOTHING;
 
-           if (rotate) {
+            if (catch_ball) {
+                RobotDebugWindow.messageAttacker.setMessage("Catch");
+                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+            } else if (rotate) {
                 this.controlThread.operation.op = Operation.Type.DEFROTATE;
                 controlThread.operation.angleDifference = (int) angleDifference / 3;
             } else if (move_robot) {
@@ -250,9 +282,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             } else if(travel_sideways) {
             	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
             	controlThread.operation.travelDistance = (int) targetDistance;
-            } else if (catch_ball) {
-                RobotDebugWindow.messageAttacker.setMessage("Catch");
-                this.controlThread.operation.op = Operation.Type.DEFCATCH;
             } else if (uncatch) {
                 RobotDebugWindow.messageAttacker.setMessage("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
@@ -273,7 +302,6 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         public ControlThread() {
             super("Robot control thread");
             setDaemon(true);
-            System.out.println("Hello");
         }
         @Override
 
@@ -328,13 +356,15 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                                 hasBall = true;
                                 caughtTime = System.currentTimeMillis();
                                 kicked = false;
+                                catcherReleased = false;
                             }
+                            
                             break;
                         case DEFKICK:
                         	System.out.println("Kick");
                             if((System.currentTimeMillis() - caughtTime > 1000)){
                                 //RobotDebugWindow.messageAttacker.setMessage("Kicking");
-
+                         
                                 brick.execute(new RobotCommand.Kick());
                                 Thread.sleep(500);
                                 brick.execute(new RobotCommand.Catch());
@@ -344,13 +374,19 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                                 ballCaughtAttacker = false;
                                 kickTime = System.currentTimeMillis();
                                 ControlBox.controlBox.reset();
+                                catcherReleased = true;
                             }
                             break;
                         case DEFUNCATCH:
+                        	control++;
                         	System.out.println("Uncatch");
-                            brick.execute(new RobotCommand.Catch());
-                            hasBall = false;
-                            RobotDebugWindow.messageAttacker.setMessage("Uncatch");
+                        	if(!catcherReleased || control == 10) {
+                        		brick.execute(new RobotCommand.Catch());
+                                hasBall = false;
+                                catcherReleased = true;
+                                RobotDebugWindow.messageAttacker.setMessage("Uncatch");
+                                control = 0;
+                        	}           
                             break;
                         default:
                             break;
