@@ -66,6 +66,7 @@ class Communications
          * value (int) - The integer value to print
          */
         void print(int value);
+		void println(int value);
 
         /*
          * If debugging is enabled, this prints the string representation (in hexadecimal) of an unsigned short
@@ -75,6 +76,7 @@ class Communications
          * value (unsigned short) - The value to print
          */
         void print(unsigned short value);
+        void println(unsigned short value);
 
         /*
          * If debugging is enabled, this prints a string to the communications channel
@@ -83,6 +85,7 @@ class Communications
          * msg (char[]) - The message to print
          */
         void print(char msg[]);
+        void println(char msg[]);
 
         /*
          * Send a character back across the communications channel
