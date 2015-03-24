@@ -644,7 +644,7 @@ public class GeneralStrategy implements Strategy {
 		return distance;
 	}
 	
-	public static boolean isRobotTooClose(float robotX, float robotY){
+	public static boolean isRobotTooClose(float robotX, float robotY, int maxDistance){
 		double distance;
 		if (weAreShootingRight){
 			distance = Math.min(distanceFromLine(PitchConstants.getPitchOutline()[0].getX(),PitchConstants.getPitchOutline()[0].getY(),
@@ -657,9 +657,12 @@ public class GeneralStrategy implements Strategy {
 					distanceFromLine(PitchConstants.getPitchOutline()[3].getX(),PitchConstants.getPitchOutline()[3].getY(),
 							PitchConstants.getPitchOutline()[4].getX(),PitchConstants.getPitchOutline()[4].getY(), robotX, robotY));
 		}
-		if(distance < 30 || Math.abs(robotY - botOfPitch) < 30 || Math.abs(topOfPitch - robotY) < 30
-        		|| Math.abs(ourGoalX - robotX) < 30 )
+		System.out.println("DISTANCE" + distance);
+		if(distance < maxDistance || Math.abs(robotY - botOfPitch) < maxDistance || Math.abs(topOfPitch - robotY) < maxDistance
+        		|| Math.abs(ourGoalX - robotX) < maxDistance ){
+			//System.out.println("DISTANCE" + distance);
 			return true;
+		}
 		return false;
 	}
 
