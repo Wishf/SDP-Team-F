@@ -203,7 +203,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 	        if( (!hasBall && ballInAttackerArea && ballXYDistance > 25) 
 	        		|| (targetDistance > 25)) {
 	            move_robot = true;
-	            uncatch = true;
+	            if (catcherReleased != true) {
+	            	uncatch = true;
+	            }
 	        } 
 	        
 	        if(ballInDefenderArea) {
@@ -238,7 +240,9 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         // If the ball slips from the catching area we can guess we did not catch it.
         if(ballXYDistance > catchThreshold) {
         	hasBall = false;
-        	uncatch = true;
+        	if (catcherReleased != true) {
+        		uncatch = true;
+        	}
         }
         else if(hasBall && !kicked && !move_robot && !rotate){
         	// We kick once we're ready. We don't need to wait for anyone.
