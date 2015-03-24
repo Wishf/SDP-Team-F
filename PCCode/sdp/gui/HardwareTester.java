@@ -2,10 +2,7 @@ package sdp.gui;
 
 import sdp.comms.Radio;
 import sdp.comms.SingletonRadio;
-import sdp.comms.packets.DisengageCatcherPacket;
-import sdp.comms.packets.DrivePacket;
-import sdp.comms.packets.EngageCatcherPacket;
-import sdp.comms.packets.KickPacket;
+import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
 
 import javax.swing.*;
@@ -53,6 +50,8 @@ public class HardwareTester extends JDialog {
             portNum = userChoiceInput.nextInt();
         }
         radio = new SingletonRadio(serialPorts[portNum]);
+
+        radio.sendPacket(new ActivatePacket());
 
         kickButton.addActionListener(new ActionListener() {
             @Override
