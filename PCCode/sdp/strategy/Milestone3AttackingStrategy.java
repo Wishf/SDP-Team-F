@@ -110,9 +110,10 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             if(!hasBall) {
                 target = new Point2(ballX-5, ballY-5);
                 RobotDebugWindow.messageAttacker.setMessage("Ball attacker b");
-                uncatch = true;
+                if (catcherReleased != true) {
+                	uncatch = true;
+                }
             }
-
         }
         
         if(ballInDefenderArea) {
@@ -121,14 +122,18 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	target = ControlBox.controlBox.getAttackerPosition();
             //RobotDebugWindow.messageAttacker.setMessage("Ball defender");
             //Need to make sure we can catch the ball.
-            uncatch = true;
+        	if (catcherReleased != true) {
+        		uncatch = true;
+        	}
         }
         
         
         if(ballInEnemyDefenderArea) {
             // Follow the defender.
             target = new Point2(correctX(), ballY);
-            uncatch = true;
+            if (catcherReleased != true) {
+            	uncatch = true;
+            }
             //RobotDebugWindow.messageAttacker.setMessage("Ball enemy defender");
         }
         
