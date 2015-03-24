@@ -162,13 +162,9 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			}else if (faceEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 	           	System.out.println("ENEMY" + angleToEnemyAttacker);
-	           	if (angleToDefCheck > 59){
-	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker* 0.3);
-	           	}else if(angleToDefCheck > 30){
-	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker * 0.6);
-	           	}else{
-	           		controlThread.operation.angleDifference = (int) (angleToEnemyAttacker );
-	           	}
+	           	
+	           		controlThread.operation.angleDifference = (int) (-angleToEnemyAttacker);
+	           	
 			}
 		}
 	}
