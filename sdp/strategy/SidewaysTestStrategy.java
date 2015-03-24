@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class RotateTestStrategy extends GeneralStrategy {
+public class SidewaysTestStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 	
 	
 
-	public RotateTestStrategy(BrickCommServer brick) {
+	public SidewaysTestStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -52,76 +52,24 @@ public class RotateTestStrategy extends GeneralStrategy {
 		
 		double dx = ballX - attackerRobotX;
 		double dy = ballY - attackerRobotY;	
-		double targetAngle = calcTargetAngle(dx, dy);
+		double targetAngle = 0;//calcTargetAngle(dx, dy);
 		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		
 		
 		boolean rotate = false;
-		if(Math.abs(angleDifference) > 15)
+		if(Math.abs(angleDifference) > 20)
 		{
 			rotate = true;
 		}
 		
-		
-		
-		
-		/*
-		
-		boolean ballInDefenderArea = false;
-		boolean saveBall = false;
-		
-		
-			
-		
 		boolean move_robot = false;
 		
-		
-		
-		boolean ballInEnemyAttackerArea = false;
-		boolean alignWithEnemyAttacker = false;
-		
-		
-		if (ballX < defenderCheck == worldState.weAreShootingRight) {
-            ballInDefenderArea = true;            
-        }
-        if(worldState.weAreShootingRight){        	
-        	ballInEnemyAttackerArea = ballX > defenderCheck && ballX < leftCheck;
-        }else{
-        	ballInEnemyAttackerArea = ballX < defenderCheck && ballX > rightCheck;
-        }
-        //String message = String.valueOf(ballInEnemyAttackerArea);
-        //RobotDebugWindow.messageDefender.setMessage(message);
-        
-        if(!ballCaughtDefender && ballInDefenderArea){
-        	//System.out.print("I am after the ball. ");
-            //target = new Point2(ballX, ballY);  
-            dx = ballX - defenderRobotX;
-            dy = ballY - defenderRobotY;
-            saveBall = true;            
-        }else {        	
-            //target = new Point2(ourGoalY[1], defenderRobotX);
-        	dy = ourGoalY[1] - defenderRobotY;
-        }
-        
-        
-        if(ballInEnemyAttackerArea){
-        	alignWithEnemyAttacker = true;
-        	//System.out.println("ALIGN");
-        	//RobotDebugWindow.messageDefender.setMessage("ALIGN");
-        	if(enemyAttackerRobotY - defenderRobotY < 0 ){        
-        	dy = Math.max(enemyAttackerRobotY - defenderRobotY , ourGoalY[2] - defenderRobotY);        	
-        	}else {
-        	dy = Math.min(enemyAttackerRobotY - defenderRobotY , ourGoalY[0] - defenderRobotY);      	
-        	}
-        }
-        double targetDistance = Math.sqrt(dx*dx + dy*dy);
-        if(Math.abs(targetDistance) > 15) {
+		if(Math.abs(dy) > 20){
 			move_robot = true;
-			
-			//System.out.println("Need to move the robot since dY=" + targetDistance);
 		}
-		boolean check = isRobotTooClose(defenderRobotX, defenderRobotY);
-		RobotDebugWindow.messageAttacker.setMessage("" + check);*/
+		
+		
+		
 		
 		
 		
@@ -132,12 +80,13 @@ public class RotateTestStrategy extends GeneralStrategy {
 			if(rotate){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference = angleDifference;
-				
-				
+			}
+			else if(move_robot){
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = dy;
 			}
 			else{
-				this.controlThread.operation.op = Operation.Type.STOP;
-				
+				this.controlThread.operation.op = Operation.Type.STOP;				
 			}
 			
 			
@@ -168,7 +117,6 @@ public class RotateTestStrategy extends GeneralStrategy {
 	protected class ControlThread extends Thread {
 		public Operation operation = new Operation();
 		private ControlThread controlThread;
-		 private boolean start = false;
 
 		public ControlThread() {
 			super("Robot control thread");
@@ -182,19 +130,11 @@ public class RotateTestStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					double rotateBy, travelDist;
-					if(!start){
-                		start = true;
-                		op = Operation.Type.DEFUNCATCH;
-                		rotateBy = 0;
-                		travelDist = 0;
-                	}
-                	else {
-	                    synchronized (this) {
-	                        op = this.operation.op;
-	                        rotateBy = this.operation.angleDifference;
-	                        travelDist = this.operation.travelDistance;
-	                    }
-                	}
+					synchronized (this) {
+						op = this.operation.op;
+						rotateBy = this.operation.angleDifference;
+						travelDist = this.operation.travelDistance;
+					}
 					//System.out.println("operation: " + op);
 					switch (op) {
 					case STOP:
@@ -219,7 +159,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						break;*/
 					case DEFCATCH:
 						if((System.currentTimeMillis() - kickTime > 3000)){
-							brick.execute(new RobotCommand.ResetCatcher());
+							brick.execute(new RobotCommand.Catch());
 							ballCaught = true;
 							caughtTime = System.currentTimeMillis();
 							kicked = false;
@@ -235,7 +175,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						}
 						break;
 					case DEFUNCATCH:
-						brick.execute(new RobotCommand.Catch());
+						brick.execute(new RobotCommand.ResetCatcher());
 						break;
 					default:
 						break;

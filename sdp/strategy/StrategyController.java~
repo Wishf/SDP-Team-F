@@ -15,7 +15,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 100;
+	public static final int STRATEGY_TICK = 140;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
@@ -31,7 +31,7 @@ public class StrategyController implements WorldStateReceiver {
 	private BallLocation ballLocation;
 	private StrategyType currentStrategy = StrategyType.DO_NOTHING;
 	private boolean pauseStrategyController = true;
-	private Strategy ats;
+	private TestStrategy ats;
 	
 	// Advanced Tactics flags
 	public static boolean confusionEnabled = false;
@@ -113,7 +113,7 @@ public class StrategyController implements WorldStateReceiver {
 			break;
         case MILESTONE_THREE_A:
             // Without the obstacle, simple version
-        	ControlBox.controlBox.avoidObstacle(true);
+        	ControlBox.controlBox.avoidObstacle(false);
         	Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
         	StrategyController.currentStrategies.add(m3as);
         	m3as.startControlThread();
@@ -121,20 +121,24 @@ public class StrategyController implements WorldStateReceiver {
         	
         case MILESTONE_THREE_B:
             // With the obstacle, extended version
-        	//ControlBox.controlBox.avoidObstacle(false);
+        	ControlBox.controlBox.avoidObstacle(false);
         	Strategy m3ds = new Milestone3DefendingStrategy(this.bcsDefender);
         	StrategyController.currentStrategies.add(m3ds);
         	m3ds.startControlThread();
             break;
             
         case MILESTONE_TWO_A:
-        	ats = new CornerStrategy(this.bcsDefender);
+        	//radio.sendPacket(new DisengageCatcherPacket());
+            Strategy ics = new DefenderStrategy(this.bcsDefender);
+        	//Strategy ics = new LateNightDefenderStrategy(this.bcsDefender);
+        	Strategy ats = new LateNightAttackerStrategy(this.bcsAttacker);
+            StrategyController.currentStrategies.add(ics);
             StrategyController.currentStrategies.add(ats);
+            ics.startControlThread();
             ats.startControlThread();
-            
             break;
         case MILESTONE_TWO_B:
-            ats = new RotateTestStrategy(this.bcsAttacker);
+            ats = new TestStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
             
@@ -159,12 +163,18 @@ public class StrategyController implements WorldStateReceiver {
 			ic.startControlThread();
 			break;
 		case DEFENDING:
-			//Strategy AS = new AttackerStrategy(this.bcsAttacker);
-			//StrategyController.currentStrategies.add(AS);
-			//AS.startControlThread();			
-			Strategy nis = new NewInterceptorStrategy(this.bcsDefender);
-			StrategyController.currentStrategies.add(nis);
-			nis.startControlThread();			
+			Strategy AS = new AttackerStrategy(this.bcsAttacker);
+			StrategyController.currentStrategies.add(AS);
+			AS.startControlThread();
+			if (interceptorDefenceEnabled){
+				Strategy inter = new InterceptorStrategy(this.bcsDefender);
+				StrategyController.currentStrategies.add(inter);
+				inter.startControlThread();
+			} else {
+				Strategy pds = new DefenderStrategy(this.bcsDefender);
+				StrategyController.currentStrategies.add(pds);
+				pds.startControlThread();
+			}
 			break;
 		case MARKING:
 			/*Strategy newMar = new newMarkingStrategy(this.bcsAttacker);
@@ -214,14 +224,13 @@ public class StrategyController implements WorldStateReceiver {
 		}
 
 		// Change strategy only if the ball has changed pitch area.
-		if (prevBallLocation != ballLocation){
-			
+		if (prevBallLocation != ballLocation){			
 			switch(this.ballLocation){
 			case ATTACKER:
 				changeToStrategy(StrategyType.ATTACKING);
 				break;
 			case DEFENDER:
-				changeToStrategy(StrategyType.MILESTONE_THREE_B);
+				changeToStrategy(StrategyType.PASSING);
 				break;
 			case ENEMY_ATTACKER:
 				changeToStrategy(StrategyType.DEFENDING);
@@ -233,4 +242,3 @@ public class StrategyController implements WorldStateReceiver {
 		}
 	}
 }
-
