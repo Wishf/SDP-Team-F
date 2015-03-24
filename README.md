@@ -15,6 +15,9 @@ Right-Click RunVision.java -> Run As -> Run Configurations -> Environment -> New
 Name: LD_LIBRARY_PATH  
 Value: ${project_loc}/Libraries  
 Apply and run.
+###Vision Settings
+Whenever you open the vision control panel, click 'Settings' -> 'Load Settings'
+It does not automatically load previously saved settings otherwise.
 
 ##Repository Structure
 ###Arduino
