@@ -15,13 +15,17 @@ public abstract class BaseRobotController implements PacketListener {
     private boolean catcherEngaged;
     private Radio radio;
     private byte position;
-    
+    protected boolean moved = false;
+    protected boolean rotated = false;
     private MovingObject oldRobot, freshRobot;
+    protected DrivePacket lastPacket = null;
     
     protected double linearVelocity = 0, angularVelocity = 0;
-    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.1, maxAngularVelocity = 0.7;
+    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.1, maxAngularVelocity = 120/1000.0;
     
     private long lastSetWorldState = -1;
+    
+    
 
     public BaseRobotController(Radio radio, byte position) {
         this.radio = radio;
@@ -30,6 +34,8 @@ public abstract class BaseRobotController implements PacketListener {
     }
 
     public boolean sendCommand(Packet packet) {
+    	if(packet instanceof DrivePacket) lastPacket = (DrivePacket)packet;
+    	else lastPacket = null;
         radio.sendPacket(packet);
         return true;
     }
@@ -42,11 +48,10 @@ public abstract class BaseRobotController implements PacketListener {
     
     public void setWorldState(WorldState worldState){
     	
-    	
     	if(lastSetWorldState > 0){
     		long delta = System.currentTimeMillis() - lastSetWorldState; 
     		
-    		if(delta < 5){
+    		if(delta < 100){
     			return;
     		}
     		
@@ -63,14 +68,23 @@ public abstract class BaseRobotController implements PacketListener {
     			freshRobot = worldState.getAttackerRobot().copy();
     		}
     		
-    		this.angularVelocity = (freshRobot.orientation_angle - oldRobot.orientation_angle)/(double)delta;
+    		double raw_angle = Math.abs(freshRobot.orientation_angle - oldRobot.orientation_angle)%360;
+    		double angle = Math.min(Math.abs(360 - raw_angle), raw_angle);
+    		this.angularVelocity = angle/(double)delta;
+    		
+    		if(angle > 10) {
+    			System.out.println("!!!!!!ROTATED!!!!!!! " + angle);
+    			rotated = true;}
+    		else rotated = false;
     		
     		double dx = freshRobot.x - oldRobot.x;
     		double dy = freshRobot.y - oldRobot.y;
-    		this.linearVelocity = Math.sqrt(dx*dx + dy*dy)/(double)delta;    	
+    		double dist = Math.sqrt(dx*dx + dy*dy);
+    		this.linearVelocity = dist/(double)delta;
+    		
     		
     		//" "+Math.round(this.linearVelocity*1000)+
-    		//System.out.println(delta+" "+Math.round(this.angularVelocity*1000));
+    		//System.out.println(rotated);
     		//RobotDebugWindow.messageAttacker.setMessage(this.linearVelocity+" "+this.angularVelocity);
     	}else{       		
     		lastSetWorldState = System.currentTimeMillis();
@@ -81,6 +95,7 @@ public abstract class BaseRobotController implements PacketListener {
     			freshRobot = worldState.getAttackerRobot().copy();
     		}
     	}
+    	
     }
 
 

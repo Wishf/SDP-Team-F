@@ -140,8 +140,8 @@ public class StrategyController implements WorldStateReceiver {
             
             break;
         case CALIBRATION:
-            ats = new CalibrationStrategy(this.bcsAttacker);
-            dfs = new CalibrationStrategy(this.bcsDefender);
+            //ats = new CalibrationStrategy(this.bcsAttacker);
+            //dfs = new CalibrationStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
             StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();

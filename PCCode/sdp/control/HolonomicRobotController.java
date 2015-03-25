@@ -34,7 +34,7 @@ public class HolonomicRobotController extends BaseRobotController {
     
     private byte ARC_POWER = 100;
     private double ROTATE_REAR_COEF = 0.5;
-    public double ROTATE_MIN = 100;
+    public double ROTATE_MIN = 55;
     public double TRAVEL_MIN = 150;
     public double SIDEWAYS_MIN = 200;
     
@@ -67,24 +67,30 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean stop(){
     	byte zero = 0;
-    	
-    	return this.sendCommand(new DrivePacket(
-    			zero, leftMotorDir, 
-    			zero, rightMotorDir, 
-    			zero, rearMotorDir,
-    			PACKET_LIFETIME));
+    	if(lastPacket == null){
+    		return this.sendCommand(new DrivePacket(
+    				zero, leftMotorDir, 
+    				zero, rightMotorDir, 
+    				zero, rearMotorDir,
+    				PACKET_LIFETIME));
+    	}else{
+    		return this.sendCommand(lastPacket.getReverse());
+    	}
     }
     
     
     
     public boolean rotate(double angle){    	
     	
-    	double a = 0.1, minPower = ROTATE_MIN, c = 0;
+    	double a = 0.6, minPower = ROTATE_MIN, c = 0;
     	
     	double maxPower = 254;
     	
     	double rearMotorCoef = ROTATE_REAR_COEF;
     	
+    	if(!rotated){
+    		minPower *= 1.5;
+    	}
     	
     	double vp = Math.min(1, Math.abs(this.angularVelocity)/this.maxAngularVelocity);
     	
