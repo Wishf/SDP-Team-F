@@ -41,6 +41,10 @@ public class MovingObject {
 		this.y = y;
 	}
 	
+	public MovingObject copy(){
+		return new MovingObject(x, y, this.orientation_angle);
+	}
+	
 	//rotating point of robots, need to represent
 	//robot dimension extension from plates
 	

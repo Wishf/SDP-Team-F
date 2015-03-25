@@ -8,12 +8,15 @@ import sdp.control.HolonomicRobotController;
 
 public class RobotCommand {
     private static HolonomicRobotController robotController = new HolonomicRobotController(null, false);
-    
+    //protected HolonomicRobotController robotController;
 	protected RobotCommand() {		
 	}
 
 	public interface Command {
 		public void sendToBrick(Radio radio)
+				throws IOException;
+		
+		public void sendToBrick(Radio radio, HolonomicRobotController rC)
 				throws IOException;
 	}
 
@@ -23,6 +26,14 @@ public class RobotCommand {
 		@Override
 		public void sendToBrick(Radio radio)
 				throws IOException {
+			Packet opcode = getOpcode();		
+			
+			radio.sendPacket(getOpcode());
+		}
+		
+		@Override
+		public void sendToBrick(Radio radio, HolonomicRobotController rC) throws IOException{
+			//super.
 			Packet opcode = getOpcode();		
 			
 			radio.sendPacket(getOpcode());
@@ -65,7 +76,7 @@ public class RobotCommand {
 
 		@Override
 		protected Packet getOpcode() {
-			return robotController.rotate(angle);
+			return null;//robotController.rotate(angle);
 		}
 	}
 
@@ -78,7 +89,7 @@ public class RobotCommand {
 		
 		@Override
 		protected Packet getOpcode() {
-			return robotController.travel(displacement);
+			return null;//robotController.travel(displacement);
 		}
 	}
 	
@@ -91,7 +102,7 @@ public class RobotCommand {
 		
 		@Override
 		protected Packet getOpcode() {
-			return robotController.travelSideways(distance);
+			return null;//robotController.travelSideways(distance);
 		}
 	}
 	

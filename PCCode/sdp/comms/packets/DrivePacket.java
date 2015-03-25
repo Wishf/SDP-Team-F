@@ -57,6 +57,22 @@ public class DrivePacket extends Packet {
     public byte getPower(int motor){
     	return motorPowers[motor*2];
     }
+    
+    public DrivePacket getReverse(){
+    	byte[] pows = new byte[3];
+    	pows[0] = motorPowers[0];
+    	pows[1] = motorPowers[2];
+    	pows[2] = motorPowers[4];
+    	DriveDirection[] dirs = new DriveDirection[3];
+    	for(int i = 0; i < dirs.length; i++){
+    		if(motorPowers[i*2+1] == DriveDirection.FORWARD.getEncoding()){
+    			dirs[i] = DriveDirection.BACKWARD;
+    		} else {
+    			dirs[i] = DriveDirection.FORWARD;
+    		}
+    	}
+    	return new DrivePacket(pows[0], dirs[0], pows[1], dirs[1], pows[2], dirs[2], millis);
+    }
 
     @Override
     public void writePacket(SerialPort sendPort) throws SerialPortException {

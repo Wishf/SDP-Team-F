@@ -45,6 +45,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
     @Override
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
+        brick.robotController.setWorldState(worldState);
         //ControlBox.controlBox.reset();
         
         
@@ -212,11 +213,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             } else if(rotate){
             	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
             	 System.out.println("Rotate" + angleDifference);
-            	 if(Math.abs(angleDifference)> 35){         		 
-            		 controlThread.operation.angleDifference =  (-angleDifference);
-            	 }else{
-            		 controlThread.operation.angleDifference =  (-angleDifference);
-            	 }
+            	 controlThread.operation.angleDifference = -angleDifference;
             	 
                 
             }
@@ -285,41 +282,37 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                         case DEFROTATE:
                         	if(System.currentTimeMillis() - caughtTime < 1500)
                         	{
-                        		brick.execute(new RobotCommand.Stop());
+                        		brick.robotController.stop();
                         	}
                             if (rotateBy != 0) {
-                                brick.executeSync(new RobotCommand.Rotate(
-                                        rotateBy));
+                                brick.robotController.rotate(rotateBy);
                             }
                             break;
                         case DEFTRAVEL:
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
-                        		brick.execute(new RobotCommand.Stop());
+                        		brick.robotController.stop();
                         	}
                             if (travelDist != 0) {
-                                brick.execute(new RobotCommand.Travel(
-                                        travelDist));
+                                brick.robotController.travel(travelDist);
                             }
                             break;
                         case DESIDEWAYS:
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
-                        		brick.execute(new RobotCommand.Stop());
+                        		brick.robotController.stop();
                         	}
                             if (travelDist != 0) {
-                                brick.execute(new RobotCommand.TravelSideways(
-                                        travelDist));
+                                brick.robotController.travelSideways(travelDist);
                             }
                             break;
                         case DEBACK:
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
-                        		brick.execute(new RobotCommand.Stop());
+                        		brick.robotController.stop();
                         	}
                             if (travelDist != 0) {
-                                brick.execute(new RobotCommand.Travel(
-                                        travelDist));
+                                brick.robotController.travel(travelDist);
                             }
                             break;
                         case DEFCATCH:
@@ -327,7 +320,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                                 //System.out.println("Catching");
 
 
-                                brick.execute(new RobotCommand.ResetCatcher());
+                                brick.robotController.openCatcher();
                                 ballCaughtDefender = true;
                                 caughtTime = System.currentTimeMillis();
                                 kicked = false;
@@ -336,14 +329,14 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                         case DEFKICK:
                         	if(System.currentTimeMillis() - caughtTime < 2000)
                         	{
-                        		brick.execute(new RobotCommand.Stop());
+                        		brick.robotController.stop();
                         	}
                             if((System.currentTimeMillis() - caughtTime > 2000)){
                                 //System.out.println("Kicking");
 
-                                brick.execute(new RobotCommand.Kick());
+                                brick.robotController.kick();
                                 Thread.sleep(500);
-                                brick.execute(new RobotCommand.Catch());
+                                brick.robotController.closeCatcher();
 
                                 kicked = true;
                                 ballCaughtDefender = false;
@@ -352,7 +345,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             break;
                         case DEFUNCATCH:
                         	
-                            brick.execute(new RobotCommand.Catch());
+                        	brick.robotController.closeCatcher();
                             break;
                         default:
                             break;
