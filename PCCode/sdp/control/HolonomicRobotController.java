@@ -89,7 +89,7 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean rotate(double angle){    	
     	
-    	double a = 0.6, minPower = ROTATE_MIN, c = 0;
+    	double a = 0.3, minPower = ROTATE_MIN, c = 0;
     	
     	double maxPower = 254;
     	
@@ -136,7 +136,7 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean travel(double displacement){
     	
-    	double a = 1.5, b = TRAVEL_MIN;
+    	double a = 1, b = TRAVEL_MIN;
     	
     	double power = a*Math.abs(displacement) +b;
     	power = Math.min(254, power);
