@@ -286,14 +286,8 @@ public class HistogramTool implements GUITool, ObjectRecogniser {
 				if (Math.hypot(x - centerPoint.x, y - centerPoint.y) < radius) {
 					// The pixel is inside the circle
 					raster.getPixel(x, y, rgb);
-					int rgbTotal = rgb[0] + rgb[1] + rgb[2];
-					rgb[0] = (rgb[0]*255)/rgbTotal;
-					rgb[1] = (rgb[1]*255)/rgbTotal;
-					rgb[2] = (rgb[2]*255)/rgbTotal;
 					Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-					
 					// RGB processing
-					//TODO Normalize
 					for (int channel = 0; channel < 3; channel++) {
 						valueCounts[channel][rgb[channel]]++;
 					}
