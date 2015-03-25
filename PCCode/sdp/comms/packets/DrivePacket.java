@@ -40,10 +40,7 @@ public class DrivePacket extends Packet {
 
         this.millis = millis;
 
-        if(this.millis > StrategyController.STRATEGY_TICK * 0.8)
-            this.millis = (int) (StrategyController.STRATEGY_TICK * 0.8);
-        if(this.millis < 50)
-            this.millis = 50;
+        
     }
 
     // Empty constructor

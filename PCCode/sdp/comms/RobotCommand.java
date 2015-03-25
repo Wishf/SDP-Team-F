@@ -7,7 +7,7 @@ import sdp.util.DriveDirection;
 import sdp.control.HolonomicRobotController;
 
 public class RobotCommand {
-    private static HolonomicRobotController robotController = new HolonomicRobotController(null, false);
+    private static HolonomicRobotController robotController = new HolonomicRobotController(null, (byte) 0);
     //protected HolonomicRobotController robotController;
 	protected RobotCommand() {		
 	}

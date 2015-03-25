@@ -178,15 +178,14 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 						if (travelDist != 0) {
 		
 							System.out.println("move!"+travelDist);
-							brick.execute(new RobotCommand.TravelSideways(
+							brick.robotController.travel((
                                     travelDist*0.5));
 						}
 						break;
 					case DEFROTATE:
                         if (rotateBy != 0) {
                         	System.out.println("rotate "+rotateBy);
-                            brick.executeSync(new RobotCommand.Rotate(
-                                    rotateBy));
+                            brick.robotController.rotate(rotateBy);
                         }
                         break;
 					default:

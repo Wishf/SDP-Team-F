@@ -119,7 +119,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         }
 
        
-        double catchThreshold = 20;
+        double catchThreshold = 35;
         boolean catch_ball = false;
         boolean kick_ball = false;
         boolean uncatch = false;
@@ -214,10 +214,12 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
             	 System.out.println("Rotate" + angleDifference);
             	 if(Math.abs(angleDifference) > 60){
-            		 controlThread.operation.angleDifference = -angleDifference*0.3;
-            	 }else{
-            		 controlThread.operation.angleDifference = -angleDifference;
+            		 controlThread.operation.angleDifference = angleDifference*0.3;
+            	 }else if(Math.abs(angleDifference)>30){
+            		 controlThread.operation.angleDifference = angleDifference*0.5;
 
+            	 }else{
+            		 controlThread.operation.angleDifference = angleDifference*0.9;
             	 }
             	 
                 
@@ -325,7 +327,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                                 //System.out.println("Catching");
 
 
-                                brick.robotController.openCatcher();
+                                brick.robotController.closeCatcher();
                                 ballCaughtDefender = true;
                                 caughtTime = System.currentTimeMillis();
                                 kicked = false;
@@ -341,7 +343,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
                                 brick.robotController.kick();
                                 Thread.sleep(500);
-                                brick.robotController.closeCatcher();
+                                brick.robotController.openCatcher();
 
                                 kicked = true;
                                 ballCaughtDefender = false;
@@ -350,7 +352,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             break;
                         case DEFUNCATCH:
                         	
-                        	brick.robotController.closeCatcher();
+                        	brick.robotController.openCatcher();
                             break;
                         default:
                             break;
