@@ -32,9 +32,9 @@ public class HolonomicRobotController extends BaseRobotController {
     private static final double WHEEL_RATIO = GROUP9_WHEEL_DIAMETER / (double)WHEEL_DIAMETER;*/
     
     
-    private byte ARC_POWER = 100;
+    private byte ARC_POWER = 80;
     private double ROTATE_REAR_COEF = 0.5;
-    public double ROTATE_MIN = 55;
+    public double ROTATE_MIN = 60;
     public double TRAVEL_MIN = 150;
     public double SIDEWAYS_MIN = 200;
     
@@ -89,7 +89,7 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean rotate(double angle){    	
     	
-    	double a = 0.3, minPower = ROTATE_MIN, c = 0;
+    	double a = 0.1, minPower = ROTATE_MIN, c = 0;
     	
     	double maxPower = 254;
     	
