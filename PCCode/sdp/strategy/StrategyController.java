@@ -8,6 +8,7 @@ import sdp.comms.packets.*;
 import sdp.comms.SingletonRadio;
 import sdp.comms.BrickCommServer;
 import sdp.strategy.interfaces.Strategy;
+import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.vision.interfaces.WorldStateReceiver;
 import sdp.world.oldmodel.WorldState;
 import sdp.util.DriveDirection;
@@ -15,7 +16,7 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 100;
+	public static final int STRATEGY_TICK = 60;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
@@ -38,6 +39,7 @@ public class StrategyController implements WorldStateReceiver {
 	public static boolean bounceShotEnabled = false;
 	public static boolean interceptorDefenceEnabled = false;
 	public static boolean bouncePassEnabled = false;
+	public static boolean isDefending = false;
 	
 	private static ArrayList<Strategy> currentStrategies = new ArrayList<Strategy>();
 	private static ArrayList<Strategy> removedStrategies = new ArrayList<Strategy>();
@@ -53,7 +55,7 @@ public class StrategyController implements WorldStateReceiver {
 			//bcsAttacker = bcsDefender;
 			//bcsDefender = (BrickCommServer) bcsTemp;
 		//}
-        //System.out.println();
+        System.out.println();
 	}
 
 	public StrategyType getCurrentStrategy() {
@@ -102,78 +104,37 @@ public class StrategyController implements WorldStateReceiver {
 		// Stop old threads
 		for (Strategy s : StrategyController.currentStrategies) {
 			s.stopControlThread();
-			StrategyController.removedStrategies.add(s);
+			//StrategyController.removedStrategies.add(s);
+			//RobotDebugWindow.messageDefender.setMessage("s");
+			
 		}
 		StrategyController.currentStrategies = new ArrayList<Strategy>();
-		//SingletonRadio radio = new SingletonRadio("/dev/ttyACM0");
+		
 		switch (type) {
-		case DO_SOMETHING:	
-			//radio.sendPacket(new ActivatePacket());
+		case DO_SOMETHING:
 			
 			break;
-        case MILESTONE_THREE_A:
-            // Without the obstacle, simple version
-        	ControlBox.controlBox.avoidObstacle(true);
-        	Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
-        	StrategyController.currentStrategies.add(m3as);
-        	m3as.startControlThread();
-        	break;
-        	
+		 case MILESTONE_THREE_A:
+			// Without the obstacle, simple version
+			ControlBox.controlBox.avoidObstacle(true);
+			Strategy m3as = new Milestone3AttackingStrategy(this.bcsAttacker);
+			StrategyController.currentStrategies.add(m3as);
+			m3as.startControlThread();
+			break;
         case MILESTONE_THREE_B:
-            // With the obstacle, extended version
-        	//ControlBox.controlBox.avoidObstacle(false);
+        	if(!isDefending) {
         	Strategy m3ds = new Milestone3DefendingStrategy(this.bcsDefender);
         	StrategyController.currentStrategies.add(m3ds);
         	m3ds.startControlThread();
+        	}
             break;
             
-        case MILESTONE_TWO_A:
-        	ats = new CornerStrategy(this.bcsDefender);
-            StrategyController.currentStrategies.add(ats);
-            ats.startControlThread();
-            
-            break;
-        case MILESTONE_TWO_B:
-            ats = new RotateTestStrategy(this.bcsAttacker);
-            StrategyController.currentStrategies.add(ats);
-            ats.startControlThread();
-            
-            break;
-		case DO_NOTHING:
-			byte stop = 0;
-			DriveDirection fw = DriveDirection.FORWARD;
-			//radio.sendPacket(new DrivePacket(stop, fw, stop, fw, stop, fw, 0));
+		case DEFENDING:		
+			Strategy ns = new NewInterceptorStrategy(this.bcsDefender);
+			StrategyController.currentStrategies.add(ns);
+			ns.startControlThread();			
 			break;
-		case PASSING:
-			Strategy ps = new PassingStrategy(this.bcsAttacker,
-					this.bcsDefender);
-			StrategyController.currentStrategies.add(ps);
-			ps.startControlThread();
-			break;
-		case ATTACKING:
-			Strategy as = new AttackerStrategy(this.bcsAttacker);
-			Strategy ic = new InterceptorStrategy(this.bcsDefender);
-			StrategyController.currentStrategies.add(as);
-			StrategyController.currentStrategies.add(ic);
-			as.startControlThread();
-			ic.startControlThread();
-			break;
-		case DEFENDING:
-			//Strategy AS = new AttackerStrategy(this.bcsAttacker);
-			//StrategyController.currentStrategies.add(AS);
-			//AS.startControlThread();			
-			Strategy nis = new NewInterceptorStrategy(this.bcsDefender);
-			StrategyController.currentStrategies.add(nis);
-			nis.startControlThread();			
-			break;
-		case MARKING:
-			/*Strategy newMar = new newMarkingStrategy(this.bcsAttacker);
-			Strategy ics = new InterceptorStrategy(this.bcsDefender);
-			StrategyController.currentStrategies.add(newMar);
-			StrategyController.currentStrategies.add(ics);
-			newMar.startControlThread();
-			ics.startControlThread();*/
-			break;
+
 		default:
 			break;
 		}
@@ -218,19 +179,20 @@ public class StrategyController implements WorldStateReceiver {
 			
 			switch(this.ballLocation){
 			case ATTACKER:
-				changeToStrategy(StrategyType.ATTACKING);
-				break;
+				changeToStrategy(StrategyType.DO_SOMETHING);
+			break;
 			case DEFENDER:
-				changeToStrategy(StrategyType.MILESTONE_THREE_B);
-				break;
+			changeToStrategy(StrategyType.MILESTONE_THREE_B);
+			break;
 			case ENEMY_ATTACKER:
-				changeToStrategy(StrategyType.DEFENDING);
-				break;
+			changeToStrategy(StrategyType.DEFENDING);
+			break;
 			case ENEMY_DEFENDER:
-				changeToStrategy(StrategyType.MARKING);
-				break;
+				changeToStrategy(StrategyType.DO_SOMETHING);
+			break;
 			}
 		}
 	}
 }
+
 

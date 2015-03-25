@@ -14,6 +14,7 @@ import sdp.strategy.interfaces.WorldStateControlBox;
 import sdp.strategy.ControlBox;
 import sdp.strategy.Operation.Type;
 
+
 public class Milestone3DefendingStrategy extends GeneralStrategy {
 
 
@@ -22,6 +23,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
     private Deque<Vector2f> ballPositions = new ArrayDeque<Vector2f>();
     private boolean kicked;
     private boolean catcherReleased;
+    boolean stopControlThread;
     
 
     public Milestone3DefendingStrategy(BrickCommServer brick) {
@@ -29,16 +31,16 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         this.controlThread = new ControlThread();
         //System.out.println("Starting.");
     }
-
     @Override
-    public void stopControlThread() {
-        this.controlThread.stop();
-    }
+	public void stopControlThread() {
+		stopControlThread = true;
+	}
 
-    @Override
-    public void startControlThread() {
-        this.controlThread.start();
-    }
+	@Override
+	public void startControlThread() {
+		stopControlThread = false;
+		controlThread.start();
+	}
 
     @Override
     public void sendWorldState(WorldState worldState) {
@@ -264,25 +266,20 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         public void run() {
         	
-            try {
-                while (true) {
+        	try {
+                while (!stopControlThread) {
                     Operation.Type op;
                     double rotateBy;
 					double travelDist;
                     
-                	if(!start){
-                		start = true;
-                		op = Operation.Type.DEFUNCATCH;
-                		rotateBy = 0;
-                		travelDist = 0;
-                	}
-                	else {
-	                    synchronized (this) {
-	                        op = this.operation.op;
+                
+	                 synchronized (this) {
+	                    	System.out.println("our zone");
+	                	 RobotDebugWindow.messageDefender.setMessage("MS"); 
+	                	 op = this.operation.op;
 	                        rotateBy = this.operation.angleDifference;
 	                        travelDist = this.operation.travelDistance;
 	                    }
-                	}
                     //System.out.println("operation: " + op);
                     switch (op) {
                         case DEFROTATE:
@@ -371,3 +368,5 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
     }
 
 }
+
+
