@@ -144,6 +144,7 @@ public class StrategySelectorTool implements GUITool {
 		//private JButton marStrat = new JButton("Marking");
 		private JButton nullStrat = new JButton("Deactivate");
 		private JButton actStrat = new JButton("Activate");
+		private JButton calibStrat = new JButton("Calibrate");
         private JButton mstAStrat = new JButton("Test - Attacker sideways");
         private JButton mstBStrat = new JButton("Test - Attacker rotate");
         private JButton ms3AStrat = new JButton("MILESTONE 3 - Pass task 1");
@@ -158,6 +159,7 @@ public class StrategySelectorTool implements GUITool {
 			//this.add(marStrat);
 			this.add(nullStrat);
 			this.add(actStrat);
+			this.add(calibStrat);
             this.add(mstAStrat);
             this.add(mstBStrat);
             this.add(ms3AStrat);
@@ -204,6 +206,15 @@ public class StrategySelectorTool implements GUITool {
 			});
             //mstAStrat.addActionListener((e) -> { sc.changeToStrategy(StrategyType.MILESTONE_TWO_A); });
             //mstBStrat.addActionListener((e) -> { sc.changeToStrategy(StrategyType.MILESTONE_TWO_B); });
+			
+			calibStrat.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					sc.changeToStrategy(StrategyType.CALIBRATION);
+				}
+			});
+			
 			
 			mstAStrat.addActionListener(new ActionListener() {
 
