@@ -34,7 +34,7 @@ public class HolonomicRobotController extends BaseRobotController {
     
     private byte ARC_POWER = 80;
     private double ROTATE_REAR_COEF = 0.5;
-    public double ROTATE_MIN = 60;
+    public double ROTATE_MIN = 50;
     public double TRAVEL_MIN = 150;
     public double SIDEWAYS_MIN = 200;
     

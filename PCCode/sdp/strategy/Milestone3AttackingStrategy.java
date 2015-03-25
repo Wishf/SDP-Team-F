@@ -209,8 +209,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
 	        } 
 	        
 	        if(ballInDefenderArea) {
+	        	if(weAreShootingRight) {
+	        		targetDistance = attackerRobotY -  target.getY();
+	        	} else {
+	        		targetDistance = target.getY() - attackerRobotY;
+	        	}
 	        	
-	        	targetDistance = target.getY() - attackerRobotY;
 	        	RobotDebugWindow.messageAttacker.setMessage("TargetY" + target.getY() + " My Y is " + attackerRobotY);
 	        	if(targetDistance > 25) {
 	        		travel_sideways = true;
@@ -240,9 +244,8 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         // If the ball slips from the catching area we can guess we did not catch it.
         if(ballXYDistance > catchThreshold) {
         	hasBall = false;
-        	if (catcherReleased != true) {
-        		uncatch = true;
-        	}
+        	uncatch = true;
+        
         }
         else if(hasBall && !kicked && !move_robot && !rotate){
         	// We kick once we're ready. We don't need to wait for anyone.
