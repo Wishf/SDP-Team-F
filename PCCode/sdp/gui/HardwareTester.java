@@ -76,15 +76,16 @@ public class HardwareTester extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 byte power = (byte) slider1.getValue();
                 radio.sendPacket(new DrivePacket(power, DriveDirection.FORWARD,
-                        power, DriveDirection.FORWARD, power, DriveDirection.FORWARD, 1000));
+                        power, DriveDirection.FORWARD, (byte)0, DriveDirection.FORWARD, 1000));
             }
         });
         backwardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 byte power = (byte) slider1.getValue();
+                System.out.println(power);
                 radio.sendPacket(new DrivePacket(power, DriveDirection.BACKWARD,
-                        power, DriveDirection.BACKWARD, power, DriveDirection.BACKWARD, 1000));
+                        power, DriveDirection.BACKWARD, (byte)0, DriveDirection.BACKWARD, 1000));
             }
         });
     }
