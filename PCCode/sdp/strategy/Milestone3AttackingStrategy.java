@@ -196,7 +196,11 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
         	if(Math.abs(targetDistance) > 25) {
         		//Going to the middle
         		travel_sideways = true;
-        		targetDistance = 240 - attackerRobotY;
+        		if(weAreShootingRight) {
+        			targetDistance = attackerRobotY -240;
+        		} else {
+        			targetDistance = 240 - attackerRobotY;
+        		}       		
         	}
         } else {
 	
