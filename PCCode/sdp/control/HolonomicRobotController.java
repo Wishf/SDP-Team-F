@@ -32,13 +32,25 @@ public class HolonomicRobotController extends BaseRobotController {
     private static final double WHEEL_RATIO = GROUP9_WHEEL_DIAMETER / (double)WHEEL_DIAMETER;*/
     
     
-    private byte ARC_POWER = 80;
-    private double ROTATE_REAR_COEF = 0.5;
-    public double ROTATE_MIN = 50;
-    public double TRAVEL_MIN = 150;
-    public double SIDEWAYS_MIN = 200;
     
-    private static final int PACKET_LIFETIME = 200;
+    
+    
+    public double ROTATE_MIN = 55;
+    public double ROTATE_MAX = 200;
+    public double ROTATE_A = 0.1;
+    private double ROTATE_REAR_COEF = 0.5;
+    
+    public double TRAVEL_MIN = 120;
+    public double TRAVEL_MAX = 254;
+    public double TRAVEL_A = 1;    
+    
+    public double SIDEWAYS_MIN = 150;
+    public double SIDEWAYS_MAX = 254;
+    public double SIDEWAYS_A = 1;
+    public byte SIDEWAYS_ARC_POWER = 70;
+    
+    
+    private static final int PACKET_LIFETIME = 100;
     
     
     
@@ -89,9 +101,9 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean rotate(double angle){    	
     	
-    	double a = 0.1, minPower = ROTATE_MIN, c = 0;
+    	double a = ROTATE_A, minPower = ROTATE_MIN, c = 0;
     	
-    	double maxPower = 254;
+    	double maxPower = ROTATE_MAX;
     	
     	double rearMotorCoef = ROTATE_REAR_COEF;
     	
@@ -136,10 +148,10 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean travel(double displacement){
     	
-    	double a = 1, b = TRAVEL_MIN;
+    	double a = TRAVEL_A, b = TRAVEL_MIN;
     	
     	double power = a*Math.abs(displacement) +b;
-    	power = Math.min(254, power);
+    	power = Math.min(TRAVEL_MAX, power);
     	
     	
     	leftMotorPower = (byte) power;
@@ -169,14 +181,14 @@ public class HolonomicRobotController extends BaseRobotController {
   
 public boolean travelSideways(double displacement){
     	
-		double a = 3, minPower = SIDEWAYS_MIN;
+		double a = SIDEWAYS_A, minPower = SIDEWAYS_MIN;
     	double power = a*Math.abs(displacement) +minPower;   	
     	
-    	power = Math.min(254, power);
+    	power = Math.min(SIDEWAYS_MAX, power);
     	
     	
     	double arcCorrectionCoef = 0.2;
-    	byte arcCorrectionPower = (byte)ARC_POWER;
+    	byte arcCorrectionPower = (byte)SIDEWAYS_ARC_POWER;
     	
     	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
     	rightMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
@@ -187,10 +199,12 @@ public boolean travelSideways(double displacement){
     	if(displacement > 0){
     		leftMotorDir = DriveDirection.FORWARD;
         	rightMotorDir = DriveDirection.BACKWARD;
+        	
     		rearMotorDir = DriveDirection.FORWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
         	rightMotorDir = DriveDirection.FORWARD;
+        	
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
 
@@ -251,8 +265,8 @@ public boolean travelSideways(double displacement){
 	}
 	
 	public void travelSideways(byte power){
-		leftMotorPower = (byte) ARC_POWER;//(power*arcCorrectionCoef);
-    	rightMotorPower = (byte) ARC_POWER;//(power*arcCorrectionCoef);
+		leftMotorPower = (byte) SIDEWAYS_ARC_POWER;//(power*arcCorrectionCoef);
+    	rightMotorPower = (byte) SIDEWAYS_ARC_POWER;//(power*arcCorrectionCoef);
     	rearMotorPower = (byte) Math.abs(power);
     	
     	
