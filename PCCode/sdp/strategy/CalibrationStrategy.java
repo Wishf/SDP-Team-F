@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class SidewaysTestStrategy extends GeneralStrategy {
+public class CalibrationStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -24,12 +24,17 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 	private boolean kicked = false;
 	private boolean ballCaught = false;
 	boolean isReady = false;
+	boolean attacker = false;
+	
+	private MovingObject oldState, newState;
+	
 	
 	
 
-	public SidewaysTestStrategy(BrickCommServer brick) {
+	public CalibrationStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
+		attacker = brick.name.equals("attacker");
 	}
 
 	@Override
@@ -48,27 +53,20 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
-		
-		
-		double dx = ballX - attackerRobotX;
-		double dy = ballY - attackerRobotY;	
-		double targetAngle = 0;//calcTargetAngle(dx, dy);
-		double angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
-		
-		
-		boolean rotate = false;
-		if(Math.abs(angleDifference) > 20)
-		{
-			rotate = true;
-		}
-		
-		boolean move_robot = false;
-		
-		if(Math.abs(dy) > 20){
-			move_robot = true;
+		brick.robotController.setWorldState(worldState);
+		if(newState == null){
+			if(attacker){
+				newState = worldState.getAttackerRobot().copy();
+			} else {
+				newState = worldState.getDefenderRobot().copy();
+			}
 		}
 		
 		
+		//MinPower
+		//travel
+		//travelSideways
+		//rotate
 		
 		
 		
@@ -77,44 +75,11 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 			
 			
 			
-			if(rotate){
-				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference = angleDifference;
-			}
-			else if(move_robot){
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = dy;
-			}
-			else{
-				this.controlThread.operation.op = Operation.Type.STOP;				
-			}
-			
-			
-			/*
-			 * if(Math.abs(angleDifference )> 0) {
-				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.rotateBy = (int) angleDifference;
-			} else if(move_robot) {
-				////System.out.println("A: ");
-				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
-			}
-			else if(true){
-				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) 220;
-			}
-			else if(alignWithEnemyAttacker){
-				
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) targetDistance;
-			}*/
-			
-			
 		}
 	}
 	
 	protected class ControlThread extends Thread {
+		public WorldState worldState;
 		public Operation operation = new Operation();
 		private ControlThread controlThread;
 
@@ -130,26 +95,32 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					double rotateBy, travelDist;
+					WorldState worldState;
 					synchronized (this) {
 						op = this.operation.op;
 						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
+						
+						worldState = this.worldState;
 					}
+					
+					
+					
 					//System.out.println("operation: " + op);
 					switch (op) {
 					case STOP:
 						brick.robotController.stop();
-						RobotDebugWindow.messageAttacker.setMessage("STOP");
+						//RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
 						brick.robotController.rotate(rotateBy);
 						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:
-						 brick.robotController.travel(travelDist);
+						 brick.execute(new RobotCommand.Travel(travelDist));
 						break;
 					case DESIDEWAYS:
-						brick.robotController.travelSideways(travelDist);
+						brick.execute(new RobotCommand.TravelSideways(travelDist));
 						break;
 					/*case DEBACK:
 						if (travelDist != 0) {
