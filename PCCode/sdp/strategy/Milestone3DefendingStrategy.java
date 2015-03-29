@@ -217,12 +217,12 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             	 this.controlThread.operation.op = Operation.Type.DEFROTATE;
             	 System.out.println("Rotate" + angleDifference);
             	 if(Math.abs(angleDifference) > 60){
-            		 controlThread.operation.angleDifference = angleDifference*0.6;
+            		 controlThread.operation.angleDifference = -angleDifference*0.6;
             	 }else if(Math.abs(angleDifference)>30){
-            		 controlThread.operation.angleDifference = angleDifference*0.45;
+            		 controlThread.operation.angleDifference = -angleDifference*0.45;
 
             	 }else{
-            		 controlThread.operation.angleDifference = angleDifference*0.6;
+            		 controlThread.operation.angleDifference = -angleDifference*0.6;
             	 }
             	 
                 
@@ -230,20 +230,17 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             else if (catch_ball) {
                 System.out.println("CATCH");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
-               // RobotDebugWindow.messageAttacker.setMessage("DEF");
-                //RobotDebugWindow.messageDefender.setMessage("Catch Ball");
+               
             } else if (kick_ball) {
-                //System.out.println("Kick");
+                
                 this.controlThread.operation.op = Operation.Type.DEFKICK;
-                //RobotDebugWindow.messageAttacker.setMessage("DEF");
-                //RobotDebugWindow.messageDefender.setMessage("KICK!");
+                
                 
             }  else if (move_robot) {
                 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
                 controlThread.operation.travelDistance = (int) targetDistance*0.35;
                 //System.out.println(" MOVE ");
-                //RobotDebugWindow.messageAttacker.setMessage("DEF");
-                //RobotDebugWindow.messageDefender.setMessage("MOVE: " + targetDistance);
+               
             }else if(move_sideways){
             	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
             	controlThread.operation.travelDistance = distanceToDefault;

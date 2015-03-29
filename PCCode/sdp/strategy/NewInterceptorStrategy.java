@@ -110,9 +110,10 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		double angle = 0;
 
 		
-		boolean fixOrientation = false;
+		
 		boolean move_sideways = false;
 		boolean fixRotate = false;
+		
 		double fixAngle = 0;
 		
 		if (Math.abs(dist) >30) {
@@ -129,15 +130,28 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				}
 			}*/
 		//}
+		angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
+		if(Math.abs(angleToEnemyAttacker) > 15){
+			faceEnemyAttacker = true;
+		}
+		
+		
 		fixAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		if (Math.abs(fixAngle)>20) {
 			fixRotate = true;
 		}
-		System.out.println("................................................" + fixRotate);
+		
+		
+		
+		//System.out.println("................................................" + move_sideways);
+		
+		
+		
 		synchronized (this.controlThread) {
 			if (fixRotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference =  (fixAngle);
+				controlThread.operation.angleDifference =  (-fixAngle);
+				System.out.println("ROTATE to DEF CHECK" + fixAngle);
 			}else if(move_sideways) {
 				//System.out.println("MOVE_sideway" + dist);
 /*				RobotDebugWindow.messageDefender.setMessage("MS"+dist);
@@ -145,7 +159,13 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
                 controlThread.operation.travelDistance = (int) dist;
-			} 
+                
+                System.out.println("MOVE TO DESTINATION ");
+			}else if(faceEnemyAttacker){
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
+				System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
+			}
 		}
 	}
 	
