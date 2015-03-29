@@ -37,12 +37,12 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public double ROTATE_MIN = 55;
     public double ROTATE_MAX = 200;
-    public double ROTATE_A = 0.1;
+    public double ROTATE_A = 0.07;
     private double ROTATE_REAR_COEF = 0.5;
     
     public double TRAVEL_MIN = 120;
     public double TRAVEL_MAX = 254;
-    public double TRAVEL_A = 1;    
+    public double TRAVEL_A = 0.35;    
     
     public double SIDEWAYS_MIN = 150;
     public double SIDEWAYS_MAX = 254;
@@ -108,7 +108,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	double rearMotorCoef = ROTATE_REAR_COEF;
     	
     	if(!rotated){
-    		minPower *= 1.5;
+    		minPower *= 1.3;
     	}
     	
     	double vp = Math.min(1, Math.abs(this.angularVelocity)/this.maxAngularVelocity);
@@ -117,7 +117,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	power = Math.min(maxPower, power);
     	
-    	System.out.println("Rotating power: "+power);
+    	//System.out.println("Rotating power: "+power);
     	
     	leftMotorPower = (byte) power;
     	rightMotorPower = (byte) power;
@@ -126,7 +126,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	
     	
-    	if(angle > 0){    		
+    	if(angle < 0){    		
     		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {

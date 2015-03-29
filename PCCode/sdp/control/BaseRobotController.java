@@ -72,8 +72,8 @@ public abstract class BaseRobotController implements PacketListener {
     		double angle = Math.min(Math.abs(360 - raw_angle), raw_angle);
     		this.angularVelocity = angle/(double)delta;
     		
-    		if(angle > 10) {
-    			System.out.println("!!!!!!ROTATED!!!!!!! " + angle);
+    		if(Math.abs(angle) > 10) {
+    			//System.out.println("!!!!!!ROTATED!!!!!!! " + angle);
     			rotated = true;}
     		else rotated = false;
     		

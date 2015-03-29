@@ -45,29 +45,14 @@ public class CornerStrategy extends GeneralStrategy {
         super.sendWorldState(worldState);
         //ControlBox.controlBox.reset();
        
-        MovingObject ball = worldState.getBall();
-
-        boolean ballInDefenderArea = false;
-        double angleToDefCheck = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
+        double angleToTop = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderRobotX, topY);
+        double angleToBottom = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderRobotX, topY);
+        
         
         
        
-
-        boolean rotate = false;
         
-        double targetAngle = 0;
-        double angleDifference = 0;
-        double dx = 0;
-        double dy = 0;
-        double distanceToDefault = ourGoalY[1] - defenderRobotY;
-        boolean move_sideways = false;       
-        double catchThreshold = 35;
-        boolean catch_ball = false;
-        boolean kick_ball = false;
-        boolean uncatch = false;
-        boolean move_robot = false;
-        
-		double angleToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attackerRobotX, attackerRobotY);
+		
 		
 		 
         
@@ -75,32 +60,18 @@ public class CornerStrategy extends GeneralStrategy {
         
       
         
-        double targetDistance;
-        double ballDistance = Math.sqrt((ballX - defenderRobotX)*(ballX - defenderRobotX) + (ballY - defenderRobotY)*(ballY - defenderRobotY));
+        
                	
         boolean tooClose = isRobotTooClose(defenderRobotX, defenderRobotY, 30);	
         System.out.println(tooClose);
     
-        targetDistance = Math.sqrt(dx*dx + dy*dy);
+       
         
-        if((ballDistance < catchThreshold && !ballCaughtDefender)  /*&& ballInDefenderArea*/) {
-            catch_ball = true;
-            catcherReleased = false;
-        }
+        
 
-        if(targetDistance > 20) {
-            move_robot = true;          
-        }
+       
         
-        if(!ballInDefenderArea && Math.abs(angleToDefCheck) < 15 && !ballCaughtDefender){
-        	rotate = false;
-        	//System.out.println("NO NEED TO ROTATE");
-        }
-        if(ballInDefenderArea && distanceToDefault > 20 ){
-        	move_sideways = true;
-        }
-        
-        
+       
 
         synchronized (this.controlThread) {
             //this.controlThread.operation.op = Operation.Type.DO_NOTHING;
