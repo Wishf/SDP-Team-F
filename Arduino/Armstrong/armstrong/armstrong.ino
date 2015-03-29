@@ -28,16 +28,20 @@ bool motorsChanged = false;
 // The third port is the back drive motor
 // For Armstrong (red transparent bricks), this should be [1,0,2]
 // For John Longley (green transparent bricks), this should be [1,2,3]
-byte motorMapping[MOTOR_N] = {1, 2, 3};
+byte motorMapping[MOTOR_N] = {
+  0, 1, 3};
 
 // The power from 0-255 to drive each motor at
-int motorPower[MOTOR_N] = {0, 0, 0};
+int motorPower[MOTOR_N] = {
+  0, 0, 0};
 
 // The direction each motor is to be driven at
-int motorDirs[MOTOR_N] = {1, 1, 1};
+int motorDirs[MOTOR_N] = {
+  1, 1, 1};
 
 // The power multiplier for each motor, in case we need to drive certain motors harder
-int motorMultiplier[MOTOR_N] = {1, 1, 1};
+int motorMultiplier[MOTOR_N] = {
+  1, 1, 1};
 
 // The time in milliseconds since the Arduino was turned on/reset when the most recent motion command arrived
 long motorTimeoutStart = 0;
@@ -88,15 +92,17 @@ int kickerTachometerStart = 0;
 // The direction the motor has to be driven to disengage the catcher
 #define CATCH_DISENGAGE_DIR 1
 // The power to drive the motor at to disengage the catcher
-#define CATCH_DISENGAGE_POWER 100
+#define CATCH_DISENGAGE_POWER 75
+#define CATCH_DISENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to disengage the catcher
-#define CATCH_DISENGAGE_DELAY 550
+#define CATCH_DISENGAGE_DELAY 2000
 
 
 // The direction the motor has to be driven to engage the catcher
 #define CATCH_ENGAGE_DIR -1
 // The power to drive the motor at to engage the catcher
 #define CATCH_ENGAGE_POWER 100
+#define CATCH_ENGAGE_HOLD_POWER 25
 // The length of time the motor should be driven for to engage the catcher
 #define CATCH_ENGAGE_DELAY 550
 
@@ -109,7 +115,7 @@ Communications comms;
 
 
 void setup() {
-  
+
   SDPsetup(); 
   motorAllStop();
 
@@ -121,7 +127,10 @@ void setup() {
   comms.set_handler('K', kick);
   comms.set_handler('M', drive);
   comms.set_handler('N', engage_catcher);
-  comms.set_handler('I', disengage_catcher);
+  comms.set_handler('I', disengage_catcher);  
+  comms.set_handler('Z', kicker_inc);
+  comms.set_handler('X', kicker_dec);
+  comms.set_handler('T', test);
 
   comms.print("started\n");// transmit started packet
 }
@@ -132,11 +141,11 @@ void loop() {
 
   // Read tachometer values for this 'frame'
   updateMotorPositions();
-  
+
   // Check communications and start handling one packet
   // This can set up state machines for motion to begin
   comms.loop();
- 
+
   // If we're accepting motion packets
   // Update state machines for each kind of motion for one 'frame'
   if(ON)
@@ -151,9 +160,9 @@ void loop() {
   else
   {
     // Stop all motors if we're not accepting motion packets
-  	if(!motorsIdle){  
-    	motorAllStop();
-    	motorsIdle = true;
+    if(!motorsIdle){  
+      motorAllStop();
+      motorsIdle = true;
     }
   } 
 }
@@ -196,7 +205,7 @@ void doCatcher(){
       // Set state to idle and stop motor
       catchState = CATCH_STATE_IDLE;
 
-      motorStop(CATCH_MOTOR);
+      moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
     }
   }
   // We are disengaging the catcher
@@ -216,7 +225,7 @@ void doCatcher(){
       // Set state to idle and stop motor
       catchState = CATCH_STATE_IDLE;
 
-      motorStop(CATCH_MOTOR);
+      moveMotor(CATCH_MOTOR, CATCH_DISENGAGE_HOLD_POWER * CATCH_DISENGAGE_DIR);
     }
   }
 }
@@ -254,8 +263,8 @@ void doKick(){
 void doMotors(){
   // If we've received a packet to say that the motors should do a new motion, we record the start time of the motion
   if(motorsChanged){
-      motorsChanged = false;
-      motorTimeoutStart = millis();
+    motorsChanged = false;
+    motorTimeoutStart = millis();
   }
 
   int i = 0;
@@ -264,15 +273,15 @@ void doMotors(){
   {
     // If the difference between the current time and the start time is greater than the timeout value, stop the motors
     if(millis() - motorTimeoutStart > motorTimeoutMillis){
-       if(motorMapping[i] > -1){
-         moveMotor(motorMapping[i], 0);
-       }
+      if(motorMapping[i] > -1){
+        moveMotor(motorMapping[i], 0);
+      }
     }
     // Else, Continue to drive the motors at their specified power and direction
     else{ 
       if(motorMapping[i] > -1){
-         moveMotor(motorMapping[i], motorPower[i] * motorDirs[i] * motorMultiplier[i]);
-       }
+        moveMotor(motorMapping[i], motorPower[i] * motorDirs[i] * motorMultiplier[i]);
+      }
     }
   }
 }
@@ -280,7 +289,8 @@ void doMotors(){
 // TACHOMETER
 
 // Tachometer positions
-int positions[ROTARY_COUNT] = {0};
+int positions[ROTARY_COUNT] = {
+  0};
 
 // Read tachometer readings for a given motor; indexed by port on the tachometer board
 // This function was created to abstract details before we had the tachometer code
@@ -321,7 +331,7 @@ void activate() {
   comms.print("activated");
 
   ON = true;
-  
+
   // Make sure the catcher is open on initialise
   catchState = CATCH_STATE_DISENGAGE;
 }
@@ -330,13 +340,13 @@ void activate() {
 // Responds to code 'K'
 // Completes a full kick cycle
 void kick() {
-    comms.send('C');
-    comms.print("kick");
+  comms.send('C');
+  comms.print("kick");
 
-    // Start kicker rotation
-    if(kickState == KICK_STATE_IDLE){
-      kickState = KICK_STATE_START;
-    }
+  // Start kicker rotation
+  if(kickState == KICK_STATE_IDLE){
+    kickState = KICK_STATE_START;
+  }
 }
 
 
@@ -402,3 +412,78 @@ void disengage_catcher(){
     catchState = CATCH_STATE_DISENGAGE;
   }
 }
+
+
+
+
+void kicker_inc(){
+  comms.print("K+");
+  kickerTachometerStart = tacho(KICK_TACHOMETER);
+  moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
+  while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
+    updateMotorPositions();
+  }
+  motorStop(KICK_MOTOR);
+}
+
+
+
+void kicker_dec(){
+  comms.print("K-");
+  kickerTachometerStart = tacho(KICK_TACHOMETER);
+  moveMotor(KICK_MOTOR, -255 * KICK_MOTOR_DIR);
+  while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
+    updateMotorPositions();
+  }
+  motorStop(KICK_MOTOR);
+}
+
+
+
+void test(){
+
+  int i = 0;
+  long time = 1000;
+  comms.print("TEST\n");
+  
+  comms.print("LEFT FORWARD 125\n");  
+  moveMotor(motorMapping[0], 125*motorDirs[0]);
+  delay(time);
+  
+  comms.print("LEFT BACKWARD 125\n");  
+  moveMotor(motorMapping[0], -125*motorDirs[0]);
+  delay(time);
+  
+  motorStop(motorMapping[0]);
+  
+  
+  
+  comms.print("RIGHT FORWARD 125\n");  
+  moveMotor(motorMapping[1], 125*motorDirs[1]);
+  delay(time); 
+  
+  comms.print("RIGHT BACKWARD 125\n");  
+  moveMotor(motorMapping[1], -125*motorDirs[1]);
+  delay(time);
+  
+  motorStop(motorMapping[1]);
+  
+  
+  
+  
+  comms.print("BACK FORWARD 125\n");  
+  moveMotor(motorMapping[2], 125*motorDirs[2]);
+  delay(time);
+  
+  comms.print("BACK BACKWARD 125\n");  
+  moveMotor(motorMapping[2], -125*motorDirs[2]);
+  delay(time);
+  
+  
+  motorStop(motorMapping[2]);
+  
+  
+  comms.print("TEST DONE!\n");
+  
+}
+
