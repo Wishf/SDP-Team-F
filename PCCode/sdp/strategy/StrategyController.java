@@ -105,7 +105,7 @@ public class StrategyController implements WorldStateReceiver {
 		// Stop old threads
 		for (Strategy s : StrategyController.currentStrategies) {
 			s.stopControlThread();
-			//StrategyController.removedStrategies.add(s);
+			StrategyController.removedStrategies.add(s);
 			//RobotDebugWindow.messageDefender.setMessage("s");
 			
 		}
@@ -158,9 +158,10 @@ public class StrategyController implements WorldStateReceiver {
             
             break;
 		case DO_NOTHING:
-			byte stop = 0;
-			DriveDirection fw = DriveDirection.FORWARD;
-			//radio.sendPacket(new DrivePacket(stop, fw, stop, fw, stop, fw, 0));
+			this.bcsDefender.robotController.openCatcher();
+			this.bcsDefender.robotController.stop();
+			this.bcsAttacker.robotController.openCatcher();
+			this.bcsAttacker.robotController.stop();
 			break;
 		case PASSING:
 			Strategy ps = new PassingStrategy(this.bcsAttacker,
