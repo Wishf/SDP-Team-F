@@ -235,6 +235,10 @@ void doCatcher(){
 void doKick(){
   // We are starting a kick motion
   if(kickState == KICK_STATE_START){
+    //Release catcher
+    catchState = CATCH_STATE_DISENGAGE;
+    
+    
     // Take the initial tachometer reading at the start of this motion
     kickerTachometerStart = tacho(KICK_TACHOMETER);
 
