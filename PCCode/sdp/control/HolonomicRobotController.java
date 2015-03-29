@@ -119,7 +119,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	power = Math.min(maxPower, power);
     	
-    	System.out.println("Rotating power: "+power);
+    	//System.out.println("Rotating power: "+power);
     	
     	leftMotorPower = (byte) power;
     	rightMotorPower = (byte) power;
