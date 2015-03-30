@@ -143,7 +143,7 @@ public class StrategyController implements WorldStateReceiver {
             
             break;
         case MILESTONE_TWO_B:
-            ats = new NewInterceptorStrategy(this.bcsDefender);
+            ats = new RotateTestStrategy(this.bcsAttacker);
             StrategyController.currentStrategies.add(ats);
             ats.startControlThread();
             

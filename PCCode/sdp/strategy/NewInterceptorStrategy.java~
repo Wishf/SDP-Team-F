@@ -18,7 +18,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	private BrickCommServer brick;
 	private ControlThread controlThread;
 	private Deque<Vector2f> ballPositions = new ArrayDeque<Vector2f>();
-	
+    boolean stopControlThread;
 	private long caughtTime;
 	private long kickTime;
 	private boolean kicked = false;
@@ -32,17 +32,23 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		this.controlThread = new ControlThread();
 	}
 
+	@Override
+	public void stopControlThread() {
+		stopControlThread = true;
+	}
 
 	@Override
 	public void startControlThread() {
-		this.controlThread.start();
+		stopControlThread = false;
+		controlThread.start();
 	}
+
 	
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
 
-		 
+		RobotDebugWindow.messageAttacker.setMessage("inter");
 		ballPositions.addLast(new Vector2f(worldState.getBall().x, worldState
 				.getBall().y));
 		if (ballPositions.size() > 3)
@@ -54,53 +60,41 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		int targetY = (int) (slope * defenderRobotX + c);
 		float dist;*/
 		
-		boolean ballInEnemyAttackerArea = false;
-		boolean alignWithEnemyAttacker = false;
-		boolean defenderNeedFixOrientation = false;
-		boolean rotate = false;
+
 		
 		float targetY = ourGoalEdges[1];
-		double angleToDefCheck = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
-		// convert true to worldState.ballNotOnPitch if playing games
-		//System.out.println("Angle: " + angleToDefCheck);
-		if(Math.abs(angleToDefCheck) > 15){
-			rotate = true;
-			
-		}
-		alignWithEnemyAttacker = false;
+
 			// Get equation of line through enemyAttacker along its orientation
 			if(worldState.weAreShootingRight){
 				if (enemyAttackerOrientation<270 && enemyAttackerOrientation >90) { 
-					alignWithEnemyAttacker = true;
 					double rad = enemyAttackerOrientation * Math.PI/180;
 					targetY = -(float) Math.tan(rad)*(enemyAttackerRobotX -defenderRobotX) + enemyAttackerRobotY;
 				
 				}else{
-					targetY = worldState.leftGoal[1];
+					targetY = enemyAttackerRobotY;
 				}
 			}
 			else{
 				if (enemyAttackerOrientation<90 || enemyAttackerOrientation >270) { 
 					double rad = enemyAttackerOrientation * Math.PI/180;
-					alignWithEnemyAttacker = true;
 					targetY = (float) Math.tan(rad)*(defenderRobotX-enemyAttackerRobotX) + enemyAttackerRobotY;
 				}
 				else{
-					targetY = worldState.leftGoal[1];
+					targetY = enemyAttackerRobotY;
 				}
 			}
 		
 		boolean faceEnemyAttacker = false;
 		double angleToEnemyAttacker = 0;
 		
-		if (targetY > 260) {
-			targetY = (int) 260;
-			faceEnemyAttacker = true;
-			angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );
-		} else if (targetY < 140) {
-			targetY = (int) 140;
-			faceEnemyAttacker = true;
-			angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );			
+		if (targetY > ourGoalEdges[2]) {
+			targetY = (int) ourGoalEdges[2];
+			//faceEnemyAttacker = true;
+			//angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );
+		} else if (targetY < ourGoalEdges[0]) {
+			targetY = (int) ourGoalEdges[0];
+			//faceEnemyAttacker = true;
+			//angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );			
 		}
 		
 		// Correct for defender plate not being in centre of robot
@@ -108,63 +102,69 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		float dist = targetY - defenderRobotY;
 		
-		//if move to right = negative, move to left = positive
-		// if we are shooting right and we need to move right sideways, the distance is positive so convert it to be negative.
-		if(!worldState.weAreShootingRight) {
+		if(!worldState.weAreShootingRight){
 			dist = -dist;
 		}
+		// if we are shooting right and we need to move right sideways, the distance is positive so convert it to be negative.
 		
 		double angle = 0;
 
 		
 		
 		boolean move_sideways = false;
+		boolean fixRotate = false;
 		
-		if (Math.abs(dist) >25) {
+		double fixAngle = 0;
+		
+		if (Math.abs(dist) >30) {
 			move_sideways = true;
 		}
-		//System.out.println("Distance: " + dist);
-		/*else {
-			if(worldState.weAreShootingRight && defenderOrientation > 180){
-				angle = 360 - defenderOrientation;
-			}
-			else if (worldState.weAreShootingRight && defenderOrientation <180) {
-				angle = - defenderOrientation;
-			}
-			else {
-				angle = 180 - defenderOrientation;
-			}
+		//else {
+			//fixOrientation = true;
+			/*fixAngle = 180 - defenderOrientation;
+			if(weAreShootingRight) {
+				if(defenderOrientation >0 && defenderOrientation <180 )
+					fixAngle  = -defenderOrientation;
+				if(defenderOrientation>180 && defenderOrientation <360){
+					fixAngle = 360-defenderOrientation;
+				}
+			}*/
+		//}
+		angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
+		if(Math.abs(angleToEnemyAttacker) > 15){
+			faceEnemyAttacker = true;
 		}
 		
-		if (Math.abs(angle) >20) {
-			rotate  = true;
-		}*/
 		
-		//RobotDebugWindow.messageDefender.setMessage("E("+enemyAttackerRobotX+","+enemyAttackerRobotY+")"+"D("+defenderRobotX+","+defenderRobotY+") "+"Enemy_angle:"+enemyAttackerOrientation+" Aim at:"+targetY+" Defender needs move:"+dist);
+		fixAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
+		if (Math.abs(fixAngle)>20) {
+			fixRotate = true;
+		}
+		
+		
+		
+		//System.out.println("................................................" + move_sideways);
+		
+		
 		
 		synchronized (this.controlThread) {
-			if(rotate){
+			if (fixRotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-           	 	System.out.println("DEFCHECK" + angleToDefCheck);
-           	 	if (angleToDefCheck > 59){
-           		 controlThread.operation.angleDifference = (int) (angleToDefCheck* 0.3);
-           	 	}else if(angleToDefCheck > 30){
-           		 controlThread.operation.angleDifference = (int) (angleToDefCheck * 0.6);
-           	 	}else{
-           		 controlThread.operation.angleDifference = (int) (angleToDefCheck  );
-           	 	}
+				controlThread.operation.angleDifference =  (-fixAngle);
+				System.out.println("ROTATE to DEF CHECK" + fixAngle);
+			}else if(move_sideways) {
+				//System.out.println("MOVE_sideway" + dist);
+/*				RobotDebugWindow.messageDefender.setMessage("MS"+dist);
+				RobotDebugWindow.messageAttacker.setMessage("Aim"+targetY);*/
 				
-			}
-			else if(move_sideways) {
-				System.out.println("MOVE" + dist);
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-				controlThread.operation.travelDistance = (int) dist;
-			}else if (faceEnemyAttacker){
+                controlThread.operation.travelDistance = (int) dist;
+                
+                System.out.println("MOVE TO DESTINATION ");
+			}else if(faceEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-	           	System.out.println("ENEMY" + angleToEnemyAttacker);
-	           	
-	           		controlThread.operation.angleDifference = (int) (-angleToEnemyAttacker);
-	           	
+				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
+				System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
 			}
 		}
 	}
@@ -182,36 +182,32 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		public void run() {
 			try {
-				while (true) {
+				while (!stopControlThread) {
 					Operation.Type op;
 					double rotateBy;
 					double travelDist;
 					synchronized (this) {
+						//System.out.println("inter");
 						op = this.operation.op;
 						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
 					}
-					//System.out.println("operation: " + op);
+
 					switch (op) {
-					case DEFROTATE:
-						if (rotateBy != 0) {
-							
-						brick.executeSync(new RobotCommand.Rotate(
-								rotateBy));
-						}
-						break;
-						/*case DEFTRAVEL:
-						 if (travelDist != 0) {
-							brick.execute(new RobotCommand.Trave(travelDist));
-						}
-						break;*/
 					case DESIDEWAYS:
 						if (travelDist != 0) {
-
-							brick.execute(new RobotCommand.TravelSideways(travelDist));
+		
+							System.out.println("move!"+travelDist);
+							brick.robotController.travelSideways((
+                                    travelDist*0.5));
 						}
 						break;
-					
+					case DEFROTATE:
+                        if (rotateBy != 0) {
+                        	System.out.println("rotate "+rotateBy);
+                            brick.robotController.rotate(rotateBy);
+                        }
+                        break;
 					default:
 						break;
 					}
@@ -229,4 +225,5 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	}
 
 }
+
 

@@ -135,27 +135,31 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			faceEnemyAttacker = true;
 		}
 		
+		boolean move_robot = false;
 		
 		fixAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		if (Math.abs(fixAngle)>20) {
 			fixRotate = true;
 		}
-		
-		
-		
-		//System.out.println("................................................" + move_sideways);
-		
-		
+		if(!weAreShootingRight) {
+			if(defenderRobotX<510) {
+				move_robot = true;
+			}
+		}else {
+			if (defenderRobotX > 140) {
+				move_robot = true;
+			}
+		}
 		
 		synchronized (this.controlThread) {
 			if (fixRotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (-fixAngle);
-				System.out.println("ROTATE to DEF CHECK" + fixAngle);
+				System.out.println("ROTATE to DEF CHECK" + -fixAngle);
 			}else if(move_sideways) {
 				//System.out.println("MOVE_sideway" + dist);
-/*				RobotDebugWindow.messageDefender.setMessage("MS"+dist);
-				RobotDebugWindow.messageAttacker.setMessage("Aim"+targetY);*/
+				RobotDebugWindow.messageDefender.setMessage(""+defenderRobotX);
+				//RobotDebugWindow.messageAttacker.setMessage("Aim"+targetY);
 				
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
                 controlThread.operation.travelDistance = (int) dist;
@@ -165,6 +169,9 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
 				System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
+			}else if(move_robot) {
+				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+				controlThread.operation.travelDistance = -30;
 			}
 		}
 	}
@@ -191,7 +198,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 						op = this.operation.op;
 						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
-					}
+					}                                            
 
 					switch (op) {
 					case DESIDEWAYS:
@@ -199,7 +206,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 							System.out.println("move!"+travelDist);
 							brick.robotController.travelSideways((
-                                    travelDist*0.5));
+                                    travelDist*0.8));
 						}
 						break;
 					case DEFROTATE:
@@ -208,11 +215,20 @@ public class NewInterceptorStrategy extends GeneralStrategy {
                             brick.robotController.rotate(rotateBy);
                         }
                         break;
+                    case DEFTRAVEL:
+                    	if(System.currentTimeMillis() - caughtTime < 1000)
+                    	{
+                    		brick.robotController.stop();
+                    	}
+                        if (travelDist != 0) {
+                            brick.robotController.travel(travelDist);
+                        }
+                        
+                        break;
 					default:
 						break;
 					}
-					
-					
+
 					
 					Thread.sleep(StrategyController.STRATEGY_TICK);
 				}
@@ -225,5 +241,6 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	}
 
 }
+
 
 
