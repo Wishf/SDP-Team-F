@@ -37,12 +37,13 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public double ROTATE_MIN = 55;
     public double ROTATE_MAX = 200;
-    public double ROTATE_A = 0.07;
-    private double ROTATE_REAR_COEF = 0.5;
+    public double ROTATE_A = 0.1;
+    public double ROTATE_REAR_COEF = 0.5;
+    public double ROTATE_INITIAL_BOOST_COEF = 1.3; 
     
     public double TRAVEL_MIN = 120;
     public double TRAVEL_MAX = 254;
-    public double TRAVEL_A = 0.35;    
+    public double TRAVEL_A = 1;    
     
     public double SIDEWAYS_MIN = 150;
     public double SIDEWAYS_MAX = 254;
@@ -50,7 +51,7 @@ public class HolonomicRobotController extends BaseRobotController {
     public byte SIDEWAYS_ARC_POWER = 70;
     
     
-    private static final int PACKET_LIFETIME = 100;
+    private static final int PACKET_LIFETIME = 150;
     
     
     
@@ -61,7 +62,8 @@ public class HolonomicRobotController extends BaseRobotController {
 	
 	DriveDirection leftMotorDir;
 	DriveDirection rightMotorDir;
-	DriveDirection rearMotorDir;    
+	DriveDirection rearMotorDir;
+	   
     
 
     public HolonomicRobotController(Radio radio, byte position){
@@ -108,7 +110,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	double rearMotorCoef = ROTATE_REAR_COEF;
     	
     	if(!rotated){
-    		minPower *= 1.3;
+    		minPower *= ROTATE_INITIAL_BOOST_COEF;
     	}
     	
     	double vp = Math.min(1, Math.abs(this.angularVelocity)/this.maxAngularVelocity);
@@ -126,7 +128,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	
     	
-    	if(angle < 0){    		
+    	if(angle > 0){    		
     		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {
@@ -312,6 +314,102 @@ public boolean travelSideways(double displacement){
 	public Packet travelDiagonally(double angle, double distance) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	
+	
+	
+	
+	public void setRCValue(String name, double value){
+		if(name.equals("ROTATE_MIN")){
+        	this.ROTATE_MIN = value;
+        }
+        else if(name.equals("ROTATE_MAX")){
+        	this.ROTATE_MAX = value;
+        }
+        else if(name.equals("ROTATE_A")){
+        	this.ROTATE_A = value;
+        }
+        else if(name.equals("ROTATE_REAR_COEF")){
+        	this.ROTATE_REAR_COEF = value;
+        }
+        else if(name.equals("ROTATE_INITIAL_BOOST_COEF")){
+        	this.ROTATE_INITIAL_BOOST_COEF = value;
+        }
+		
+        
+        
+        else if(name.equals("TRAVEL_MIN")){
+        	this.TRAVEL_MIN = value;
+        }
+        else if(name.equals("TRAVEL_MAX")){
+        	this.TRAVEL_MAX = value;
+        }
+        else if(name.equals("TRAVEL_A")){
+        	this.TRAVEL_A = value;
+        }
+        
+        
+        else if(name.equals("SIDEWAYS_MIN")){
+        	this.SIDEWAYS_MIN = value;
+        }
+        else if(name.equals("SIDEWAYS_MAX")){
+        	this.SIDEWAYS_MAX = value;
+        }
+        else if(name.equals("SIDEWAYS_A")){
+        	this.SIDEWAYS_A = value;
+        }	        
+        else if(name.equals("SIDEWAYS_ARC_POWER")){
+        	this.SIDEWAYS_ARC_POWER = (byte) value;
+        }
+	}
+	
+	
+	public double getRCValue(String name){
+		if(name.equals("ROTATE_MIN")){
+        	return this.ROTATE_MIN; 
+        }
+        else if(name.equals("ROTATE_MAX")){
+        	return this.ROTATE_MAX;
+        }
+        else if(name.equals("ROTATE_A")){
+        	return this.ROTATE_A;
+        }
+        else if(name.equals("ROTATE_REAR_COEF")){
+        	return this.ROTATE_REAR_COEF;
+        }
+        else if(name.equals("ROTATE_INITIAL_BOOST_COEF")){
+        	return this.ROTATE_INITIAL_BOOST_COEF;
+        }
+		
+        
+        
+        else if(name.equals("TRAVEL_MIN")){
+        	return this.TRAVEL_MIN;
+        }
+        else if(name.equals("TRAVEL_MAX")){
+        	return this.TRAVEL_MAX;
+        }
+        else if(name.equals("TRAVEL_A")){
+        	return this.TRAVEL_A;
+        }
+        
+        
+        else if(name.equals("SIDEWAYS_MIN")){
+        	return this.SIDEWAYS_MIN;
+        }
+        else if(name.equals("SIDEWAYS_MAX")){
+        	return this.SIDEWAYS_MAX;
+        }
+        else if(name.equals("SIDEWAYS_A")){
+        	return this.SIDEWAYS_A;
+        }	        
+        else if(name.equals("SIDEWAYS_ARC_POWER")){
+        	return this.SIDEWAYS_ARC_POWER;
+        }
+        else{
+        	return 0;
+        }
 	}
     
 }
