@@ -98,12 +98,14 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         boolean uncatch = false;
         boolean rotate = false;
         boolean travel_sideways = false;
+        boolean rotate_to_defender = false;
         Point2 target = new Point2(attackerRobotX, attackerRobotY);
         double targetDistance = 0;
         float sidewaysThreshold = 20;
         double targetAngle = 0;
         boolean move_robot = false;
         double angleDifference = 0;
+       
         
         float ball_dx = ballX - attackerRobotX;
         float ball_dy = ballY - attackerRobotY;
@@ -164,6 +166,9 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	if (catcherReleased != true) {
         		uncatch = true;
         	}
+        	
+        	rotate_to_defender = true;
+        	
         } else if(isBallInEnemyDefenderArea(worldState)) {
         	
         	target = new Point2(correctX(), ballY);
@@ -194,6 +199,11 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     		{
     			travel_sideways = false;
     		}
+        }
+        
+        if(!travel_sideways && rotate_to_defender) {
+        	targetAngle = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderRobotX, defenderRobotY);
+        	rotate = true;
         }
         
         if(move_robot) {
