@@ -492,20 +492,20 @@ public boolean travelSideways(double displacement){
 			return false;
 
 		
-		this.ROTATE_MIN = (double) data.get("ROTATE_MIN");
-		this.ROTATE_MAX = (double) data.get("ROTATE_MAX");
-		this.ROTATE_A = (double) data.get("ROTATE_A");
-		this.ROTATE_REAR_COEF = (double) data.get("ROTATE_REAR_COEF");
-		this.ROTATE_INITIAL_BOOST_COEF = (double) data.get("ROTATE_INITIAL_BOOST_COEF");
+		this.ROTATE_MIN = (Double) data.get("ROTATE_MIN");
+		this.ROTATE_MAX = (Double) data.get("ROTATE_MAX");
+		this.ROTATE_A = (Double) data.get("ROTATE_A");
+		this.ROTATE_REAR_COEF = (Double) data.get("ROTATE_REAR_COEF");
+		this.ROTATE_INITIAL_BOOST_COEF = (Double) data.get("ROTATE_INITIAL_BOOST_COEF");
 		
 		
-		this.TRAVEL_MIN = (double) data.get("TRAVEL_MIN");
-		this.TRAVEL_MAX = (double) data.get("TRAVEL_MAX");
-		this.TRAVEL_A = (double) data.get("TRAVEL_A");
+		this.TRAVEL_MIN = (Double) data.get("TRAVEL_MIN");
+		this.TRAVEL_MAX = (Double) data.get("TRAVEL_MAX");
+		this.TRAVEL_A = (Double) data.get("TRAVEL_A");
         
-		this.SIDEWAYS_MIN = (double) data.get("SIDEWAYS_MIN");
-		this.SIDEWAYS_MAX = (double) data.get("SIDEWAYS_MAX");
-		this.SIDEWAYS_A = (double) data.get("SIDEWAYS_A");
+		this.SIDEWAYS_MIN = (Double) data.get("SIDEWAYS_MIN");
+		this.SIDEWAYS_MAX = (Double) data.get("SIDEWAYS_MAX");
+		this.SIDEWAYS_A = (Double) data.get("SIDEWAYS_A");
 		this.SIDEWAYS_ARC_POWER = ((Integer) data.get("SIDEWAYS_ARC_POWER")).byteValue();
 		
 	    return true;
