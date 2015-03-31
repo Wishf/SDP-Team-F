@@ -10,7 +10,7 @@ import org.apache.commons.cli.Options;
 import sdp.strategy.StrategyController;
 import sdp.vision.gui.VisionGUI;
 import sdp.vision.gui.tools.AlignmentTool;
-import sdp.vision.gui.tools.CalibrationTool;
+//import sdp.vision.gui.tools.CalibrationTool;
 import sdp.vision.gui.tools.ColourThresholdConfigTool;
 import sdp.vision.gui.tools.HistogramTool;
 import sdp.vision.gui.tools.PitchModelView;
@@ -128,8 +128,8 @@ public class RunVision {
 			RobotDebugWindow robotDebugWindow = new RobotDebugWindow(gui, strategyController);
 			gui.addTool(robotDebugWindow, "Robot Debug Window");
 			
-			CalibrationTool calibrationTool = new CalibrationTool(gui, strategyController);
-			gui.addTool(calibrationTool, "Calibration");
+			//CalibrationTool calibrationTool = new CalibrationTool(gui, strategyController);
+			//gui.addTool(calibrationTool, "Calibration");
 
 			vStream.addReceiver(pmvTool);
 			vStream.addReceiver(distortionFix);
