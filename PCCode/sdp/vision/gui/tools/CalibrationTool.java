@@ -3,14 +3,22 @@ package sdp.vision.gui.tools;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sdp.control.HolonomicRobotController;
@@ -18,10 +26,13 @@ import sdp.strategy.StrategyController;
 import sdp.vision.gui.GUITool;
 import sdp.vision.gui.VisionGUI;
 
-public class CalibrationTool implements GUITool {
-	private VisionGUI gui;
-	private JFrame subWindow;
-	private StrategyController sc;
+public class CalibrationTool implements GUITool, ActionListener {
+	protected VisionGUI gui;
+	protected JFrame subWindow;
+	protected StrategyController sc;
+	protected JButton attOpenButton, attSaveButton, defOpenButton, defSaveButton;
+	protected JLabel attFileLabel, defFileLabel;
+    protected JFileChooser fc;
 	
 	
 	ArrayList<MappedJSlider> sliders;
@@ -31,7 +42,15 @@ public class CalibrationTool implements GUITool {
 		this.gui = gui;
 		this.sc = sc;
 		
+		
+		//Create a file chooser
+		this.fc = new JFileChooser();
+		
+		
+		
 		sliders = new ArrayList<MappedJSlider>();
+		
+		UIManager.put("Slider.paintValue", false);
 
 		subWindow = new JFrame("Calibration");
 		subWindow.setResizable(false);
@@ -47,57 +66,85 @@ public class CalibrationTool implements GUITool {
 		JPanel defenderTab = new JPanel();
         JPanel attackerTab = new JPanel();
         
-        defenderTab.setLayout(new GridLayout(0, 2));
-        attackerTab.setLayout(new GridLayout(0, 2));
+        defenderTab.setLayout(new GridLayout(0, 3));
+        attackerTab.setLayout(new GridLayout(0, 3));
         
         
         
         tabbedPane.addTab("Defender", defenderTab);
         tabbedPane.addTab("Attacker", attackerTab);
-		
         
+        createSaveLoadButtons(attackerTab, defenderTab);
         
         //Defender
-        addSlider(defenderTab, "ROTATE_MIN", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "ROTATE_MAX", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "ROTATE_A", 0, 1000, 0.01, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "ROTATE_REAR_COEF", 0, 100, 0.01, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "ROTATE_INITIAL_BOOST_COEF", 100, 300, 0.01, sc.bcsDefender.robotController);
-        
-        addSlider(defenderTab, "TRAVEL_MIN", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "TRAVEL_MAX", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "TRAVEL_A", 0, 1000, 0.01, sc.bcsDefender.robotController);
-        
-        addSlider(defenderTab, "SIDEWAYS_MIN", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "SIDEWAYS_MAX", 0, 255, 1, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "SIDEWAYS_A", 0, 1000, 0.01, sc.bcsDefender.robotController);
-        addSlider(defenderTab, "SIDEWAYS_ARC_POWER", 0, 255, 1, sc.bcsDefender.robotController);
-        
-        
-        
+        addAllSliders(defenderTab, sc.bcsDefender.robotController);   
         //Attacker
-        addSlider(attackerTab, "ROTATE_MIN", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "ROTATE_MAX", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "ROTATE_A", 0, 1000, 0.01, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "ROTATE_REAR_COEF", 0, 100, 0.01, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "ROTATE_INITIAL_BOOST_COEF", 100, 300, 0.01, sc.bcsAttacker.robotController);
-        
-        addSlider(attackerTab, "TRAVEL_MIN", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "TRAVEL_MAX", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "TRAVEL_A", 0, 1000, 0.01, sc.bcsAttacker.robotController);
-        
-        addSlider(attackerTab, "SIDEWAYS_MIN", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "SIDEWAYS_MAX", 0, 255, 1, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "SIDEWAYS_A", 0, 1000, 0.01, sc.bcsAttacker.robotController);
-        addSlider(attackerTab, "SIDEWAYS_ARC_POWER", 0, 255, 1, sc.bcsAttacker.robotController);
+        addAllSliders(attackerTab, sc.bcsAttacker.robotController);
 		
 	}
 	
+	private void createSaveLoadButtons(JPanel attCont, JPanel defCont){
+		//Attacker
+		attOpenButton = new JButton("Load from a file");
+		attOpenButton.addActionListener(this);
+	
+		attSaveButton = new JButton("Save to a file");
+		attSaveButton.addActionListener(this);
+		
+		attFileLabel = new JLabel("none");
+		
+		
+		attCont.add(attOpenButton);
+		attCont.add(attSaveButton);
+		attCont.add(attFileLabel);
+		
+		
+		//Defender
+		defOpenButton = new JButton("Load from a file");
+		defOpenButton.addActionListener(this);
+	
+		defSaveButton = new JButton("Save to a file");
+		defSaveButton.addActionListener(this);
+		
+		defFileLabel = new JLabel("none");
+		
+		
+		defCont.add(defOpenButton);
+		defCont.add(defSaveButton);
+		defCont.add(defFileLabel);
+	}
+	
+	private void addAllSliders(JPanel container, HolonomicRobotController rc){
+		addSlider(container, "ROTATE_MIN", 20, 150, 1, rc);
+        addSlider(container, "ROTATE_MAX", 150, 254, 1, rc);
+        addSlider(container, "ROTATE_A", 0, 20000, 0.0001, rc);
+        addSlider(container, "ROTATE_REAR_COEF", 0, 200, 0.01, rc);
+        addSlider(container, "ROTATE_INITIAL_BOOST_COEF", 100, 300, 0.01, rc);
+        
+        addSlider(container, "TRAVEL_MIN", 50, 150, 1, rc);
+        addSlider(container, "TRAVEL_MAX", 150, 254, 1, rc);
+        addSlider(container, "TRAVEL_A", 0, 5000, 0.001, rc);
+        
+        addSlider(container, "SIDEWAYS_MIN", 50, 254, 1, rc);
+        addSlider(container, "SIDEWAYS_MAX", 50, 254, 1, rc);
+        addSlider(container, "SIDEWAYS_A", 0, 5000, 0.001, rc);
+        addSlider(container, "SIDEWAYS_ARC_POWER", 0, 254, 1, rc);
+	}
+	
+	
 	private void addSlider(JPanel container, String name, int min, int max, double scaling, HolonomicRobotController rc){
-		JLabel label = new JLabel(name);
+		JLabel label = new JLabel(name+" = ");		
+		JLabel valueLabel = new JLabel();		
+		MappedJSlider slider = new MappedJSlider(name, JSlider.HORIZONTAL, min, max, scaling, rc, valueLabel);
+		
+		label.setHorizontalAlignment(JLabel.RIGHT);
+		
+		
+		
 		container.add(label);
-		MappedJSlider slider = new MappedJSlider(name, JSlider.HORIZONTAL, min, max, scaling, rc);
+		container.add(valueLabel);
 		container.add(slider);
+		
 		
 		sliders.add(slider);
 	}
@@ -117,18 +164,24 @@ public class CalibrationTool implements GUITool {
 	
 	private class MappedJSlider extends JSlider implements ChangeListener{
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		String name;
 		HolonomicRobotController rc;
 		double scaling;
+		private JLabel valueLabel;
 		
-		public MappedJSlider(String name, int orientation, int min, int max, double scaling, HolonomicRobotController rc){
+		public MappedJSlider(String name, int orientation, int min, int max, double scaling, HolonomicRobotController rc, JLabel valueLabel){
 			super(orientation, min, max, (int) (rc.getRCValue(name)/scaling));
 			this.scaling = scaling;
 			
 			this.name = name;
 			this.rc = rc;
+			this.valueLabel = valueLabel;
 			
-			Hashtable labelTable = new Hashtable();
+			Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 			labelTable.put( new Integer( min ), new JLabel(""+min*scaling) );
 			labelTable.put( new Integer( max ), new JLabel(""+max*scaling) );
 			
@@ -136,18 +189,37 @@ public class CalibrationTool implements GUITool {
 			this.setPaintLabels(true);
 			
 			this.addChangeListener(this);
+			
+			setValueLabel();
 		}		
 		
 		
-
+		private void setValueLabel(){
+			
+			double power = Math.log10(scaling);
+			double factor = Math.pow(10, -power);
+			
+			double value = (rc.getRCValue(name));
+			
+			double labelValue = (double)Math.round(value * factor) / factor;
+			
+			//System.out.println(factor+" "+value);
+			
+			this.valueLabel.setText(""+labelValue);
+			
+			
+		}
 		
 		public void stateChanged(ChangeEvent e) {
 		    JSlider source = (JSlider)e.getSource();
-		    if (!source.getValueIsAdjusting()) {
+		    if ( true){ //!source.getValueIsAdjusting()) {
 		        int value = (int)source.getValue();
 		        
+		        double actualValue = value*this.scaling;
 		        
-		        rc.setRCValue(this.name, value);
+		        rc.setRCValue(this.name, actualValue);
+		        
+		        setValueLabel();
 		    }
 		}
 		
@@ -159,6 +231,89 @@ public class CalibrationTool implements GUITool {
 		
 		
 	}
+	
+	
+	public void actionPerformed(ActionEvent e) {
+		updateAllSliders();
+		//Handle attacker open button action.
+        if (e.getSource() == attOpenButton) {
+            int returnVal = fc.showOpenDialog(subWindow);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                
+                System.out.println(System.getProperty("user.dir"));
+                attFileLabel.setText(file.getName());
+                
+                
+                
+                if(!sc.bcsAttacker.robotController.loadConfig(file)){
+                	System.out.println("Problem loading!");
+                }
+                
+            } else {
+            	System.out.println("Open command cancelled by user.");
+            }
+        //Handle attacker save button action.
+        } else if (e.getSource() == attSaveButton) {
+            int returnVal = fc.showSaveDialog(subWindow);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                
+                //System.out.println("Att Opening: " + file.getName());
+                attFileLabel.setText(file.getName());
+                
+                sc.bcsAttacker.robotController.saveConfig(file);
+                
+                
+            } else {
+            	System.out.println("Open command cancelled by user.");
+            }
+        }
+        
+        //Handle defender open
+        else if (e.getSource() == defOpenButton) {
+            int returnVal = fc.showOpenDialog(subWindow);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                
+                
+                //System.out.println("Def Opening: " + file.getName());
+                defFileLabel.setText(file.getName());
+                
+                if(!sc.bcsDefender.robotController.loadConfig(file)){
+                	System.out.println("Problem loading!");
+                }
+                
+            } else {
+            	System.out.println("Open command cancelled by user.");
+            }
+        //Handle defender save
+        } else if (e.getSource() == defSaveButton) {
+            int returnVal = fc.showSaveDialog(subWindow);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                
+                //System.out.println("Def Saving: " + file.getName());
+                defFileLabel.setText(file.getName());
+                
+                
+                
+                sc.bcsDefender.robotController.saveConfig(file);
+            } else {
+            	System.out.println("Open command cancelled by user.");
+            }
+        }
+        
+        updateAllSliders();
+    }
+
+	
+	
+	
 	
 	
 	
