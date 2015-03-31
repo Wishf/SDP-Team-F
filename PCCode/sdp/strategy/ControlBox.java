@@ -270,7 +270,7 @@ public class ControlBox implements WorldStateControlBox {
 			}
 		}
 		//Get the angle from our position.
-		return calcTargetAngle(ws.getAttackerRobot().x - x, ws.getDefenderRobot().y - y);
+		return calcTargetAngle(x - ws.getAttackerRobot().x, y - ws.getDefenderRobot().y);
 	}
 	
 	private double getCenterY(WorldState ws){

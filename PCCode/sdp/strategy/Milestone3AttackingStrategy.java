@@ -62,7 +62,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     }
     
     public float correctX() {
-    	if(weAreShootingRight) {		
+    	/*if(weAreShootingRight) {		
     		return attackerRobotX;
     	} else {
     		if(attackerRobotX - leftCheck < 10 || rightCheck - attackerRobotX < 10) {
@@ -70,10 +70,20 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     		} else {
     			return attackerRobotX;
     		}
-    	}
-    	//return attackerRobotX;
+    	}*/
+    	return attackerRobotX;
     }
 
+    // Makes sure the robot does not bounce into the ball
+    public Point2 targetFromBall(float ballX, float ballY) {
+    	float side = ballY - 240;
+    	if(side > 0) {
+    		return new Point2(ballX, ballY-10);
+    	} else {
+    		return new Point2(ballX, ballY+10);
+    	}
+    }
+    
     
     @Override
     public void sendWorldState(WorldState worldState) {
@@ -108,7 +118,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
             // 1. Catch the ball
             // 2. Ask the control box where to go.
             if(!hasBall) {
-                target = new Point2(ballX-5, ballY-5);
+            	target = targetFromBall(ballX, ballY);
                 RobotDebugWindow.messageAttacker.setMessage("Ball attacker b");
                 if (catcherReleased != true) {
                 	uncatch = true;
@@ -390,14 +400,12 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFUNCATCH:
-                        	control++;
                         	System.out.println("Uncatch");
-                        	if(!catcherReleased || control == 10) {
+                        	if(!catcherReleased) {
                         		brick.robotController.openCatcher();
                                 hasBall = false;
                                 catcherReleased = true;
-                                RobotDebugWindow.messageAttacker.setMessage("Uncatch");
-                                control = 0;
+                             //   RobotDebugWindow.messageAttacker.setMessage("Uncatch");
                         	}           
                             break;
                         default:
