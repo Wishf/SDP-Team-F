@@ -19,6 +19,8 @@ Apply and run.
 Whenever you open the vision control panel, click 'Settings' -> 'Load Settings'
 It does not automatically load previously saved settings otherwise.
 
+ALSO checkout xawtv in the terminal! It's very interesting!
+
 ##Repository Structure
 ###Arduino
 This directory contains all of the code that runs on the Arduino.
