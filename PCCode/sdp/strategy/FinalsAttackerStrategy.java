@@ -7,6 +7,7 @@ import sdp.comms.BrickCommServer;
 import sdp.comms.RobotCommand;
 import sdp.comms.RobotCommand.TravelSideways;
 import sdp.vision.Vector2f;
+import sdp.vision.PitchConstants;
 import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
@@ -15,7 +16,6 @@ import sdp.strategy.interfaces.WorldStateControlBox;
 import sdp.strategy.ControlBox;
 
 public class FinalsAttackerStrategy extends GeneralStrategy {
-
 
     private BrickCommServer brick;
     private ControlThread controlThread;
@@ -180,6 +180,22 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     		
         }
         
+/*        if (target.getY() >= bottomY) {
+        	System.out.println("You've gone too far this time. The Y target was " + target.getY() + " and the actual bot is " + bottomY);
+        	target.setY(bottomY - 40);
+        	
+        } else if (target.getY() < topY) {
+        	System.out.println("You've gone too far this time. The Y target was " + target.getY() + " and the actual top is " + topY);        	
+        	target.setY(topY + 40);
+        }
+        
+        if (target.getX() <= leftCheck) {
+        	System.out.println("You've gone too far this time. The X target was " + target.getX() + " and the actual left is " + leftCheck);        	
+        	target.setX(leftCheck - 40);
+        } else if (target.getX() >= rightCheck) {
+        	System.out.println("You've gone too far this time. The X target was " + target.getX() + " and the actual right is " + rightCheck);        	
+        	target.setX(rightCheck + 40);
+        } NEW CODE IMPLEMENTED TO STOP IT GETTING STUCK BUT NOT TESTED YET SO COMMENTED */
 
         if(travel_sideways) {
         	
@@ -313,7 +329,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                             }
                             break;
                         case DESIDEWAYS:
-                            if (travelDist != 0) {
+                            if (travelDist != 0) {                            	
                                 brick.robotController.travelSideways(travelDist);
                             }
                             break;
