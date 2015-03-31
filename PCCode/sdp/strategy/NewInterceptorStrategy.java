@@ -23,6 +23,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	private long kickTime;
 	private boolean kicked = false;
 	private boolean ballCaught = false;
+	private boolean rotateAgain = true;
 	
 	
 	
@@ -133,6 +134,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		if(Math.abs(angleToEnemyAttacker) > 15){
 			faceEnemyAttacker = true;
+			
 		}
 		
 		boolean move_robot = false;
@@ -152,10 +154,10 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		}
 		
 		synchronized (this.controlThread) {
-			if (fixRotate) {
+			if (fixRotate && rotateAgain) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference =  (-fixAngle);
-				System.out.println("ROTATE to DEF CHECK" + -fixAngle);
+				controlThread.operation.angleDifference =  (fixAngle);
+				System.out.println("ROTATE to DEF CHECK" + fixAngle);
 			}else if(move_sideways) {
 				//System.out.println("MOVE_sideway" + dist);
 				RobotDebugWindow.messageDefender.setMessage(""+defenderRobotX);
@@ -169,6 +171,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
 				System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
+				rotateAgain = false;
 			}else if(move_robot) {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = -30;

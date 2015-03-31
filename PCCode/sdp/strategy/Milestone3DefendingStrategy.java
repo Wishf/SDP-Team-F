@@ -134,14 +134,17 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         
         double targetDistance;
         double ballDistance = Math.sqrt((ballX - defenderRobotX)*(ballX - defenderRobotX) + (ballY - defenderRobotY)*(ballY - defenderRobotY));
-        if(ballDistance > catchThreshold && !catcherReleased){
+        if(ballDistance > 1.5 *catchThreshold){
         	uncatch = true;
+        	System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
         // If the ball slips from the catching area we can guess we did not catch it.
         if(ballCaughtDefender /*&& !(ballX < defenderCheck)*/){
         	if(!worldState.ballNotOnPitch && ballDistance > 2*catchThreshold) {       
             	//System.out.println("I've lost the ball!");
+        		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             	ballCaughtDefender = false;
+            	catcherReleased = false;
             	uncatch = true;
             	//catcherReleased = true;
             } 
@@ -155,7 +158,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	RobotDebugWindow.messageDefender.setMessage("Target" + our_goal.getX() + "  " + our_goal.getY());
         	//System.out.println("TARGET" + targetDistance);
         	       	
-        	if(Math.abs(angleToTeamMate) < 25 && Math.abs(targetDistance )< 25){
+        	if(Math.abs(angleToTeamMate) < 15 && Math.abs(targetDistance )< 25){
         		System.out.println(".................TRUE  "  + angleToTeamMate);
             // Here: need to check if the defender is ready and we don't need to move any further
 	        	if(!catcherReleased){
@@ -167,7 +170,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 		            //System.out.println("1111111111111");
 	        	}
         	}        	
-        	else if(Math.abs(targetDistance) < 25 && Math.abs(angleToTeamMate) > 25 ){
+        	else if(Math.abs(targetDistance) < 25 && Math.abs(angleToTeamMate) > 15 ){
         		rotate = true;
         		angleDifference = angleToTeamMate;        		
         		System.out.println("........................  " + angleToTeamMate);
@@ -184,7 +187,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         
         if((ballDistance < catchThreshold && !ballCaughtDefender)  /*&& ballInDefenderArea*/) {
             catch_ball = true;
-            catcherReleased = false;
+            
         }
 
         if(targetDistance > 35) {
@@ -221,6 +224,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             else if (catch_ball) {
                 System.out.println("CATCH");
                 this.controlThread.operation.op = Operation.Type.DEFCATCH;
+                catcherReleased = false;
                
             } else if (kick_ball) {
                 
@@ -234,8 +238,8 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                
             }else if(move_sideways){
             	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
-            	controlThread.operation.travelDistance = distanceToDefault;
-            	System.out.println("DEFAULT");
+            	controlThread.operation.travelDistance = -distanceToDefault;
+            	System.out.println("DEFAULT: " + distanceToDefault);
             }
             else{
             	this.controlThread.operation.op = Operation.Type.DO_NOTHING;

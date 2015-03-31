@@ -35,9 +35,9 @@ public class HolonomicRobotController extends BaseRobotController {
     
     
     
-    public double ROTATE_MIN = 55;
+    public double ROTATE_MIN = 70;
     public double ROTATE_MAX = 200;
-    public double ROTATE_A = 0.1;
+    public double ROTATE_A = 0.01;
     public double ROTATE_REAR_COEF = 0.5;
     public double ROTATE_INITIAL_BOOST_COEF = 1.3; 
     
@@ -128,7 +128,7 @@ public class HolonomicRobotController extends BaseRobotController {
     	
     	
     	
-    	if(angle > 0){    		
+    	if(angle < 0){    		
     		leftMotorDir = DriveDirection.FORWARD;			
     		rightMotorDir = DriveDirection.BACKWARD;
     	} else {
