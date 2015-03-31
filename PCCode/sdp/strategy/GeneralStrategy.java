@@ -36,8 +36,8 @@ public class GeneralStrategy implements Strategy {
 	protected float[] goalY;
 	protected float[] ourGoalY;
 	protected float[] ourGoalEdges = new float[3];
-	protected int topY;
-	protected int bottomY;
+	protected int topY = PitchConstants.getPitchOutlineTop();
+	protected int bottomY = PitchConstants.getPitchOutlineBottom();
 	protected float defenderResetX;
 	protected float defenderResetY;
 	protected float attackerResetX;

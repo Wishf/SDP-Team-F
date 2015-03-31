@@ -1,5 +1,17 @@
 package sdp.control;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.yaml.snakeyaml.Yaml;
+
 import sdp.comms.Radio;
 import sdp.comms.packets.*;
 import sdp.util.DriveDirection;
@@ -321,8 +333,12 @@ public boolean travelSideways(double displacement){
 	
 	
 	public void setRCValue(String name, double value){
+		
+		//System.out.println("Setting "+name+"="+value);
+		
 		if(name.equals("ROTATE_MIN")){
         	this.ROTATE_MIN = value;
+        	System.out.println(this.ROTATE_MIN);
         }
         else if(name.equals("ROTATE_MAX")){
         	this.ROTATE_MAX = value;
@@ -410,6 +426,89 @@ public boolean travelSideways(double displacement){
         else{
         	return 0;
         }
+	}
+	
+	
+	
+	public String saveConfig(File file){
+		Map<String, Object> data = new HashMap<String, Object>();
+	    
+		
+	    
+
+		data.put("ROTATE_MIN", this.ROTATE_MIN);
+		data.put("ROTATE_MAX", this.ROTATE_MIN);
+		data.put("ROTATE_A", this.ROTATE_A);
+		data.put("ROTATE_REAR_COEF", this.ROTATE_REAR_COEF);
+		data.put("ROTATE_INITIAL_BOOST_COEF", this.ROTATE_INITIAL_BOOST_COEF);
+		
+		
+		data.put("TRAVEL_MIN", this.TRAVEL_MIN);
+		data.put("TRAVEL_MAX", this.TRAVEL_MAX);
+		data.put("TRAVEL_A", this.TRAVEL_A);
+        
+        
+		data.put("SIDEWAYS_MIN", this.SIDEWAYS_MIN);
+		data.put("SIDEWAYS_MAX", this.SIDEWAYS_MAX);
+		data.put("SIDEWAYS_A", this.SIDEWAYS_A);
+		data.put("SIDEWAYS_ARC_POWER", this.SIDEWAYS_ARC_POWER);
+		
+		
+		Yaml yaml = new Yaml();
+	    String yamlData = yaml.dump(data);
+	    //System.out.println(yamlData);
+	    
+	    BufferedWriter output;
+		try {
+			output = new BufferedWriter(new FileWriter(file));
+			output.write(yamlData);
+			output.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    
+	    return yamlData;
+	    
+	}
+	
+	
+	public boolean loadConfig(File file){
+		
+		//System.out.println("Setting "+name+"="+value);
+	
+		Yaml yaml = new Yaml();
+		Map<String, Object> data = null;
+	    
+		try {
+			InputStream input = new FileInputStream(file);
+			data = (Map<String, Object>) yaml.load(input);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(data == null)
+			return false;
+
+		
+		this.ROTATE_MIN = (Double) data.get("ROTATE_MIN");
+		this.ROTATE_MAX = (Double) data.get("ROTATE_MAX");
+		this.ROTATE_A = (Double) data.get("ROTATE_A");
+		this.ROTATE_REAR_COEF = (Double) data.get("ROTATE_REAR_COEF");
+		this.ROTATE_INITIAL_BOOST_COEF = (Double) data.get("ROTATE_INITIAL_BOOST_COEF");
+		
+		
+		this.TRAVEL_MIN = (Double) data.get("TRAVEL_MIN");
+		this.TRAVEL_MAX = (Double) data.get("TRAVEL_MAX");
+		this.TRAVEL_A = (Double) data.get("TRAVEL_A");
+        
+		this.SIDEWAYS_MIN = (Double) data.get("SIDEWAYS_MIN");
+		this.SIDEWAYS_MAX = (Double) data.get("SIDEWAYS_MAX");
+		this.SIDEWAYS_A = (Double) data.get("SIDEWAYS_A");
+		this.SIDEWAYS_ARC_POWER = ((Integer) data.get("SIDEWAYS_ARC_POWER")).byteValue();
+		
+	    return true;
 	}
     
 }

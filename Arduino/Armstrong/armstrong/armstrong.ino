@@ -78,7 +78,14 @@ int kickState = KICK_STATE_IDLE;
 // The number of tachometer ticks measured when the kick motion is started
 int kickerTachometerStart = 0;
 
+
+
+
+
+
+
 // CATCH
+bool hasBall = false;
 // The motor port the catcher motor is attached to
 #define CATCH_MOTOR 4
 
@@ -89,27 +96,31 @@ int kickerTachometerStart = 0;
 #define CATCH_STATE_OPERATING_ENGAGE 3
 #define CATCH_STATE_OPERATING_DISENGAGE 4
 
+
+#define CATCHER_TACHO 5
+#define CATCHER_TACHO_FULLY_CLOSED 9
 // The direction the motor has to be driven to disengage the catcher
 #define CATCH_DISENGAGE_DIR 1
 // The power to drive the motor at to disengage the catcher
-#define CATCH_DISENGAGE_POWER 75
+#define CATCH_DISENGAGE_POWER 255
 #define CATCH_DISENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to disengage the catcher
-#define CATCH_DISENGAGE_DELAY 2000
+#define CATCH_DISENGAGE_DELAY 1000
 
 
 // The direction the motor has to be driven to engage the catcher
 #define CATCH_ENGAGE_DIR -1
 // The power to drive the motor at to engage the catcher
-#define CATCH_ENGAGE_POWER 100
-#define CATCH_ENGAGE_HOLD_POWER 25
+#define CATCH_ENGAGE_POWER 255
+#define CATCH_ENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to engage the catcher
-#define CATCH_ENGAGE_DELAY 550
+#define CATCH_ENGAGE_DELAY 1000
 
 // The time in milliseconds since the Arduino started up/reset that the catch engage/disengage motion was started
 long catchStartTime;
 // The current state the catcher state machine is in
 int catchState = CATCH_STATE_IDLE;
+int catchTachoStart;
 
 Communications comms;
 
@@ -131,6 +142,7 @@ void setup() {
   comms.set_handler('Z', kicker_inc);
   comms.set_handler('X', kicker_dec);
   comms.set_handler('T', test);
+  comms.set_handler('B', has_ball);
 
   comms.print("started\n");// transmit started packet
 }
@@ -192,6 +204,7 @@ void doCatcher(){
   if(catchState == CATCH_STATE_ENGAGE){
     // Record motion start time and set state to engage in operation
     catchStartTime = millis();
+    catchTachoStart = tacho(CATCHER_TACHO);
 
     catchState = CATCH_STATE_OPERATING_ENGAGE;
 
@@ -204,13 +217,27 @@ void doCatcher(){
     if(millis() - catchStartTime >= CATCH_ENGAGE_DELAY){
       // Set state to idle and stop motor
       catchState = CATCH_STATE_IDLE;
-
-      moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
+      
+      comms.print(abs(catchTachoStart - tacho(CATCHER_TACHO)));
+      
+      //Ball caught
+      if(abs(catchTachoStart - tacho(CATCHER_TACHO)) < CATCHER_TACHO_FULLY_CLOSED){
+          moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
+          hasBall = true;
+          comms.print("I have the ball!");
+      }
+      else{
+        catchState = CATCH_STATE_DISENGAGE;          
+      }
+      
+      
+      
     }
   }
   // We are disengaging the catcher
   else if(catchState == CATCH_STATE_DISENGAGE){
     // Record motion start time and set state to disengage in operation
+    hasBall = false;
     catchStartTime = millis();
 
     catchState = CATCH_STATE_OPERATING_DISENGAGE;
@@ -399,7 +426,7 @@ void engage_catcher(){
   comms.print("catch");
 
   // Switch catcher state to start engage sequence
-  if(catchState == CATCH_STATE_IDLE){
+  if(catchState != CATCH_STATE_OPERATING_DISENGAGE){
     catchState = CATCH_STATE_ENGAGE;
   }
 }
@@ -412,9 +439,9 @@ void disengage_catcher(){
   comms.print("uncatch");
 
   // Switch catcher state to start disengage sequence
-  if(catchState == CATCH_STATE_IDLE){
+  //if(catchState == CATCH_STATE_IDLE){
     catchState = CATCH_STATE_DISENGAGE;
-  }
+  //}
 }
 
 
@@ -489,5 +516,15 @@ void test(){
   
   comms.print("TEST DONE!\n");
   
+}
+
+
+void has_ball(){
+  if(hasBall){
+    comms.print(1);
+  }
+  else{
+    comms.print(0);
+  }
 }
 
