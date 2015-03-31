@@ -26,7 +26,11 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     private boolean catcherReleased;
     private boolean initialized;
     private int control;
+    private boolean lt_uncatch = false;
+    private int previous_ball_counter = 0;
     private double previous_ball_distance = -1;
+    private boolean readyToShoot = false;
+    private Point2 shootingPosition;
 
     public FinalsAttackerStrategy(BrickCommServer brick) {
         this.brick = brick;
@@ -60,16 +64,13 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     }
     
     public float correctX() {
-    	/*if(weAreShootingRight) {		
-    		return attackerRobotX;
+    	if(attackerRobotX-leftCheck < 10) {
+    		return attackerRobotX+10;
+    	} else if(rightCheck-attackerRobotX < 10) {
+    		return attackerRobotX-10;
     	} else {
-    		if(attackerRobotX - leftCheck < 10 || rightCheck - attackerRobotX < 10) {
-    			return 250;
-    		} else {
-    			return attackerRobotX;
-    		}
-    	}*/
-    	return attackerRobotX;
+    		return attackerRobotX;
+    	}
     }
 
     // Makes sure the robot does not bounce into the ball
@@ -80,6 +81,27 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     	} else {
     		return new Point2(ballX, ballY+10);
     	}
+    }
+    
+    public Point2 shootingTarget(float x, float y) {
+    	if(y < 120) {
+    		return new Point2(x, 120);
+    	} else if(y > 330){
+    		return new Point2(x, 330);
+    	} else {
+    		return new Point2(x, y);
+    	}
+    }
+    
+    public double getPiAngle(double ballX) {
+    	if(ballX > leftCheck) {
+    		return 0;
+    	} else if(ballX < rightCheck) {
+    		return 180;
+    	} 
+    	
+    	return 0;
+    	
     }
     
     
@@ -105,6 +127,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         double targetAngle = 0;
         boolean move_robot = false;
         double angleDifference = 0;
+        boolean waitForShoot = false;
        
         
         float ball_dx = ballX - attackerRobotX;
@@ -121,25 +144,28 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	
         	if(ballXYdistance > catchThreshold) {
         		hasBall = false;
-        	}
-        	
-        	if(ballXYdistance < catchThreshold && previous_ball_distance > catchThreshold) {
-        		uncatch = true;
-        	}
+        	}  	
         	
         	if(hasBall) {
         		//Rotate to the CB
-        		ControlBox.controlBox.computeShot(worldState);
-            	targetAngle = ControlBox.controlBox.getShootingAngle();
-            	rotate = true;
-            	kick_ball = true;
+        		if(readyToShoot) {
+        			ControlBox.controlBox.computeShot(worldState);
+                	targetAngle = ControlBox.controlBox.getShootingAngle();
+                	rotate = true;
+                	kick_ball = true;
+                	waitForShoot = false;
+        		} else {
+        			travel_sideways = true;
+                	target = shootingTarget(attackerRobotX, attackerRobotY);
+                	rotate = true;
+                	targetAngle = getPiAngle(enemyDefenderRobotX);
+                	waitForShoot = true;
+        		}	           	
         	} else {
         		// Get to the target
         		target = targetFromBall(ballX, ballY);
         		RobotDebugWindow.messageAttacker.setMessage("Ball attacker b");
-                if (catcherReleased != true) {
-                	uncatch = true;
-                }
+                uncatch = true;
                 move_robot = true;
                 
                 if(ballXYdistance < catchThreshold) {
@@ -150,12 +176,9 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	}
         } else {
         	// Rotation at right angle
-        	if(ballX > leftCheck) {
-        		targetAngle = 0;
-        	} else if(ballX < rightCheck) {
-        		targetAngle = 180;
-        	}
+        	targetAngle = getPiAngle(ballX);
         	rotate = true;
+        	readyToShoot = false;
         }
         
         if(isBallInDefenderArea(worldState)) {
@@ -244,11 +267,26 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	}
         }
         
-        if(kick_ball && rotate) {
+        if(kick_ball && (rotate || travel_sideways) ) {
         	kick_ball = false;
         }
         
-        previous_ball_distance = ballXYdistance;
+        if(!rotate && !travel_sideways && waitForShoot) {
+        	readyToShoot = true;
+        }
+        
+        if(ballXYdistance < catchThreshold && previous_ball_distance > catchThreshold) {
+    		uncatch = true;
+    		lt_uncatch = true;
+    	}
+        
+        if(previous_ball_counter == 5) {
+        	previous_ball_distance = ballXYdistance;
+        	previous_ball_counter = 0;
+        } else {
+        	previous_ball_counter++;
+        }
+        
         
         
         /* 	        if(ballXYDistance < catchThreshold && !hasBall) {
@@ -287,7 +325,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
             } else if(travel_sideways) {
             	this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
             	controlThread.operation.travelDistance = (int) targetDistance;
-            } else if (uncatch) {
+            } else if (uncatch || lt_uncatch) {
                 RobotDebugWindow.messageAttacker.setMessage("Uncatch");
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
             } else if (kick_ball) {
@@ -329,7 +367,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                         case DEFROTATE:
                             if (rotateBy != 0) {
                             	RobotDebugWindow.messageAttacker.setMessage("Rotate by "+ rotateBy);
-                                brick.robotController.rotate(rotateBy);
+                                brick.robotController.rotate(-rotateBy);
                             }
                             break;
                         case DEFTRAVEL:
@@ -374,6 +412,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                                 kickTime = System.currentTimeMillis();
                                 ControlBox.controlBox.reset();
                                 catcherReleased = true;
+                                readyToShoot = false;
                             }
                             break;
                         case DEFUNCATCH:
@@ -382,6 +421,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                         		brick.robotController.openCatcher();
                                 hasBall = false;
                                 catcherReleased = true;
+                                lt_uncatch = false;
                              //   RobotDebugWindow.messageAttacker.setMessage("Uncatch");
                         	//}           
                             break;
