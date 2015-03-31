@@ -5,7 +5,7 @@
 #include <Wire.h>
 
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define ROTARY_SLAVE_ADDRESS 5
 #define ROTARY_COUNT 6
@@ -105,7 +105,7 @@ bool hasBall = false;
 #define CATCH_DISENGAGE_POWER 255
 #define CATCH_DISENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to disengage the catcher
-#define CATCH_DISENGAGE_DELAY 1000
+#define CATCH_DISENGAGE_DELAY 750
 
 
 // The direction the motor has to be driven to engage the catcher
@@ -114,7 +114,7 @@ bool hasBall = false;
 #define CATCH_ENGAGE_POWER 255
 #define CATCH_ENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to engage the catcher
-#define CATCH_ENGAGE_DELAY 1000
+#define CATCH_ENGAGE_DELAY 750
 
 // The time in milliseconds since the Arduino started up/reset that the catch engage/disengage motion was started
 long catchStartTime;
@@ -227,8 +227,11 @@ void doCatcher(){
           comms.print("I have the ball!");
       }
       else{
-        catchState = CATCH_STATE_DISENGAGE;          
+        catchState = CATCH_STATE_DISENGAGE;       
+         
       }
+      
+      has_ball();
       
       
       
@@ -521,10 +524,10 @@ void test(){
 
 void has_ball(){
   if(hasBall){
-    comms.print(1);
+    comms.send('1');
   }
   else{
-    comms.print(0);
+    comms.send('0');
   }
 }
 

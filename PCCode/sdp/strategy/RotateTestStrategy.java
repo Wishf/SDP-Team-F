@@ -129,7 +129,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						//RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
-						brick.robotController.rotate(rotateBy);
+						brick.robotController.rotate(-rotateBy);
 						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:
