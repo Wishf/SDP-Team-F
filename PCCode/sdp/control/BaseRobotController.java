@@ -34,7 +34,9 @@ public abstract class BaseRobotController implements PacketListener {
     private double smoothing = 0.92;
     private DecimalFormat df = new DecimalFormat("+0.00000;-0.00000"); 
     protected double lastLinearVelocity = 0, lastXV=0, lastYV=0, lastAngularVelocity = 0;
-    
+
+
+	protected boolean ballCaught;
     
 
     public BaseRobotController(Radio radio, byte position) {
@@ -174,7 +176,9 @@ public abstract class BaseRobotController implements PacketListener {
             onMotionComplete();
         } else if(p instanceof CatcherStateToggledPacket) {
             catcherEngaged = !catcherEngaged;
-        }
+        } else if (p instanceof BallStatePacket) {
+			ballCaught = ((BallStatePacket)p).ballCaught;
+		}
     }
 
     public boolean getCatcherState(){

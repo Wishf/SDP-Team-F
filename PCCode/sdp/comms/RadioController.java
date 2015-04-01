@@ -29,7 +29,7 @@ public class RadioController implements SerialPortEventListener {
     public void serialEvent(SerialPortEvent event) {
     	
         // Message received
-        if (false) {//if(event.isRXCHAR()) {
+        if(event.isRXCHAR()) {
             try {
                 buffer.write(parent.readBytes(event.getEventValue()), event.getEventValue());
             } catch (SerialPortException e) {
@@ -41,9 +41,9 @@ public class RadioController implements SerialPortEventListener {
 
                 try {
                     byte peeked_id = buffer.peek();
-                    
+
                     System.out.println(peeked_id);
-                    
+
                     Packet read = null;
 
                     // TODO: Refactor this unholy mess
@@ -113,6 +113,36 @@ public class RadioController implements SerialPortEventListener {
                         }
 
                         read = new CatcherStateToggledPacket();
+                    } else if (peeked_id == BallStatePacket.ID) {
+                        if (buffer.elements() < BallStatePacket.Length) {
+                            break;
+                        }
+
+                        read = new BallStatePacket();
+                    } else if (peeked_id == CalibrateCatcherPacket.ID){
+                        if (buffer.elements() < CalibrateCatcherPacket.Length) {
+                            break;
+                        }
+
+                        read = new CalibrateCatcherPacket();
+                    } else if (peeked_id == KickerDecreasePacket.ID) {
+                        if (buffer.elements() < KickerDecreasePacket.Length) {
+                            break;
+                        }
+
+                        read = new KickerDecreasePacket();
+                    } else if (peeked_id == KickerIncreasePacket.ID) {
+                        if (buffer.elements() < KickerIncreasePacket.Length) {
+                            break;
+                        }
+
+                        read = new KickerIncreasePacket();
+                    } else if (peeked_id == BallCaughtPacket.ID) {
+                        if (buffer.elements() < BallCaughtPacket.Length) {
+                            break;
+                        }
+
+                        read = new BallCaughtPacket();
                     } else {
                         // Throw away garbage bytes
                         buffer.discard();
