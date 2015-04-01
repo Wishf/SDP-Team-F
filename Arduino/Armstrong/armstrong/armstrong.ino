@@ -622,10 +622,16 @@ void test(){
 void has_ball(){
   comms.send('Y');
   if(hasBall){
-    comms.send(1);
+    comms.send('2');
   }
   else{
-    comms.send(0);
+    if(catchState == CATCH_STATE_DISENGAGE){
+      comms.send('0');
+    } else if(catchState == CATCH_STATE_OPERATING_DISENGAGE || catchState == CATCH_STATE_WINDDOWN_DISENGAGE){
+      comms.send('1');
+    } else if(catchState == CATCH_STATE_OPERATING_ENGAGE || catchState == CATCH_STATE_WINDDOWN_ENGAGE){
+      comms.send('3');
+    }
   }
 }
 
