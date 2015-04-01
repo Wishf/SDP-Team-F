@@ -338,6 +338,18 @@ public boolean travelSideways(double displacement){
     	return this.sendCommand(new KickPacket());
     }
     
+    public boolean increaseKicker(){
+    	return this.sendCommand(new KickerIncreasePacket());
+    }
+    
+    public boolean decreaseKicker(){
+    	return this.sendCommand(new KickerDecreasePacket());
+    }
+    
+    public boolean calibrateCatcher(){
+    	return this.sendCommand(new CalibrateCatcherPacket());
+    }
+    
     
     
     

@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -33,6 +35,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 	protected JButton attOpenButton, attSaveButton, defOpenButton, defSaveButton;
 	protected JLabel attFileLabel, defFileLabel;
     protected JFileChooser fc;
+    protected JButton kickIncreaseButton, kickDecreaseButoon, calibrateCatcherButton;
 	
 	
 	ArrayList<MappedJSlider> sliders;
@@ -77,11 +80,43 @@ public class CalibrationTool implements GUITool, ActionListener {
         createSaveLoadButtons(attackerTab, defenderTab);
         
         //Defender
+        createCalibButtons(defenderTab, sc.bcsDefender.robotController);  
         addAllSliders(defenderTab, sc.bcsDefender.robotController);   
         //Attacker
+        createCalibButtons(attackerTab, sc.bcsAttacker.robotController);
         addAllSliders(attackerTab, sc.bcsAttacker.robotController);
 		
 	}
+	
+	
+	private void createCalibButtons(JPanel container, final HolonomicRobotController rc){
+		kickIncreaseButton = new JButton("Wind up kicker");
+		kickDecreaseButoon = new JButton("Wind down buton");
+		calibrateCatcherButton = new JButton("Calibrate Catcher");
+		
+		
+		
+		kickIncreaseButton.addActionListener(new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+		        rc.increaseKicker();
+		    }
+		});
+		kickDecreaseButoon.addActionListener(new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+		        rc.decreaseKicker();
+		    }
+		});
+		calibrateCatcherButton.addActionListener(new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+		        rc.calibrateCatcher();
+		    }
+		});
+		
+		container.add(kickIncreaseButton);
+		container.add(kickDecreaseButoon);
+		container.add(calibrateCatcherButton);
+	}
+	
 	
 	private void createSaveLoadButtons(JPanel attCont, JPanel defCont){
 		//Attacker
