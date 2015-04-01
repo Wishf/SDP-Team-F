@@ -1,6 +1,7 @@
 package sdp.vision.gui.tools;
 
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -84,10 +85,21 @@ public class RobotDebugWindow implements GUITool {
 
 	@SuppressWarnings("serial")
 	public class DebugWindow extends JPanel {
-		private JLabel label = new JLabel();
-		private JTextField field = new JTextField(40);
+		private JLabel label;
+		private JTextField field;
+		
+		Font font;
+		
 
 		public DebugWindow(String robot) {
+			label = new JLabel();
+			field = new JTextField(40);
+			font = new Font("Courier", Font.BOLD, 30);
+			
+			label.setFont(font);
+			field.setFont(font);
+			
+			
 			this.add(label);
             this.add(field);
             this.label.setText(robot + ": ");

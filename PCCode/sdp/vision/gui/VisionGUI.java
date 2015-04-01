@@ -87,7 +87,7 @@ public class VisionGUI extends JFrame implements VideoReceiver,
 			}
 		});
 		JScrollPane listScroller = new JScrollPane(toolList);
-		listScroller.setPreferredSize(new Dimension(150, 0));
+		listScroller.setPreferredSize(new Dimension(150, (int) (videoHeight*0.4)));
 		rightPanel.add(listScroller);
 		
 		rightPanel.add(Box.createVerticalStrut(5));

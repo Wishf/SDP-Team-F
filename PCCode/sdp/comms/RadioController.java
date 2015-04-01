@@ -41,6 +41,9 @@ public class RadioController implements SerialPortEventListener {
 
                 try {
                     byte peeked_id = buffer.peek();
+                    
+                    System.out.println(peeked_id);
+                    
                     Packet read = null;
 
                     // TODO: Refactor this unholy mess

@@ -49,21 +49,23 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public double ROTATE_MIN = 70;
     public double ROTATE_MAX = 200;
-    public double ROTATE_A = 0.01;
+    public double ROTATE_A = 0.5;
     public double ROTATE_REAR_COEF = 0.5;
-    public double ROTATE_INITIAL_BOOST_COEF = 1.3; 
+    public double ROTATE_C = 70; 
     
     public double TRAVEL_MIN = 120;
     public double TRAVEL_MAX = 254;
     public double TRAVEL_A = 1;    
+    public double TRAVEL_C = 140;   
     
     public double SIDEWAYS_MIN = 150;
     public double SIDEWAYS_MAX = 254;
     public double SIDEWAYS_A = 1;
+    public double SIDEWAYS_C = 170;   
     public byte SIDEWAYS_ARC_POWER = 70;
     
     
-    private static final int PACKET_LIFETIME = 150;
+    private static final int PACKET_LIFETIME = 100;
     
     
     
@@ -91,7 +93,7 @@ public class HolonomicRobotController extends BaseRobotController {
 
     }
     
-    public boolean stop(){
+    /*public boolean stop(){
     	byte zero = 0;
     	if(lastPacket == null){
     		return this.sendCommand(new DrivePacket(
@@ -99,37 +101,53 @@ public class HolonomicRobotController extends BaseRobotController {
     				zero, rightMotorDir, 
     				zero, rearMotorDir,
     				PACKET_LIFETIME));
-    	}else{
+    	}
+    	else{
     		return this.sendCommand(lastPacket.getReverse());
-    		/*try{Thread.sleep(PACKET_LIFETIME);
+    		try{Thread.sleep(PACKET_LIFETIME);
     			this.sendCommand(new DrivePacket(
     				zero, leftMotorDir, 
     				zero, rightMotorDir, 
     				zero, rearMotorDir,
-    				PACKET_LIFETIME));}catch(Exception e){e.printStackTrace();}*/
+    				PACKET_LIFETIME));}catch(Exception e){e.printStackTrace();}
     		//return true;
     	}
-    }
+    }*/
     
+    public boolean stop(){
+    	byte zero = 0;
+    	return this.sendCommand(new DrivePacket(
+			zero, leftMotorDir, 
+			zero, rightMotorDir, 
+			zero, rearMotorDir,
+			PACKET_LIFETIME));
+	}
     
     
     public boolean rotate(double angle){    	
     	
-    	double a = ROTATE_A, minPower = ROTATE_MIN, c = 0;
+    	double a = ROTATE_A, minPower = ROTATE_MIN, c = ROTATE_C;
     	
     	double maxPower = ROTATE_MAX;
     	
     	double rearMotorCoef = ROTATE_REAR_COEF;
     	
-    	if(!rotated){
+    	/*if(!rotated){
     		minPower *= ROTATE_INITIAL_BOOST_COEF;
-    	}
+    	}*/
     	
     	double vp = Math.min(1, Math.abs(this.angularVelocity)/this.maxAngularVelocity);
     	
     	double power = a*Math.abs(angle) + minPower - vp*c;
     	
     	power = Math.min(maxPower, power);
+    	
+    	if(position == (byte)'d'){
+			RobotDebugWindow.messageDefender.setMessage("rotating power="+power);
+		}
+		else {
+			RobotDebugWindow.messageAttacker.setMessage("rotating power="+power);
+		}
     	
     	//System.out.println("Rotating power: "+power);
     	
@@ -162,9 +180,12 @@ public class HolonomicRobotController extends BaseRobotController {
     
     public boolean travel(double displacement){
     	
-    	double a = TRAVEL_A, b = TRAVEL_MIN;
+    	double a = TRAVEL_A, minPower = TRAVEL_MIN, c = TRAVEL_C;
     	
-    	double power = a*Math.abs(displacement) +b;
+    	
+		double vp = Math.min(1, Math.abs(this.vForwards)/this.maxForwardsVelocity);
+    	
+    	double power = a*Math.abs(displacement) + minPower - vp*c;
     	power = Math.min(TRAVEL_MAX, power);
     	
     	
@@ -195,8 +216,11 @@ public class HolonomicRobotController extends BaseRobotController {
   
 public boolean travelSideways(double displacement){
     	
-		double a = SIDEWAYS_A, minPower = SIDEWAYS_MIN;
-    	double power = a*Math.abs(displacement) +minPower;   	
+		double a = SIDEWAYS_A, minPower = SIDEWAYS_MIN, c = SIDEWAYS_C;
+		
+		double vp = Math.min(1, Math.abs(this.vSideways)/this.maxForwardsVelocity);
+    	
+    	double power = a*Math.abs(displacement) + minPower - vp*c;  	
     	
     	power = Math.min(SIDEWAYS_MAX, power);
     	
@@ -314,6 +338,18 @@ public boolean travelSideways(double displacement){
     	return this.sendCommand(new KickPacket());
     }
     
+    public boolean increaseKicker(){
+    	return this.sendCommand(new KickerIncreasePacket());
+    }
+    
+    public boolean decreaseKicker(){
+    	return this.sendCommand(new KickerDecreasePacket());
+    }
+    
+    public boolean calibrateCatcher(){
+    	return this.sendCommand(new CalibrateCatcherPacket());
+    }
+    
     
     
     
@@ -338,7 +374,7 @@ public boolean travelSideways(double displacement){
 		
 		if(name.equals("ROTATE_MIN")){
         	this.ROTATE_MIN = value;
-        	System.out.println(this.ROTATE_MIN);
+        	//System.out.println(this.ROTATE_MIN);
         }
         else if(name.equals("ROTATE_MAX")){
         	this.ROTATE_MAX = value;
@@ -349,8 +385,8 @@ public boolean travelSideways(double displacement){
         else if(name.equals("ROTATE_REAR_COEF")){
         	this.ROTATE_REAR_COEF = value;
         }
-        else if(name.equals("ROTATE_INITIAL_BOOST_COEF")){
-        	this.ROTATE_INITIAL_BOOST_COEF = value;
+        else if(name.equals("ROTATE_C")){
+        	this.ROTATE_C = value;
         }
 		
         
@@ -364,6 +400,9 @@ public boolean travelSideways(double displacement){
         else if(name.equals("TRAVEL_A")){
         	this.TRAVEL_A = value;
         }
+        else if(name.equals("TRAVEL_C")){
+        	this.TRAVEL_C = value;
+        }
         
         
         else if(name.equals("SIDEWAYS_MIN")){
@@ -374,7 +413,10 @@ public boolean travelSideways(double displacement){
         }
         else if(name.equals("SIDEWAYS_A")){
         	this.SIDEWAYS_A = value;
-        }	        
+        }	
+        else if(name.equals("SIDEWAYS_C")){
+        	this.SIDEWAYS_C = value;
+        }	
         else if(name.equals("SIDEWAYS_ARC_POWER")){
         	this.SIDEWAYS_ARC_POWER = (byte) value;
         }
@@ -394,8 +436,8 @@ public boolean travelSideways(double displacement){
         else if(name.equals("ROTATE_REAR_COEF")){
         	return this.ROTATE_REAR_COEF;
         }
-        else if(name.equals("ROTATE_INITIAL_BOOST_COEF")){
-        	return this.ROTATE_INITIAL_BOOST_COEF;
+        else if(name.equals("ROTATE_C")){
+        	return this.ROTATE_C;
         }
 		
         
@@ -409,6 +451,9 @@ public boolean travelSideways(double displacement){
         else if(name.equals("TRAVEL_A")){
         	return this.TRAVEL_A;
         }
+        else if(name.equals("TRAVEL_C")){
+        	return this.TRAVEL_C;
+        }
         
         
         else if(name.equals("SIDEWAYS_MIN")){
@@ -419,7 +464,10 @@ public boolean travelSideways(double displacement){
         }
         else if(name.equals("SIDEWAYS_A")){
         	return this.SIDEWAYS_A;
-        }	        
+        }	
+        else if(name.equals("SIDEWAYS_C")){
+        	return this.SIDEWAYS_C;
+        }	 
         else if(name.equals("SIDEWAYS_ARC_POWER")){
         	return this.SIDEWAYS_ARC_POWER;
         }
@@ -440,17 +488,19 @@ public boolean travelSideways(double displacement){
 		data.put("ROTATE_MAX", this.ROTATE_MIN);
 		data.put("ROTATE_A", this.ROTATE_A);
 		data.put("ROTATE_REAR_COEF", this.ROTATE_REAR_COEF);
-		data.put("ROTATE_INITIAL_BOOST_COEF", this.ROTATE_INITIAL_BOOST_COEF);
+		data.put("ROTATE_C", this.ROTATE_C);
 		
 		
 		data.put("TRAVEL_MIN", this.TRAVEL_MIN);
 		data.put("TRAVEL_MAX", this.TRAVEL_MAX);
 		data.put("TRAVEL_A", this.TRAVEL_A);
+		data.put("TRAVEL_C", this.TRAVEL_C);
         
         
 		data.put("SIDEWAYS_MIN", this.SIDEWAYS_MIN);
 		data.put("SIDEWAYS_MAX", this.SIDEWAYS_MAX);
 		data.put("SIDEWAYS_A", this.SIDEWAYS_A);
+		data.put("SIDEWAYS_C", this.SIDEWAYS_C);
 		data.put("SIDEWAYS_ARC_POWER", this.SIDEWAYS_ARC_POWER);
 		
 		
@@ -496,16 +546,18 @@ public boolean travelSideways(double displacement){
 		this.ROTATE_MAX = (Double) data.get("ROTATE_MAX");
 		this.ROTATE_A = (Double) data.get("ROTATE_A");
 		this.ROTATE_REAR_COEF = (Double) data.get("ROTATE_REAR_COEF");
-		this.ROTATE_INITIAL_BOOST_COEF = (Double) data.get("ROTATE_INITIAL_BOOST_COEF");
+		this.ROTATE_C = (Double) data.get("ROTATE_C");
 		
 		
 		this.TRAVEL_MIN = (Double) data.get("TRAVEL_MIN");
 		this.TRAVEL_MAX = (Double) data.get("TRAVEL_MAX");
 		this.TRAVEL_A = (Double) data.get("TRAVEL_A");
+		this.TRAVEL_C = (Double) data.get("TRAVEL_C");
         
 		this.SIDEWAYS_MIN = (Double) data.get("SIDEWAYS_MIN");
 		this.SIDEWAYS_MAX = (Double) data.get("SIDEWAYS_MAX");
 		this.SIDEWAYS_A = (Double) data.get("SIDEWAYS_A");
+		this.SIDEWAYS_C = (Double) data.get("SIDEWAYS_C");
 		this.SIDEWAYS_ARC_POWER = ((Integer) data.get("SIDEWAYS_ARC_POWER")).byteValue();
 		
 	    return true;

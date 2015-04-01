@@ -6,7 +6,7 @@
 #define _COMMSLIB_H_
 
 #include "Arduino.h"
-#define DEBUG true
+#define DEBUG false
 
 typedef void (* function_pointer_t)();
 
@@ -67,6 +67,16 @@ class Communications
          */
         void print(int value);
 		void println(int value);
+
+        /*
+         * If debugging is enabled, this prints the string representation of an integer to the communications channel
+         *
+         * PARAMETERS
+         * value (long unsigned int) - The integer value to print
+         */
+        void print(long unsigned int value);
+        void println(long unsigned int value);
+        
 
         /*
          * If debugging is enabled, this prints the string representation (in hexadecimal) of an unsigned short

@@ -41,8 +41,27 @@ public class MovingObject {
 		this.y = y;
 	}
 	
+	public MovingObject() {
+		x = 0;
+		y = 0;
+		orientation_angle = 0;
+		velocity = 0;
+	}
+
 	public MovingObject copy(){
 		return new MovingObject(x, y, this.orientation_angle);
+	}
+	
+	public MovingObject copyTo(MovingObject m){
+		m.orientation_angle = this.orientation_angle;
+		m.x = this.x;
+		m.y = this.y;	
+		
+		return m; 
+	}
+	
+	public boolean equals(MovingObject m){
+		return (m.x == this.x && m.y == this.y && m.orientation_angle == this.orientation_angle);
 	}
 	
 	//rotating point of robots, need to represent

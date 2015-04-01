@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class RotateTestStrategy extends GeneralStrategy {
+public class CatcherTestStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 	
 	
 
-	public RotateTestStrategy(BrickCommServer brick) {
+	public CatcherTestStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -48,36 +48,57 @@ public class RotateTestStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
-		brick.robotController.setWorldState(worldState);
 		
 		
+		
+		double ballDistance = Math.sqrt((ballX - defenderRobotX)*(ballX - defenderRobotX) + (ballY - defenderRobotY)*(ballY - defenderRobotY));
+		
+		double catchThreshold = 35;
+        boolean catch_ball = false;
+        boolean kick_ball = false;
+        boolean rotate = false;
+        boolean move_robot = false;
+		
+        
+        double targetAngle;//calcTargetAngle(dx, dy);
 		double dx;
-		double dy;		
-		double angleDifference;		
-		double ourOrientation;
+		double dy;	
+		double angleDifference;
 		
+		if(worldState.weAreShootingRight){
+			targetAngle = 0;
+		}
+		else{
+			targetAngle = 180;
+		}
+			
 		if(this.brick.name.equals("attacker")){
 			dx = ballX - attackerRobotX;
 			dy = ballY - attackerRobotY;
-			ourOrientation = attackerOrientation;
+			angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		}
 		else{
 			dx = ballX - defenderRobotX;
 			dy = ballY - defenderRobotY;
-			ourOrientation = defenderOrientation;
+			angleDifference = calcAngleDiff(defenderOrientation, targetAngle);
 		}
+        
 		
-		double targetAngle = calcTargetAngle(dx, dy);
-		angleDifference = calcAngleDiff(ourOrientation, targetAngle);
-		
-		
-		boolean rotate = false;
-		if(Math.abs(angleDifference) > 10)
+		if(Math.abs(angleDifference) > 20)
 		{
 			rotate = true;
 		}
 		
+		if(Math.abs(dy) > 20){
+			move_robot = true;
+		}
 		
+        if(ballCaught){
+        	kick_ball = true;
+        }
+        else if((ballDistance < catchThreshold)  /*&& ballInDefenderArea*/) {
+            catch_ball = true;            
+        }
 		
 		
 		
@@ -86,30 +107,56 @@ public class RotateTestStrategy extends GeneralStrategy {
 		
 		synchronized (this.controlThread) {
 			
-			//this.controlThread.worldState = worldState;
 			
-			if(rotate){
+			
+			if (catch_ball) {
+                //System.out.println("CATCH");
+                this.controlThread.operation.op = Operation.Type.DEFCATCH;
+			}
+			 else if (kick_ball) {
+		        RobotDebugWindow.messageAttacker.setMessage("Kick");
+			    this.controlThread.operation.op = Operation.Type.DEFKICK;
+			} 
+			 else if(rotate){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference = angleDifference;
-				
-				
+			}
+			else if(move_robot){
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = dy;
 			}
 			else{
-				this.controlThread.operation.op = Operation.Type.STOP;
-				
+				this.controlThread.operation.op = Operation.Type.STOP;				
 			}
 			
-		
+			
+			/*
+			 * if(Math.abs(angleDifference )> 0) {
+				this.controlThread.operation.op = Operation.Type.DEFROTATE;
+				controlThread.operation.rotateBy = (int) angleDifference;
+			} else if(move_robot) {
+				////System.out.println("A: ");
+				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+				controlThread.operation.travelDistance = (int) Math.abs(targetDistance);
+			}
+			else if(true){
+				//RobotDebugWindow.messageAttacker.setMessage("SAVE: " + targetDistance);
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int) 220;
+			}
+			else if(alignWithEnemyAttacker){
+				
+				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				controlThread.operation.travelDistance = (int) targetDistance;
+			}*/
 			
 			
 		}
 	}
 	
 	protected class ControlThread extends Thread {
-		public WorldState worldState;
 		public Operation operation = new Operation();
 		private ControlThread controlThread;
-		 private boolean start = false;
 
 		public ControlThread() {
 			super("Robot control thread");
@@ -123,34 +170,26 @@ public class RotateTestStrategy extends GeneralStrategy {
 				while (true) {
 					Operation.Type op;
 					double rotateBy, travelDist;
-
-					WorldState worldState;
 					synchronized (this) {
 						op = this.operation.op;
 						rotateBy = this.operation.angleDifference;
 						travelDist = this.operation.travelDistance;
-						
-						worldState = this.worldState;
 					}
-					
-					
-					
-
 					//System.out.println("operation: " + op);
 					switch (op) {
 					case STOP:
 						brick.robotController.stop();
-						//RobotDebugWindow.messageAttacker.setMessage("STOP");
+						RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
 						brick.robotController.rotate(-rotateBy);
 						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:
-						 brick.execute(new RobotCommand.Travel(travelDist));
+						 brick.robotController.travel(travelDist);
 						break;
 					case DESIDEWAYS:
-						brick.execute(new RobotCommand.TravelSideways(travelDist));
+						brick.robotController.travelSideways(-travelDist);
 						break;
 					/*case DEBACK:
 						if (travelDist != 0) {
@@ -159,8 +198,8 @@ public class RotateTestStrategy extends GeneralStrategy {
 						}
 						break;*/
 					case DEFCATCH:
-						if((System.currentTimeMillis() - kickTime > 3000)){
-							brick.execute(new RobotCommand.ResetCatcher());
+						if((System.currentTimeMillis() - kickTime > 500)){
+							brick.execute(new RobotCommand.Catch());
 							ballCaught = true;
 							caughtTime = System.currentTimeMillis();
 							kicked = false;
@@ -176,7 +215,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 						}
 						break;
 					case DEFUNCATCH:
-						brick.execute(new RobotCommand.Catch());
+						brick.execute(new RobotCommand.ResetCatcher());
 						break;
 					default:
 						break;

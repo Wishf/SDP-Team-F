@@ -157,7 +157,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			if (fixRotate && rotateAgain) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (fixAngle);
-				System.out.println("ROTATE to DEF CHECK" + fixAngle);
+				//System.out.println("ROTATE to DEF CHECK" + fixAngle);
 			}else if(move_sideways) {
 				//System.out.println("MOVE_sideway" + dist);
 				RobotDebugWindow.messageDefender.setMessage(""+defenderRobotX);
@@ -166,11 +166,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
                 controlThread.operation.travelDistance = (int) dist;
                 
-                System.out.println("MOVE TO DESTINATION ");
+                //System.out.println("MOVE TO DESTINATION ");
 			}else if(faceEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
-				System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
+				//System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
 				rotateAgain = false;
 			}else if(move_robot) {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
