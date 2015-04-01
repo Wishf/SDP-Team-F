@@ -534,8 +534,8 @@ public boolean travelSideways(double displacement){
 			InputStream input = new FileInputStream(file);
 			data = (Map<String, Object>) yaml.load(input);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("FUU");
+			return false;
 		}
 		
 		if(data == null)
