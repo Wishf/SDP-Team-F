@@ -37,9 +37,10 @@ public abstract class BaseRobotController implements PacketListener {
 
 
 	protected boolean ballCaught;
-    
+	protected BallStates catcherState;
 
-    public BaseRobotController(Radio radio, byte position) {
+
+	public BaseRobotController(Radio radio, byte position) {
         this.radio = radio;
         this.position = position;
         this.catcherEngaged = true;
@@ -177,7 +178,9 @@ public abstract class BaseRobotController implements PacketListener {
         } else if(p instanceof CatcherStateToggledPacket) {
             catcherEngaged = !catcherEngaged;
         } else if (p instanceof BallStatePacket) {
-			ballCaught = ((BallStatePacket)p).ballCaught;
+			BallStatePacket b = ((BallStatePacket)p);
+			ballCaught = b.ballCaught;
+			catcherState = b.state;
 		}
     }
 

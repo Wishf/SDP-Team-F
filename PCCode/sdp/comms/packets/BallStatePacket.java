@@ -4,14 +4,15 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import sdp.util.CircularByteBuffer;
 
-/**
- * Created by Matthew on 01/04/2015.
- */
+import java.nio.charset.Charset;
+
+
 public class BallStatePacket extends Packet {
     public static final byte ID = 'Y';
     public static final int Length = 2;
 
     public boolean ballCaught;
+    public BallStates state;
 
     public BallStatePacket(){
 
@@ -38,13 +39,32 @@ public class BallStatePacket extends Packet {
 
     @Override
     public void readPacket(CircularByteBuffer stream) {
-        byte val = 0;
+        byte[] buf = new byte[1];
         try {
-            val = stream.read();
+            stream.read(buf, 0, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        ballCaught = val != 0;
+        String s = new String(buf, Charset.forName("US-ASCII"));
+
+        switch(s.charAt(0)){
+            case '0': // catcher open
+                ballCaught = false;
+                state = BallStates.OPEN;
+                break;
+            case '1': // catcher opening
+                ballCaught = false;
+                state = BallStates.OPENING;
+                break;
+            case '2': // has ball
+                ballCaught = true;
+                state = BallStates.CLOSE;
+                break;
+            case '3': // catcher closing
+                ballCaught = false;
+                state = BallStates.CLOSING;
+                break;
+        }
     }
 }

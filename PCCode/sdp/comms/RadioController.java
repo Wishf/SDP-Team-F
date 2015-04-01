@@ -8,6 +8,7 @@ import sdp.comms.packets.*;
 import sdp.util.CircularByteBuffer;
 
 import java.nio.BufferUnderflowException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Queue;
 
@@ -31,7 +32,8 @@ public class RadioController implements SerialPortEventListener {
         // Message received
         if(event.isRXCHAR()) {
             try {
-                buffer.write(parent.readBytes(event.getEventValue()), event.getEventValue());
+                byte[] bytes = parent.readBytes(event.getEventValue());
+                buffer.write(bytes, event.getEventValue());
             } catch (SerialPortException e) {
                 e.printStackTrace();
             } catch (Exception e) {
@@ -41,8 +43,6 @@ public class RadioController implements SerialPortEventListener {
 
                 try {
                     byte peeked_id = buffer.peek();
-
-                    System.out.println(peeked_id);
 
                     Packet read = null;
 

@@ -38,7 +38,7 @@ public class Radio {
     public void start(){
         try {
             port.openPort();
-            port.setParams(SerialPort.BAUDRATE_9600,
+            port.setParams(SerialPort.BAUDRATE_115200,
                     SerialPort.DATABITS_8,
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);
