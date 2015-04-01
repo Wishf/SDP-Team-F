@@ -118,16 +118,18 @@ public class CalibrationTool implements GUITool, ActionListener {
 		addSlider(container, "ROTATE_MIN", 20, 150, 1, rc);
         addSlider(container, "ROTATE_MAX", 150, 254, 1, rc);
         addSlider(container, "ROTATE_A", 0, 20000, 0.0001, rc);
+        addSlider(container, "ROTATE_C", 0, 200, 1, rc);
         addSlider(container, "ROTATE_REAR_COEF", 0, 200, 0.01, rc);
-        addSlider(container, "ROTATE_INITIAL_BOOST_COEF", 100, 300, 0.01, rc);
         
         addSlider(container, "TRAVEL_MIN", 50, 150, 1, rc);
         addSlider(container, "TRAVEL_MAX", 150, 254, 1, rc);
         addSlider(container, "TRAVEL_A", 0, 5000, 0.001, rc);
+        addSlider(container, "TRAVEL_C", 0, 200, 1, rc);
         
         addSlider(container, "SIDEWAYS_MIN", 50, 254, 1, rc);
         addSlider(container, "SIDEWAYS_MAX", 50, 254, 1, rc);
         addSlider(container, "SIDEWAYS_A", 0, 5000, 0.001, rc);
+        addSlider(container, "SIDEWAYS_C", 0, 200, 1, rc);
         addSlider(container, "SIDEWAYS_ARC_POWER", 0, 254, 1, rc);
 	}
 	

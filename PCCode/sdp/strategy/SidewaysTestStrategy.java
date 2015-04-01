@@ -48,6 +48,7 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
 		
 		double targetAngle;//calcTargetAngle(dx, dy);
 		double dx;
@@ -77,7 +78,7 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 		
 		
 		boolean rotate = false;
-		if(Math.abs(angleDifference) > 20)
+		if(Math.abs(angleDifference) > 30)
 		{
 			rotate = true;
 		}

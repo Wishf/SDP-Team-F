@@ -5,7 +5,7 @@
 #include <Wire.h>
 
 
-#define DEBUG 0
+#define DEBUG false
 
 #define ROTARY_SLAVE_ADDRESS 5
 #define ROTARY_COUNT 6

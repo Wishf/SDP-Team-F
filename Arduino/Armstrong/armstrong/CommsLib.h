@@ -6,7 +6,7 @@
 #define _COMMSLIB_H_
 
 #include "Arduino.h"
-#define DEBUG true
+#define DEBUG false
 
 typedef void (* function_pointer_t)();
 

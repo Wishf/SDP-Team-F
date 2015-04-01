@@ -72,7 +72,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 		
 		
 		boolean rotate = false;
-		if(Math.abs(angleDifference) > 25)
+		if(Math.abs(angleDifference) > 10)
 		{
 			rotate = true;
 		}
