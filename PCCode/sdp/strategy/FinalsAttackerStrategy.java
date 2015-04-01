@@ -83,11 +83,21 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     	}
     }
     
+    public Point2 shootAvoidObstacle() {
+    	float side = enemyDefenderRobotY - 240;
+    	
+    	if(side > 0) {
+    		return new Point2(attackerRobotX, 270);
+    	} else {
+    		return new Point2(attackerRobotX, 200);
+    	}
+    }
+    
     public Point2 shootingTarget(float x, float y) {
-    	if(y < 150) {
-    		return new Point2(x, 150);
-    	} else if(y > 300){
-    		return new Point2(x, 300);
+    	if(y < 200) {
+    		return new Point2(x, 200);
+    	} else if(y > 250){
+    		return new Point2(x, 250);
     	} else {
     		return new Point2(x, y);
     	}
@@ -144,27 +154,32 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	
         	if(ballXYdistance > catchThreshold) {
         		hasBall = false;
+        		readyToShoot = false;
         	}  	
         	
         	if(hasBall) {
         		//Rotate to the CB
-        		if(readyToShoot) {
-        			ControlBox.controlBox.computeShot(worldState);
-                	targetAngle = ControlBox.controlBox.getShootingAngle();
-                	rotate = true;
-                	kick_ball = true;
-                	waitForShoot = false;
-        		} else {
+        		//if(readyToShoot) {
+        		//	ControlBox.controlBox.computeShot(worldState);
+                //	targetAngle = ControlBox.controlBox.getShootingAngle();
+                //	RobotDebugWindow.messageAttacker.setMessage("RTS");
+                //	rotate = true;
+                //	
+                //	waitForShoot = false;
+        		//} else {
         			travel_sideways = true;
-                	target = shootingTarget(attackerRobotX, attackerRobotY);
+                	target = shootAvoidObstacle();//shootingTarget(attackerRobotX, attackerRobotY);
                 	rotate = true;
                 	targetAngle = getPiAngle(enemyDefenderRobotX);
-                	waitForShoot = true;
-        		}	           	
+                	//waitForShoot = true;
+                	kick_ball = true;
+                	System.out.println("Point position " + target + " defY " + enemyDefenderRobotY);
+                	//RobotDebugWindow.messageAttacker.setMessage();
+                	//RobotDebugWindow.messageAttacker.setMessage("Waiting for rts");
+        		//}	           	
         	} else {
         		// Get to the target
         		target = targetFromBall(ballX, ballY);
-        		RobotDebugWindow.messageAttacker.setMessage("Ball attacker b");
                 uncatch = true;
                 move_robot = true;
                 
@@ -178,7 +193,6 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	// Rotation at right angle
         	targetAngle = getPiAngle(ballX);
         	rotate = true;
-        	readyToShoot = false;
         }
         
         if(isBallInDefenderArea(worldState)) {
@@ -193,8 +207,12 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	rotate_to_defender = true;
         	
         } else if(isBallInEnemyDefenderArea(worldState)) {
+        	if(worldState.ballNotOnPitch) {
+        		target = new Point2(correctX(), enemyDefenderRobotY);
+        	} else {
+        		target = new Point2(correctX(), ballY);
+        	}
         	
-        	target = new Point2(correctX(), ballY);
             if (catcherReleased != true) {
             	uncatch = true;
             }
@@ -202,27 +220,36 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
       	
         	
         } else if(isBallInEnemyAttackerArea(worldState)) {
-        	// Follow the ball
-        	target = new Point2(attackerRobotX, ballY);
+        	if(worldState.ballNotOnPitch) {
+        		target = new Point2(attackerRobotX, enemyAttackerRobotY);
+        	} else {
+        		target = new Point2(attackerRobotX, ballY);
+        	}
+        	
     		travel_sideways = true;
     		
         }
         
-        if (target.getY() >= bottomY) {
-        	System.out.println("You've gone too far this time. The Y target was " + target.getY() + " and the actual bot is " + bottomY);
-        	target.setY(bottomY - 40);
+        int border_threshold = 40;
+        int border_control_agency = 50;
+        
+       if (target.getY() >= topY-border_threshold) {
+        	System.out.println("A. The Y target was " + target.getY() + " and the actual bot is " + topY);
+        	target.setY(topY - border_control_agency);
         	
-        } else if (target.getY() < topY) {
-        	System.out.println("You've gone too far this time. The Y target was " + target.getY() + " and the actual top is " + topY);        	
-        	target.setY(topY + 40);
+        } else if (target.getY() < bottomY+border_threshold) {
+        	System.out.println("B. The Y target was " + target.getY() + " and the actual top is " + bottomY);        	
+        	target.setY(bottomY + border_control_agency);
         }
         
-        if (target.getX() <= leftCheck) {
-        	System.out.println("You've gone too far this time. The X target was " + target.getX() + " and the actual left is " + leftCheck);        	
-        	target.setX(leftCheck - 40);
-        } else if (target.getX() >= rightCheck) {
-        	System.out.println("You've gone too far this time. The X target was " + target.getX() + " and the actual right is " + rightCheck);        	
-        	target.setX(rightCheck + 40);
+        if (target.getX() <= leftCheck+border_threshold) {
+        	System.out.println("C. The X target was " + target.getX() + " and the actual left is " + leftCheck);        	
+        	target.setX(leftCheck + border_control_agency);
+        	
+        } else if (target.getX() >= rightCheck-border_threshold) {
+        	System.out.println("D. The X target was " + target.getX() + " and the actual right is " + rightCheck);        	
+        	target.setX(rightCheck - border_control_agency);
+        	
         } //NEW CODE IMPLEMENTED TO STOP IT GETTING STUCK BUT NOT TESTED YET SO COMMENTED */
 
         if(travel_sideways) {
@@ -244,6 +271,19 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	targetAngle = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderRobotX, defenderRobotY);
         	rotate = true;
         }
+        
+        int margin = 20;
+        /*if(attackerRobotX > leftCheck - margin) {
+        	target = new Point2(leftCheck - margin, attackerRobotY);
+        	move_robot = true;
+        	travel_sideways = false;
+        	
+        } else if(attackerRobotX < rightCheck + margin) {
+        	target = new Point2(rightCheck + margin, attackerRobotY);
+        	move_robot = true;
+        	travel_sideways = false;
+        	
+        }*/
         
         if(move_robot) {
         	double dx = 0;
@@ -271,7 +311,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         	kick_ball = false;
         }
         
-        if(!rotate && !travel_sideways && waitForShoot) {
+        if(!travel_sideways && waitForShoot) {
         	readyToShoot = true;
         }
         
@@ -286,7 +326,6 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         } else {
         	previous_ball_counter++;
         }
-        
         
         
         /* 	        if(ballXYDistance < catchThreshold && !hasBall) {
