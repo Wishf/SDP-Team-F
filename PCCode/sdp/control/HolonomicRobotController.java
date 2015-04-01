@@ -63,7 +63,7 @@ public class HolonomicRobotController extends BaseRobotController {
     public byte SIDEWAYS_ARC_POWER = 70;
     
     
-    private static final int PACKET_LIFETIME = 150;
+    private static final int PACKET_LIFETIME = 70;
     
     
     
@@ -91,7 +91,7 @@ public class HolonomicRobotController extends BaseRobotController {
 
     }
     
-    public boolean stop(){
+    /*public boolean stop(){
     	byte zero = 0;
     	if(lastPacket == null){
     		return this.sendCommand(new DrivePacket(
@@ -99,18 +99,27 @@ public class HolonomicRobotController extends BaseRobotController {
     				zero, rightMotorDir, 
     				zero, rearMotorDir,
     				PACKET_LIFETIME));
-    	}else{
+    	}
+    	else{
     		return this.sendCommand(lastPacket.getReverse());
-    		/*try{Thread.sleep(PACKET_LIFETIME);
+    		try{Thread.sleep(PACKET_LIFETIME);
     			this.sendCommand(new DrivePacket(
     				zero, leftMotorDir, 
     				zero, rightMotorDir, 
     				zero, rearMotorDir,
-    				PACKET_LIFETIME));}catch(Exception e){e.printStackTrace();}*/
+    				PACKET_LIFETIME));}catch(Exception e){e.printStackTrace();}
     		//return true;
     	}
-    }
+    }*/
     
+    public boolean stop(){
+    	byte zero = 0;
+    	return this.sendCommand(new DrivePacket(
+			zero, leftMotorDir, 
+			zero, rightMotorDir, 
+			zero, rearMotorDir,
+			PACKET_LIFETIME));
+	}
     
     
     public boolean rotate(double angle){    	
@@ -338,7 +347,7 @@ public boolean travelSideways(double displacement){
 		
 		if(name.equals("ROTATE_MIN")){
         	this.ROTATE_MIN = value;
-        	System.out.println(this.ROTATE_MIN);
+        	//System.out.println(this.ROTATE_MIN);
         }
         else if(name.equals("ROTATE_MAX")){
         	this.ROTATE_MAX = value;

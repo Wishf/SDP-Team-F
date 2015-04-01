@@ -68,6 +68,7 @@ public class DynamicWorldState {
 		private Shape catcher;
 		private Shape plate;
 		private AffineTransform plateCenterTransform;
+		private boolean hasBall;
 
 		public Robot(RobotModel model) {
 			this.model = model;

@@ -16,11 +16,11 @@ import sdp.util.DriveDirection;
 public class StrategyController implements WorldStateReceiver {
 
 	/** Measured in milliseconds */
-	public static final int STRATEGY_TICK = 100;
+	public static final int STRATEGY_TICK = 60;
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
-		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, MILESTONE_TWO_A, MILESTONE_TWO_B, MILESTONE_THREE_A, MILESTONE_THREE_B, CALIBRATION
+		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, TEST_SIDEWAYS, TEST_ROTATE, MILESTONE_THREE_A, MILESTONE_THREE_B, CALIBRATION, TEST_CATCH
 	}
 	
 	public enum BallLocation{
@@ -136,16 +136,31 @@ public class StrategyController implements WorldStateReceiver {
 			StrategyController.currentStrategies.add(ns);
 			ns.startControlThread();			
 
-        case MILESTONE_TWO_A:
+        case TEST_SIDEWAYS:
         	ats = new SidewaysTestStrategy(this.bcsAttacker);
+        	dfs = new SidewaysTestStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
+            StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
+            dfs.startControlThread();
             
             break;
-        case MILESTONE_TWO_B:
-            ats = new RotateTestStrategy(this.bcsAttacker);
+        case TEST_ROTATE:
+        	ats = new RotateTestStrategy(this.bcsAttacker);
+        	dfs = new RotateTestStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
+            StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
+            dfs.startControlThread();
+            
+            break;
+        case TEST_CATCH:
+        	ats = new CatcherTestStrategy(this.bcsAttacker);
+        	dfs = new CatcherTestStrategy(this.bcsDefender);
+            StrategyController.currentStrategies.add(ats);
+            StrategyController.currentStrategies.add(dfs);
+            ats.startControlThread();
+            dfs.startControlThread();
             
             break;
         case CALIBRATION:

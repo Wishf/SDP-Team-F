@@ -77,6 +77,7 @@ long motorTimeoutMillis = 0;
 int kickState = KICK_STATE_IDLE;
 // The number of tachometer ticks measured when the kick motion is started
 int kickerTachometerStart = 0;
+long kickStartTime;
 
 
 
@@ -90,19 +91,20 @@ bool hasBall = false;
 #define CATCH_MOTOR 4
 
 // State definitions for the catcher state machine
-#define CATCH_STATE_IDLE 0
-#define CATCH_STATE_DISENGAGE 1
-#define CATCH_STATE_OPERATING_DISENGAGE 2
-#define CATCH_STATE_WINDDOWN_DISENGAGE 3
-#define CATCH_STATE_ENGAGE 4
-#define CATCH_STATE_OPERATING_ENGAGE 5
-#define CATCH_STATE_WINDDOWN_ENGAGE 6
+#define CATCH_STATE_DISENGAGED 0
+#define CATCH_STATE_ENGAGED 1
+
+#define CATCH_STATE_DISENGAGE 2
+#define CATCH_STATE_OPERATING_DISENGAGE 3
+#define CATCH_STATE_WINDDOWN_DISENGAGE 4
+#define CATCH_STATE_ENGAGE 5
+#define CATCH_STATE_OPERATING_ENGAGE 6
+#define CATCH_STATE_WINDDOWN_ENGAGE 7
 
 #define CATCH_WINDDOWN_PERIOD 2
 
 
 #define CATCHER_TACHO 5
-#define CATCHER_TACHO_FULLY_CLOSED 9
 // The direction the motor has to be driven to disengage the catcher
 #define CATCH_DISENGAGE_DIR 1
 // The power to drive the motor at to disengage the catcher
@@ -126,7 +128,8 @@ int catchWindDownSpeed;
 
 int catchTachoOpen;
 int catchTachoClosed;
-#define CATCH_TACHO_CAUGHT_THRESHOLD 1
+#define CATCH_TACHO_CAUGHT_THRESHOLD_MIN 1
+#define CATCH_TACHO_CAUGHT_THRESHOLD_MAX 4
 
 // Start by calibrating
 int catchState = CATCH_STATE_DISENGAGE;
@@ -157,8 +160,12 @@ void setup() {
   comms.set_handler('Z', kicker_inc);
   comms.set_handler('X', kicker_dec);
   comms.set_handler('T', test);
+  comms.set_handler('R', calibrate_catcher);
+
+
   comms.set_handler('B', has_ball);
-  comms.set_handler('C', calibrate_catcher);
+  comms.set_handler('C', catcher_state);
+
 
   comms.print("started");// transmit started packet
 }
@@ -266,12 +273,12 @@ void doCatcher(){
         catcherCalibrated = true;
       }
       else{        
-        comms.print("Closed catcher tacho: ");
-        comms.println(abs((catchTachoClosed-catchTachoOpen) - tacho(CATCHER_TACHO)));
+        comms.print("Catch tacho diff from closed: ");
+        comms.println(abs(catchTachoClosed - tacho(CATCHER_TACHO)));
         //Ball caught
-        if(abs((catchTachoClosed-catchTachoOpen) - tacho(CATCHER_TACHO)) > CATCH_TACHO_CAUGHT_THRESHOLD){
+        if((abs(catchTachoClosed - tacho(CATCHER_TACHO)) > CATCH_TACHO_CAUGHT_THRESHOLD_MIN) && (abs(catchTachoClosed - tacho(CATCHER_TACHO)) < CATCH_TACHO_CAUGHT_THRESHOLD_MAX)){
           // Set state to idle and stop motor
-          catchState = CATCH_STATE_IDLE;
+          catchState = CATCH_STATE_ENGAGED;
           moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
           hasBall = true;
           comms.println("Ball caught!");
@@ -328,7 +335,7 @@ void doCatcher(){
     }
     else {
       // Set state to idle and stop motor
-      catchState = CATCH_STATE_IDLE;
+      catchState = CATCH_STATE_DISENGAGED;
       moveMotor(CATCH_MOTOR, CATCH_DISENGAGE_HOLD_POWER * CATCH_DISENGAGE_DIR);
 
       if(!catcherCalibrated){
@@ -352,6 +359,7 @@ void doKick(){
     
     // Take the initial tachometer reading at the start of this motion
     kickerTachometerStart = tacho(KICK_TACHOMETER);
+    kickStartTime = millis();
 
     // Set state machine to signify the kicker is rotating
     kickState = KICK_STATE_MOVING_UP;
@@ -362,6 +370,14 @@ void doKick(){
   // We are in the middle of rotating the kicker
   else if(kickState == KICK_STATE_MOVING_UP){
     // If we've rotated the kicker a quarter of the way around
+    //comms.print((millis()-kickStartTime));
+    //comms.print(" ");
+    //comms.println(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart));
+
+    
+
+
+
     if(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) > KICK_TICKS_QUARTER){
       // Set state to idle
       kickState = KICK_STATE_IDLE;
@@ -609,6 +625,15 @@ void has_ball(){
   }
   else{
     comms.send('0');
+  }
+}
+
+void catcher_state(){
+  if(catchState == CATCH_STATE_DISENGAGED){
+    comms.send('0');
+  }
+  else{
+    comms.send('1');
   }
 }
 
