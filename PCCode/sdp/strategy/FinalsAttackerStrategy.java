@@ -84,10 +84,10 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     }
     
     public Point2 shootingTarget(float x, float y) {
-    	if(y < 120) {
-    		return new Point2(x, 120);
-    	} else if(y > 330){
-    		return new Point2(x, 330);
+    	if(y < 150) {
+    		return new Point2(x, 150);
+    	} else if(y > 300){
+    		return new Point2(x, 300);
     	} else {
     		return new Point2(x, y);
     	}
@@ -208,7 +208,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     		
         }
         
-/*        if (target.getY() >= bottomY) {
+        if (target.getY() >= bottomY) {
         	System.out.println("You've gone too far this time. The Y target was " + target.getY() + " and the actual bot is " + bottomY);
         	target.setY(bottomY - 40);
         	
@@ -223,7 +223,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         } else if (target.getX() >= rightCheck) {
         	System.out.println("You've gone too far this time. The X target was " + target.getX() + " and the actual right is " + rightCheck);        	
         	target.setX(rightCheck + 40);
-        } NEW CODE IMPLEMENTED TO STOP IT GETTING STUCK BUT NOT TESTED YET SO COMMENTED */
+        } //NEW CODE IMPLEMENTED TO STOP IT GETTING STUCK BUT NOT TESTED YET SO COMMENTED */
 
         if(travel_sideways) {
         	
@@ -252,7 +252,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
             dx = target.getX() - attackerRobotX;
             dy = target.getY() - attackerRobotY;
             
-            targetAngle = calcTargetAngle(-dx,-dy);
+            targetAngle = calcTargetAngle(dx,dy);
             
             targetDistance = Math.sqrt(dx*dx + dy*dy);
             
@@ -301,7 +301,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         
         }
         if(!initialized) {
-        	catch_balisBallInEnemyDefenderAreal = false;
+        	catch_ball = false;
         	rotate = false;
         	move_robot = false;
         	travel_sideways = false;
