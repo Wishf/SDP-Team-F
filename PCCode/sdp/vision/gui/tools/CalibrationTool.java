@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -77,7 +78,10 @@ public class CalibrationTool implements GUITool, ActionListener {
         tabbedPane.addTab("Defender", defenderTab);
         tabbedPane.addTab("Attacker", attackerTab);
         
+        
         createSaveLoadButtons(attackerTab, defenderTab);
+        
+        loadFromDefaultFile();
         
         //Defender
         createCalibButtons(defenderTab, sc.bcsDefender.robotController);  
@@ -151,13 +155,13 @@ public class CalibrationTool implements GUITool, ActionListener {
 	
 	private void addAllSliders(JPanel container, HolonomicRobotController rc){
 		addSlider(container, "ROTATE_MIN", 20, 150, 1, rc);
-        addSlider(container, "ROTATE_MAX", 150, 254, 1, rc);
+        addSlider(container, "ROTATE_MAX", 50, 254, 1, rc);
         addSlider(container, "ROTATE_A", 0, 20000, 0.0001, rc);
         addSlider(container, "ROTATE_C", 0, 200, 1, rc);
         addSlider(container, "ROTATE_REAR_COEF", 0, 200, 0.01, rc);
         
         addSlider(container, "TRAVEL_MIN", 50, 150, 1, rc);
-        addSlider(container, "TRAVEL_MAX", 150, 254, 1, rc);
+        addSlider(container, "TRAVEL_MAX", 50, 254, 1, rc);
         addSlider(container, "TRAVEL_A", 0, 5000, 0.001, rc);
         addSlider(container, "TRAVEL_C", 0, 200, 1, rc);
         
@@ -335,11 +339,8 @@ public class CalibrationTool implements GUITool, ActionListener {
                 File file = fc.getSelectedFile();
                 
                 //System.out.println("Def Saving: " + file.getName());
-                defFileLabel.setText(file.getName());
+                saveDefToFile(file);
                 
-                
-                
-                sc.bcsDefender.robotController.saveConfig(file);
             } else {
             	System.out.println("Open command cancelled by user.");
             }
@@ -349,9 +350,90 @@ public class CalibrationTool implements GUITool, ActionListener {
     }
 
 	
+	File saveDefToFile(File file){
+		if(file == null){
+			System.out.print("balss");
+		}
+		sc.bcsDefender.robotController.saveConfig(file);
+		defFileLabel.setText(file.getName());
+		
+		return file;
+        
+	}
+	
+	File saveAttToFile(File file){
+		if(file == null){
+			System.out.print("balss");
+		}
+		sc.bcsAttacker.robotController.saveConfig(file);
+		attFileLabel.setText(file.getName());   
+		
+		return file;
+	}
 	
 	
+	File saveAttToDefaultFile(){
+		String path = System.getProperty("user.dir")+File.separator+"default-attacker.yml";		
+		File file = new File(path);
+		
+		file.getParentFile().mkdirs(); 
+		try {
+			if(!file.exists())
+				file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return saveAttToFile(file);
+	}
 	
+	File saveDefToDefaultFile(){
+		String path = System.getProperty("user.dir")+File.separator+"default-defender.yml";		
+		File file = new File(path);
+		
+		file.getParentFile().mkdirs(); 
+		try {
+			if(!file.exists())
+				file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("yo");
+			e.printStackTrace();
+		}
+		
+		return saveDefToFile(file);	
+	}
+	
+	void loadFromDefaultFile(){
+		
+		String path = System.getProperty("user.dir")+File.separator+"default-attacker.yml";
+		
+		File attFile = new File(path);
+		System.out.print(attFile.getName());
+		
+		path = System.getProperty("user.dir")+File.separator+"default-defender.yml";		
+		File defFile = new File(path);
+		
+		if(!defFile.exists()){
+        	defFile = saveDefToDefaultFile();
+        }
+		else{
+			defFileLabel.setText(defFile.getName());
+			sc.bcsDefender.robotController.loadConfig(defFile);
+		}
+		
+		if(!attFile.exists()){
+        	attFile = saveAttToDefaultFile();
+        }
+		else{
+			sc.bcsAttacker.robotController.loadConfig(attFile);
+			//attFileLabel.setText(attFile.getName());
+		}
+		
+		
+		updateAllSliders();
+	}
 	
 	
 
@@ -368,12 +450,19 @@ public class CalibrationTool implements GUITool, ActionListener {
 
 	@Override
 	public boolean deactivate() {
-		subWindow.setVisible(false);
+		saveAttToDefaultFile();
+		saveDefToDefaultFile();
+		
+		System.out.println("hello");
+		
+		subWindow.setVisible(false);		
 		return true;
 	}
 
 	@Override
 	public void dispose() {
+		saveAttToDefaultFile();
+		saveDefToDefaultFile();
 		subWindow.dispose();
 	}
 }
