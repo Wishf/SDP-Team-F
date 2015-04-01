@@ -92,9 +92,13 @@ bool hasBall = false;
 // State definitions for the catcher state machine
 #define CATCH_STATE_IDLE 0
 #define CATCH_STATE_DISENGAGE 1
-#define CATCH_STATE_ENGAGE 2
-#define CATCH_STATE_OPERATING_ENGAGE 3
-#define CATCH_STATE_OPERATING_DISENGAGE 4
+#define CATCH_STATE_OPERATING_DISENGAGE 2
+#define CATCH_STATE_WINDDOWN_DISENGAGE 3
+#define CATCH_STATE_ENGAGE 4
+#define CATCH_STATE_OPERATING_ENGAGE 5
+#define CATCH_STATE_WINDDOWN_ENGAGE 6
+
+#define CATCH_WINDDOWN_PERIOD 2
 
 
 #define CATCHER_TACHO 5
@@ -105,7 +109,7 @@ bool hasBall = false;
 #define CATCH_DISENGAGE_POWER 255
 #define CATCH_DISENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to disengage the catcher
-#define CATCH_DISENGAGE_DELAY 750
+#define CATCH_DISENGAGE_DELAY 500
 
 
 // The direction the motor has to be driven to engage the catcher
@@ -114,13 +118,24 @@ bool hasBall = false;
 #define CATCH_ENGAGE_POWER 255
 #define CATCH_ENGAGE_HOLD_POWER 0
 // The length of time the motor should be driven for to engage the catcher
-#define CATCH_ENGAGE_DELAY 750
+#define CATCH_ENGAGE_DELAY 500
 
 // The time in milliseconds since the Arduino started up/reset that the catch engage/disengage motion was started
 long catchStartTime;
-// The current state the catcher state machine is in
-int catchState = CATCH_STATE_IDLE;
-int catchTachoStart;
+int catchWindDownSpeed;
+
+int catchTachoOpen;
+int catchTachoClosed;
+#define CATCH_TACHO_CAUGHT_THRESHOLD 1
+
+// Start by calibrating
+int catchState = CATCH_STATE_DISENGAGE;
+bool catcherCalibrated = false;
+
+
+
+
+
 
 Communications comms;
 
@@ -143,8 +158,9 @@ void setup() {
   comms.set_handler('X', kicker_dec);
   comms.set_handler('T', test);
   comms.set_handler('B', has_ball);
+  comms.set_handler('C', calibrate_catcher);
 
-  comms.print("started\n");// transmit started packet
+  comms.print("started");// transmit started packet
 }
 
 
@@ -180,6 +196,9 @@ void loop() {
 }
 
 
+
+
+
 // Move a given motor (indexed by port on the motor board) by a given power
 // Negative values are backwards, positive are forward
 // Zero will stop the motor
@@ -204,7 +223,6 @@ void doCatcher(){
   if(catchState == CATCH_STATE_ENGAGE){
     // Record motion start time and set state to engage in operation
     catchStartTime = millis();
-    catchTachoStart = tacho(CATCHER_TACHO);
 
     catchState = CATCH_STATE_OPERATING_ENGAGE;
 
@@ -216,27 +234,62 @@ void doCatcher(){
     // If the catcher engage timeout has elapsed
     if(millis() - catchStartTime >= CATCH_ENGAGE_DELAY){
       // Set state to idle and stop motor
-      catchState = CATCH_STATE_IDLE;
+      catchState = CATCH_STATE_WINDDOWN_ENGAGE;
       
-      comms.print(abs(catchTachoStart - tacho(CATCHER_TACHO)));
+      //comms.println("Windown");
       
-      //Ball caught
-      if(abs(catchTachoStart - tacho(CATCHER_TACHO)) < CATCHER_TACHO_FULLY_CLOSED){
-          moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
-          hasBall = true;
-          comms.print("I have the ball!");
-      }
-      else{
-        catchState = CATCH_STATE_DISENGAGE;       
-         
-      }
-      
-      has_ball();
-      
-      
+      catchWindDownSpeed = CATCH_ENGAGE_POWER;
+      catchStartTime = millis();
       
     }
   }
+  else if(catchState == CATCH_STATE_WINDDOWN_ENGAGE){
+
+    if(millis() - catchStartTime >= CATCH_WINDDOWN_PERIOD){
+      catchWindDownSpeed -= 1;
+      catchStartTime = millis();
+    }
+
+    // If still winding down
+    if(catchWindDownSpeed > 0){
+      //comms.println(catchWindDownSpeed);
+      //comms.print('\n');
+      moveMotor(CATCH_MOTOR, catchWindDownSpeed * CATCH_ENGAGE_DIR);
+    }
+    else {
+
+      if(!catcherCalibrated){
+        catchTachoClosed = tacho(CATCHER_TACHO);
+        catchState = CATCH_STATE_DISENGAGE;
+        comms.print("Calib closed catcher tacho: ");
+        comms.println(catchTachoClosed);
+        catcherCalibrated = true;
+      }
+      else{        
+        comms.print("Closed catcher tacho: ");
+        comms.println(abs((catchTachoClosed-catchTachoOpen) - tacho(CATCHER_TACHO)));
+        //Ball caught
+        if(abs((catchTachoClosed-catchTachoOpen) - tacho(CATCHER_TACHO)) > CATCH_TACHO_CAUGHT_THRESHOLD){
+          // Set state to idle and stop motor
+          catchState = CATCH_STATE_IDLE;
+          moveMotor(CATCH_MOTOR, CATCH_ENGAGE_HOLD_POWER * CATCH_ENGAGE_DIR);
+          hasBall = true;
+          comms.println("Ball caught!");
+        }
+        else{
+          catchState = CATCH_STATE_DISENGAGE; 
+          comms.println("Ball not caught!");               
+        }
+        
+        //Send back ball state
+        has_ball();     
+      }
+      
+    }
+  }
+
+
+
   // We are disengaging the catcher
   else if(catchState == CATCH_STATE_DISENGAGE){
     // Record motion start time and set state to disengage in operation
@@ -252,10 +305,38 @@ void doCatcher(){
   else if(catchState == CATCH_STATE_OPERATING_DISENGAGE){
     // If the catcher disengage timeout has elapsed
     if(millis() - catchStartTime >= CATCH_DISENGAGE_DELAY){
+      // Start the winddown
+      catchState = CATCH_STATE_WINDDOWN_DISENGAGE;
+
+      //comms.println("Winddown");
+      
+      catchWindDownSpeed = CATCH_DISENGAGE_POWER;
+    }
+  }
+  else if(catchState == CATCH_STATE_WINDDOWN_DISENGAGE){
+
+    if(millis() - catchStartTime >= CATCH_WINDDOWN_PERIOD){
+      catchWindDownSpeed -= 1;
+      catchStartTime = millis();
+    }
+
+    // If still winding down
+    if(catchWindDownSpeed > 0){
+      //comms.print(catchWindDownSpeed);
+      //comms.print('\n');
+      moveMotor(CATCH_MOTOR, catchWindDownSpeed * CATCH_DISENGAGE_DIR);
+    }
+    else {
       // Set state to idle and stop motor
       catchState = CATCH_STATE_IDLE;
-
       moveMotor(CATCH_MOTOR, CATCH_DISENGAGE_HOLD_POWER * CATCH_DISENGAGE_DIR);
+
+      if(!catcherCalibrated){
+        catchTachoOpen = tacho(CATCHER_TACHO);
+        catchState = CATCH_STATE_ENGAGE;
+        comms.print("Calib open catcher tacho: ");
+        comms.println(catchTachoOpen);
+      }
     }
   }
 }
@@ -352,7 +433,7 @@ void updateMotorPositions() {
 // Tells robot to refuse movement packets
 void deactivate(){
   comms.send('C');
-  comms.print("deactivated");
+  comms.println("deactivated");
 
   ON = false;
 }
@@ -362,7 +443,7 @@ void deactivate(){
 // Tells robot to accept movement packets
 void activate() {
   comms.send('C');
-  comms.print("activated");
+  comms.println("activated");
 
   ON = true;
 
@@ -375,7 +456,7 @@ void activate() {
 // Completes a full kick cycle
 void kick() {
   comms.send('C');
-  comms.print("kick");
+  comms.println("kick");
 
   // Start kicker rotation
   if(kickState == KICK_STATE_IDLE){
@@ -426,12 +507,12 @@ void drive() {
 void engage_catcher(){
   // Send response that signifies the catcher state has been changed
   comms.send('G');
-  comms.print("catch");
+  comms.println("catch");
 
   // Switch catcher state to start engage sequence
-  if(catchState != CATCH_STATE_OPERATING_DISENGAGE){
+  //if(catchState != CATCH_STATE_OPERATING_DISENGAGE){
     catchState = CATCH_STATE_ENGAGE;
-  }
+  //}
 }
 
 // Responds to code 'I'
@@ -439,7 +520,7 @@ void engage_catcher(){
 void disengage_catcher(){
   // Send response that signifies the catcher state has been changed
   comms.send('G');
-  comms.print("uncatch");
+  comms.println("uncatch");
 
   // Switch catcher state to start disengage sequence
   //if(catchState == CATCH_STATE_IDLE){
@@ -451,7 +532,7 @@ void disengage_catcher(){
 
 
 void kicker_inc(){
-  comms.print("K+");
+  comms.println("K+");
   kickerTachometerStart = tacho(KICK_TACHOMETER);
   moveMotor(KICK_MOTOR, 255 * KICK_MOTOR_DIR);
   while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
@@ -463,7 +544,7 @@ void kicker_inc(){
 
 
 void kicker_dec(){
-  comms.print("K-");
+  comms.println("K-");
   kickerTachometerStart = tacho(KICK_TACHOMETER);
   moveMotor(KICK_MOTOR, -255 * KICK_MOTOR_DIR);
   while(abs(tacho(KICK_TACHOMETER) - kickerTachometerStart) < 1){
@@ -478,13 +559,13 @@ void test(){
 
   int i = 0;
   long time = 1000;
-  comms.print("TEST\n");
+  comms.println("TEST\n");
   
-  comms.print("LEFT FORWARD 125\n");  
+  comms.println("LEFT FORWARD 125\n");  
   moveMotor(motorMapping[0], 125*motorDirs[0]);
   delay(time);
   
-  comms.print("LEFT BACKWARD 125\n");  
+  comms.println("LEFT BACKWARD 125\n");  
   moveMotor(motorMapping[0], -125*motorDirs[0]);
   delay(time);
   
@@ -492,11 +573,11 @@ void test(){
   
   
   
-  comms.print("RIGHT FORWARD 125\n");  
+  comms.println("RIGHT FORWARD 125\n");  
   moveMotor(motorMapping[1], 125*motorDirs[1]);
   delay(time); 
   
-  comms.print("RIGHT BACKWARD 125\n");  
+  comms.println("RIGHT BACKWARD 125\n");  
   moveMotor(motorMapping[1], -125*motorDirs[1]);
   delay(time);
   
@@ -505,11 +586,11 @@ void test(){
   
   
   
-  comms.print("BACK FORWARD 125\n");  
+  comms.println("BACK FORWARD 125\n");  
   moveMotor(motorMapping[2], 125*motorDirs[2]);
   delay(time);
   
-  comms.print("BACK BACKWARD 125\n");  
+  comms.println("BACK BACKWARD 125\n");  
   moveMotor(motorMapping[2], -125*motorDirs[2]);
   delay(time);
   
@@ -517,7 +598,7 @@ void test(){
   motorStop(motorMapping[2]);
   
   
-  comms.print("TEST DONE!\n");
+  comms.println("TEST DONE!\n");
   
 }
 
@@ -529,5 +610,12 @@ void has_ball(){
   else{
     comms.send('0');
   }
+}
+
+
+void calibrate_catcher(){
+  catchState = CATCH_STATE_DISENGAGE;
+  catcherCalibrated = false;
+  comms.send('C');
 }
 
