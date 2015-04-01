@@ -219,7 +219,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
             dx = target.getX() - attackerRobotX;
             dy = target.getY() - attackerRobotY;
             
-            targetAngle = calcTargetAngle(dx,dy);
+            targetAngle = calcTargetAngle(-dx,-dy);
             
             targetDistance = Math.sqrt(dx*dx + dy*dy);
             
@@ -253,7 +253,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         
         }
         if(!initialized) {
-        	catch_ball = false;
+        	catch_balisBallInEnemyDefenderAreal = false;
         	rotate = false;
         	move_robot = false;
         	travel_sideways = false;
