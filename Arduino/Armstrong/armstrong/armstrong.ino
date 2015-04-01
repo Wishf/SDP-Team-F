@@ -620,11 +620,12 @@ void test(){
 
 
 void has_ball(){
+  comms.send('Y');
   if(hasBall){
-    comms.send('1');
+    comms.send(1);
   }
   else{
-    comms.send('0');
+    comms.send(0);
   }
 }
 
