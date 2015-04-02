@@ -62,7 +62,7 @@ public class CornerStrategy extends GeneralStrategy {
         
         
                	
-        boolean tooClose = isRobotTooClose(defenderRobotX, defenderRobotY, 30);	
+        boolean tooClose = isObjectTooClose(defenderRobotX, defenderRobotY, 30);	
         System.out.println(tooClose);
     
        

@@ -247,7 +247,7 @@ public class StrategyController implements WorldStateReceiver {
 			
 			switch(this.ballLocation){
 			case ATTACKER:
-				changeToStrategy(StrategyType.DO_SOMETHING);
+				changeToStrategy(StrategyType.MILESTONE_THREE_B);
 			break;
 			case DEFENDER:
 			changeToStrategy(StrategyType.MILESTONE_THREE_B);
@@ -256,7 +256,7 @@ public class StrategyController implements WorldStateReceiver {
 			changeToStrategy(StrategyType.DEFENDING);
 			break;
 			case ENEMY_DEFENDER:
-				changeToStrategy(StrategyType.DO_SOMETHING);
+				changeToStrategy(StrategyType.MILESTONE_THREE_B);
 			break;
 			}
 		}

@@ -61,6 +61,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 
         if (ballX < defenderCheck == worldState.weAreShootingRight) {
             ballInDefenderArea = true;
+            System.out.println("BALL");
         }
 
         boolean rotate = false;
@@ -73,12 +74,13 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         boolean move_sideways = false;
         boolean robotTooClose = isObjectTooClose(defenderRobotX, defenderRobotY, 40);
         boolean moveAway = false;
+        double angleToCentre = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderRobotX, ourGoalY[1]);
        
         if(robotTooClose){
     		moveAway = true;
     		
     	}
-       RobotDebugWindow.messageDefender.setMessage(" " + moveAway);
+       
         
         if(!ballCaughtDefender && ballInDefenderArea){        	
             dx = ballX - defenderRobotX;
@@ -87,7 +89,8 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             
         }else if (!ballCaughtDefender && Math.abs(angleToDefCheck) > 15 && !ballInDefenderArea) {         	
         	rotate = true;
-        	angleDifference = angleToDefCheck;        	
+        	angleDifference = angleToDefCheck;     
+        	System.out.println("ROTATE TO DEFCHECK");
         }       
 
        
@@ -102,6 +105,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         
         if(Math.abs(angleDifference) > 15.0 ) {        	
             rotate = true;
+            System.out.println("ROTATE TO BALL");
         }
 
        
@@ -135,7 +139,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	dx = our_goal.getX() - defenderRobotX;
         	targetDistance = Math.sqrt(dx*dx + dy*dy);
         	angleDifference = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, our_goal.getX(), our_goal.getY());
-        	RobotDebugWindow.messageDefender.setMessage("Target" + our_goal.getX() + "  " + our_goal.getY());
+        	//RobotDebugWindow.messageDefender.setMessage("Target" + our_goal.getX() + "  " + our_goal.getY());
         	
         	
         	       	
@@ -152,13 +156,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	}        	
         	else if(Math.abs(targetDistance) < 25 && Math.abs(angleToTeamMate) > 15 ){
         		rotate = true;
-        		angleDifference = angleToTeamMate;        		
+        		angleDifference = angleToTeamMate; 
+        		System.out.println("ROTATE TO TEAMMATE");
         		
         	}
         	else if(targetDistance > 25 && Math.abs(angleDifference)>15  ){
         		
         		angleDifference = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation,our_goal.getX(), our_goal.getY());
         		rotate = true;
+        		System.out.println("ROTATE TO TARGET");
         		
         	}
         	
@@ -178,7 +184,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	rotate = false;
         	//System.out.println("NO NEED TO ROTATE");
         }
-        if(!ballInDefenderArea && distanceToDefault > 25 ){
+        if(!ballInDefenderArea && Math.abs(distanceToDefault) > 25 ){
         	move_sideways = true;
         	
         }
@@ -196,9 +202,15 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             } else if(rotate){            	
             	 
             	 if(isObjectTooClose(defenderRobotX, defenderRobotY, 30)){
-            		 //System.out.println("TRUE");
-            		 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-            		 controlThread.operation.travelDistance = -50;
+            		 if(Math.abs(angleToDefCheck) > 50 ){
+            			 System.out.println("TRUE");
+            			 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+            			 if(Math.abs(angleToCentre) <80){
+	            			 controlThread.operation.travelDistance = 40;
+	            		 }else{
+	            			 controlThread.operation.travelDistance = - 40;
+	            		 }
+            		 }
             	 }else{
             		 //System.out.println("FALSE");
             		 this.controlThread.operation.op = Operation.Type.DEFROTATE;
@@ -209,8 +221,16 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	
             else if (catch_ball) {
             	 if(isObjectTooClose(defenderRobotX, defenderRobotY, 25)){
-            		 this.controlThread.operation.op = Operation.Type.DEFROTATE;
-            		 controlThread.operation.travelDistance = -50;
+            		 
+            		 if(Math.abs(angleToDefCheck) > 50 ){
+            			 System.out.println("TRUE");
+            			 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+            			 if(Math.abs(angleToCentre) <80){
+	            			 controlThread.operation.travelDistance = 40;
+	            		 }else{
+	            			 controlThread.operation.travelDistance = - 40;
+	            		 }
+            		 }
             	 }else{
             		 //System.out.println("CATCH");
 	                this.controlThread.operation.op = Operation.Type.DEFCATCH;                
@@ -219,15 +239,21 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
             } 
         	
             else if (kick_ball) {            	
-                this.controlThread.operation.op = Operation.Type.DEFKICK;
-                
+                this.controlThread.operation.op = Operation.Type.DEFKICK;                
                 
             }
         	
             else if (move_robot) {
             	 if(isObjectTooClose(defenderRobotX, defenderRobotY,20)){
-            		 this.controlThread.operation.op = Operation.Type.DEFROTATE;
-            		 controlThread.operation.travelDistance = -50;
+            		 if(Math.abs(angleToDefCheck) > 50 ){
+            			 System.out.println("TRUE");
+	            		 this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+	            		 if(Math.abs(angleToCentre) <80){
+	            			 controlThread.operation.travelDistance = 40;
+	            		 }else{
+	            			 controlThread.operation.travelDistance = - 40;
+	            		 }
+            		 }
             	 }else{
 	                this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 	                controlThread.operation.travelDistance = (int) targetDistance;  
