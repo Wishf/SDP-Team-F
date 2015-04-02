@@ -24,7 +24,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	private long kickTime;
 	private boolean kicked = false;
 	private boolean ballCaught = false;
-	
+	private boolean rotateAgain = true;
 	
 	
 
@@ -60,8 +60,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		int targetY = (int) (slope * defenderRobotX + c);
 		float dist;*/
-		
-
+		boolean rotateToEnemyAttacker = false;
+		double angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY);
+		if (angleToEnemyAttacker > 20){
+			rotateToEnemyAttacker = true;
+		}
 		
 		float targetY = ourGoalEdges[1];
 
@@ -86,7 +89,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			}
 			
 		boolean faceEnemyAttacker = false;
-		double angleToEnemyAttacker = 0;
+		
 		
 		if (targetY > ourGoalEdges[2]|| defenderRobotY > ourGoalEdges[2]) {
 			targetY = (int) ourGoalEdges[2];
@@ -122,8 +125,9 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		double fixAngle = 0;
 		
-		if (Math.abs(dist) >10) {
+		if (Math.abs(dist) >15) {
 			move_sideways = true;
+			rotateAgain = true;
 		}
 		//else {
 			//fixOrientation = true;
@@ -175,12 +179,12 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		}
 		
 		synchronized (this.controlThread) {
-/*			if (fixRotate) {
+			if (fixRotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (fixAngle);
 				//System.out.println("ROTATE to DEF CHECK" + fixAngle);
-			}else */
-			if(move_backward) {
+			}
+			else if(move_backward) {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = -10;
 			}
@@ -198,9 +202,10 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = 15;
 			}
-			else if(fixRotate){
+			else if(rotateToEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference =  (fixAngle);
+				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
+				rotateAgain = false;
 				//System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
 			}
 			
