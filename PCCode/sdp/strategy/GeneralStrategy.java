@@ -646,7 +646,7 @@ public class GeneralStrategy implements Strategy {
 		return distance;
 	}
 	
-	public static boolean isRobotTooClose(float robotX, float robotY, int maxDistance){
+	public static boolean isObjectTooClose(float robotX, float robotY, int maxDistance){
 		double distance;
 		if (weAreShootingRight){
 			distance = Math.min(distanceFromLine(PitchConstants.getPitchOutline()[0].getX(),PitchConstants.getPitchOutline()[0].getY(),
