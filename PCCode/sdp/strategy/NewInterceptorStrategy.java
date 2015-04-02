@@ -6,6 +6,7 @@ import java.util.Deque;
 
 import sdp.comms.BrickCommServer;
 import sdp.comms.RobotCommand;
+import sdp.vision.PitchConstants;
 import sdp.vision.Vector2f;
 import sdp.vision.gui.tools.RobotDebugWindow;
 import sdp.world.oldmodel.MovingObject;
@@ -23,7 +24,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	private long kickTime;
 	private boolean kicked = false;
 	private boolean ballCaught = false;
-	
+	private boolean rotateAgain = true;
 	
 	
 
@@ -59,8 +60,11 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		int targetY = (int) (slope * defenderRobotX + c);
 		float dist;*/
-		
-
+		boolean rotateToEnemyAttacker = false;
+		double angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY);
+		if (angleToEnemyAttacker > 20){
+			rotateToEnemyAttacker = true;
+		}
 		
 		float targetY = ourGoalEdges[1];
 
@@ -85,7 +89,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			}
 			
 		boolean faceEnemyAttacker = false;
-		double angleToEnemyAttacker = 0;
+		
 		
 		if (targetY > ourGoalEdges[2]|| defenderRobotY > ourGoalEdges[2]) {
 			targetY = (int) ourGoalEdges[2];
@@ -96,6 +100,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			//faceEnemyAttacker = true;
 			//angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );			
 		}
+		
 		
 		// Correct for defender plate not being in centre of robot
 		//targetY += defenderOffset;
@@ -120,8 +125,9 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		double fixAngle = 0;
 		
-		if (Math.abs(dist) >10) {
+		if (Math.abs(dist) >15) {
 			move_sideways = true;
+			rotateAgain = true;
 		}
 		//else {
 			//fixOrientation = true;
@@ -139,7 +145,8 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 			faceEnemyAttacker = true;
 		}
 		
-		boolean move_robot = false;
+		boolean move_backward = false;
+		boolean move_forward = false;
 		
 		fixAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		if (Math.abs(fixAngle)>30) {
@@ -150,24 +157,34 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		}
 		
 		
+		
+		
 		// Danger! step back!
 		if(!weAreShootingRight) {
-			if(defenderRobotX<510) {
-				move_robot = true;
+			if(defenderRobotX<worldState.dividers[2]+20) {
+				move_backward = true;
 			}
-		}else {
-			if (defenderRobotX > 140) {
-				move_robot = true;
+			else if (defenderRobotX>PitchConstants.getPitchOutline()[1].getX()){
+				move_forward = true;
+			}
+		}
+		
+		else {
+			if (defenderRobotX > worldState.dividers[0]-20) {
+				move_backward = true;
+			}
+			else if (defenderRobotX<PitchConstants.getPitchOutline()[5].getX()){
+				move_forward = true;	
 			}
 		}
 		
 		synchronized (this.controlThread) {
-/*			if (fixRotate) {
+			if (fixRotate) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (fixAngle);
 				//System.out.println("ROTATE to DEF CHECK" + fixAngle);
-			}else */
-			if(move_robot) {
+			}
+			else if(move_backward) {
 				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = -10;
 			}
@@ -181,9 +198,14 @@ public class NewInterceptorStrategy extends GeneralStrategy {
                 
                 //System.out.println("MOVE TO DESTINATION ");
 			}
-			else if(fixRotate){
+			else if(move_forward) {
+				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+				controlThread.operation.travelDistance = 15;
+			}
+			else if(rotateToEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference =  (fixAngle);
+				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
+				rotateAgain = false;
 				//System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
 			}
 			
@@ -220,7 +242,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 							//System.out.println("move_sideways: "+travelDist);
 							brick.robotController.travelSideways((
-                                    travelDist));
+                                    travelDist*0.8));
 						}
 						break;
 					case DEFROTATE:
