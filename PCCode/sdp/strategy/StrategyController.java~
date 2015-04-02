@@ -134,8 +134,7 @@ public class StrategyController implements WorldStateReceiver {
 		case DEFENDING:		
 			Strategy ns = new NewInterceptorStrategy(this.bcsDefender);
 			StrategyController.currentStrategies.add(ns);
-			ns.startControlThread();
-			break;			
+			ns.startControlThread();			
 
         case TEST_SIDEWAYS:
         	ats = new SidewaysTestStrategy(this.bcsAttacker);

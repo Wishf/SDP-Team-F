@@ -23,6 +23,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	private long kickTime;
 	private boolean kicked = false;
 	private boolean ballCaught = false;
+	private boolean rotateAgain = true;
 	
 	
 	
@@ -48,7 +49,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
 
-		//RobotDebugWindow.messageAttacker.setMessage("interceptor");
+		RobotDebugWindow.messageAttacker.setMessage("inter");
 		ballPositions.addLast(new Vector2f(worldState.getBall().x, worldState
 				.getBall().y));
 		if (ballPositions.size() > 3)
@@ -69,7 +70,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 				if (enemyAttackerOrientation<270 && enemyAttackerOrientation >90) { 
 					double rad = enemyAttackerOrientation * Math.PI/180;
 					targetY = -(float) Math.tan(rad)*(enemyAttackerRobotX -defenderRobotX) + enemyAttackerRobotY;
-					
+				
 				}else{
 					targetY = enemyAttackerRobotY;
 				}
@@ -83,15 +84,15 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 					targetY = enemyAttackerRobotY;
 				}
 			}
-			
+		
 		boolean faceEnemyAttacker = false;
 		double angleToEnemyAttacker = 0;
 		
-		if (targetY > ourGoalEdges[2]|| defenderRobotY > ourGoalEdges[2]) {
+		if (targetY > ourGoalEdges[2]) {
 			targetY = (int) ourGoalEdges[2];
 			//faceEnemyAttacker = true;
 			//angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );
-		} else if (defenderRobotY < ourGoalEdges[0]||targetY < ourGoalEdges[0]) {
+		} else if (targetY < ourGoalEdges[0]) {
 			targetY = (int) ourGoalEdges[0];
 			//faceEnemyAttacker = true;
 			//angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, enemyAttackerRobotX, enemyAttackerRobotY );			
@@ -99,19 +100,15 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		// Correct for defender plate not being in centre of robot
 		//targetY += defenderOffset;
-		RobotDebugWindow.messageDefender.setMessage("targetY:"+targetY);
-		float dist = targetY - defenderRobotY;
 		
+		float dist = targetY - defenderRobotY;
 		
 		if(!worldState.weAreShootingRight){
 			dist = -dist;
 		}
-		RobotDebugWindow.messageAttacker.setMessage("dist:"+dist);
 		// if we are shooting right and we need to move right sideways, the distance is positive so convert it to be negative.
 		
 		double angle = 0;
-
-		// if defender over-move
 
 		
 		
@@ -120,7 +117,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		
 		double fixAngle = 0;
 		
-		if (Math.abs(dist) >10) {
+		if (Math.abs(dist) >30) {
 			move_sideways = true;
 		}
 		//else {
@@ -137,20 +134,15 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		angleToEnemyAttacker = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
 		if(Math.abs(angleToEnemyAttacker) > 15){
 			faceEnemyAttacker = true;
+			
 		}
 		
 		boolean move_robot = false;
 		
 		fixAngle = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderCheck, defenderRobotY);
-		if (Math.abs(fixAngle)>30) {
+		if (Math.abs(fixAngle)>20) {
 			fixRotate = true;
-		}else {
-			fixRotate = false;
-			fixAngle = 0;
 		}
-		
-		
-		// Danger! step back!
 		if(!weAreShootingRight) {
 			if(defenderRobotX<510) {
 				move_robot = true;
@@ -162,31 +154,28 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		}
 		
 		synchronized (this.controlThread) {
-/*			if (fixRotate) {
+			if (fixRotate && rotateAgain) {
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference =  (fixAngle);
 				//System.out.println("ROTATE to DEF CHECK" + fixAngle);
-			}else */
-			if(move_robot) {
-				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
-				controlThread.operation.travelDistance = -10;
-			}
-			else if(move_sideways) {
+			}else if(move_sideways) {
 				//System.out.println("MOVE_sideway" + dist);
-				//RobotDebugWindow.messageDefender.setMessage(""+defenderRobotX);
+				RobotDebugWindow.messageDefender.setMessage(""+defenderRobotX);
 				//RobotDebugWindow.messageAttacker.setMessage("Aim"+targetY);
 				
 				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
                 controlThread.operation.travelDistance = (int) dist;
                 
                 //System.out.println("MOVE TO DESTINATION ");
-			}
-			else if(fixRotate){
+			}else if(faceEnemyAttacker){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
-				controlThread.operation.angleDifference =  (fixAngle);
+				controlThread.operation.angleDifference =  (angleToEnemyAttacker);
 				//System.out.println("ROTATE TO ENEMY ATTACKER "+ angleToEnemyAttacker);
+				rotateAgain = false;
+			}else if(move_robot) {
+				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
+				controlThread.operation.travelDistance = -30;
 			}
-			
 		}
 	}
 	
@@ -218,27 +207,27 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 					case DESIDEWAYS:
 						if (travelDist != 0) {
 		
-							//System.out.println("move_sideways: "+travelDist);
+							System.out.println("move!"+travelDist);
 							brick.robotController.travelSideways((
-                                    travelDist));
+                                    travelDist*0.8));
 						}
 						break;
 					case DEFROTATE:
                         if (rotateBy != 0) {
-                        	//System.out.println("rotate "+rotateBy);
+                        	System.out.println("rotate "+rotateBy);
                             brick.robotController.rotate(rotateBy);
                         }
                         break;
-                   case DEFTRAVEL:
+                    case DEFTRAVEL:
                     	if(System.currentTimeMillis() - caughtTime < 1000)
                     	{
                     		brick.robotController.stop();
                     	}
                         if (travelDist != 0) {
                             brick.robotController.travel(travelDist);
-                        }break;
+                        }
                         
-                        
+                        break;
 					default:
 						break;
 					}
@@ -255,7 +244,6 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 	}
 
 }
-
 
 
 
