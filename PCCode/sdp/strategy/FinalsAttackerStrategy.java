@@ -84,13 +84,24 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     }
     
     public Point2 shootAvoidObstacle() {
-    	float side = enemyDefenderRobotY - 240;
+    	//float side = enemyDefenderRobotY - 240;
     	
-    	if(side > 0) {
+/*    	if(side > 0) {
     		return new Point2(attackerRobotX, 270);
     	} else {
     		return new Point2(attackerRobotX, 200);
-    	}
+    	}*/
+        if (enemyDefenderRobotY >= goalY[1] && enemyDefenderRobotY <= goalY[2]) {
+            System.out.println("Defender is between points 1 and 2.");
+            return new Point2(attackerRobotX, (goalY[0] + goalY[1] / 2));
+        } else if ((enemyDefenderRobotY >= goalY[0] && enemyDefenderRobotY <= goalY[1])) {
+            System.out.println("Defender is between points 0 and 1.");
+            return new Point2(attackerRobotX, (goalY[1] + goalY[2] / 2));
+        }
+        else {
+            //System.out.println("Defender is " + enemyDefenderRobotY);
+            return new Point2(attackerRobotX, (goalY[1]));
+        }
     }
     
     public Point2 shootingTarget(float x, float y) {
@@ -164,7 +175,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                 //	targetAngle = ControlBox.controlBox.getShootingAngle();
                 //	RobotDebugWindow.messageAttacker.setMessage("RTS");
                 //	rotate = true;
-                //	
+                //
                 //	waitForShoot = false;
         		//} else {
         			travel_sideways = true;
@@ -173,7 +184,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                 	targetAngle = getPiAngle(enemyDefenderRobotX);
                 	//waitForShoot = true;
                 	kick_ball = true;
-                	System.out.println("Point position " + target + " defY " + enemyDefenderRobotY);
+                	//System.out.println("Point position " + target + " defY " + enemyDefenderRobotY);
                 	//RobotDebugWindow.messageAttacker.setMessage();
                 	//RobotDebugWindow.messageAttacker.setMessage("Waiting for rts");
         		//}	           	
@@ -198,6 +209,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         if(isBallInDefenderArea(worldState)) {
         	ControlBox.controlBox.computePositions(worldState);
         	target = ControlBox.controlBox.getAttackerPosition();
+
         	travel_sideways = true;
             //Need to make sure we can catch the ball.
         	if (catcherReleased != true) {
@@ -232,25 +244,47 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         
         int border_threshold = 40;
         int border_control_agency = 50;
-        
-       if (target.getY() >= topY-border_threshold) {
-        	System.out.println("A. The Y target was " + target.getY() + " and the actual bot is " + topY);
-        	target.setY(topY - border_control_agency);
-        	
-        } else if (target.getY() < bottomY+border_threshold) {
-        	System.out.println("B. The Y target was " + target.getY() + " and the actual top is " + bottomY);        	
-        	target.setY(bottomY + border_control_agency);
+
+        if (weAreShootingRight) {
+            if (target.getY() >= bottomY - border_threshold) {
+                //System.out.println("Shooting right & The Y target was " + target.getY() + " and the actual bot threshold is " + (bottomY - border_threshold));
+                target.setY(bottomY - border_control_agency);
+
+            } else if (target.getY() < topY + border_threshold) {
+                //System.out.println("Shooting right & The Y target was " + target.getY() + " and the actual top threshold is " + (topY + border_threshold));
+                target.setY(topY + border_control_agency);
+            }
+
+            if (target.getX() <= leftCheck + border_threshold) {
+                //System.out.println("Shooting right & The X target was " + target.getX() + " and the actual left threshold is " + (leftCheck + border_threshold));
+                target.setX(leftCheck + border_control_agency);
+
+            } else if (target.getX() >= rightCheck - border_threshold) {
+                //System.out.println("Shooting right & The X target was " + target.getX() + " and the actual right threshold is " + (rightCheck - border_threshold));
+                target.setX(rightCheck - border_control_agency);
+
+            }
+        } else {
+            if (target.getY() >= bottomY - border_threshold) {
+                //System.out.println("Shooting left & The Y target was " + target.getY() + " and the actual bot threshold is " + (bottomY - border_threshold));
+                target.setY(bottomY - border_control_agency);
+
+            } else if (target.getY() < topY + border_threshold) {
+                //System.out.println("Shooting left & The Y target was " + target.getY() + " and the actual top threshold is " + (topY + border_threshold));
+                target.setY(topY + border_control_agency);
+            }
+
+            if (target.getX() >= rightCheck + border_threshold) {
+               // System.out.println("Shooting left & The X target was " + target.getX() + " and the actual right threshold is " + (rightCheck + border_threshold));
+                target.setX(rightCheck + border_control_agency);
+                //System.out.println("X is now " + target.getX());
+
+            } else if (target.getX() <= leftCheck - border_threshold) {
+                //System.out.println("Shooting left & The X target was " + target.getX() + " and the actual left threshold is " + (leftCheck - border_threshold));
+                target.setX(leftCheck - border_control_agency);
+                //System.out.println("X is now " + target.getX());
+            }
         }
-        
-        if (target.getX() <= leftCheck+border_threshold) {
-        	System.out.println("C. The X target was " + target.getX() + " and the actual left is " + leftCheck);        	
-        	target.setX(leftCheck + border_control_agency);
-        	
-        } else if (target.getX() >= rightCheck-border_threshold) {
-        	System.out.println("D. The X target was " + target.getX() + " and the actual right is " + rightCheck);        	
-        	target.setX(rightCheck - border_control_agency);
-        	
-        } //NEW CODE IMPLEMENTED TO STOP IT GETTING STUCK BUT NOT TESTED YET SO COMMENTED */
 
         if(travel_sideways) {
         	
@@ -268,22 +302,31 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         }
         
         if(!travel_sideways && rotate_to_defender) {
-        	targetAngle = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderRobotX, defenderRobotY);
-        	rotate = true;
+            //System.out.println("I am trying to rotate to the defender what ever that means lololol");
+        	//targetAngle = calculateAngle(attackerRobotX, attackerRobotY, attackerOrientation, defenderRobotX, defenderRobotY);
+        	targetAngle = getPiAngle(ballX);
+            rotate = true;
         }
         
-        int margin = 20;
-        /*if(attackerRobotX > leftCheck - margin) {
-        	target = new Point2(leftCheck - margin, attackerRobotY);
-        	move_robot = true;
-        	travel_sideways = false;
-        	
-        } else if(attackerRobotX < rightCheck + margin) {
-        	target = new Point2(rightCheck + margin, attackerRobotY);
-        	move_robot = true;
-        	travel_sideways = false;
-        	
+        int margin = 30;
+
+/*        if (!weAreShootingRight) {
+            if (attackerRobotX < leftCheck + margin) {
+                System.out.println("I am too damn far to the left. My X is " + attackerRobotX + " and now it's gonna be " + (leftCheck + margin));
+                target = new Point2(leftCheck + margin + 10, attackerRobotY);
+                move_robot = true;
+                travel_sideways = false;
+
+            } else if (attackerRobotX > rightCheck - margin) {
+                System.out.println("I am too damn far to the right. My X is " + attackerRobotX + " and now it's gonna be " + (rightCheck - margin));
+                target = new Point2(rightCheck - margin, attackerRobotY);
+                move_robot = true;
+                travel_sideways = false;
+
+            }
         }*/
+
+        //System.out.print(isObjectTooClose(defenderRobotX, defenderRobotY, 40));
         
         if(move_robot) {
         	double dx = 0;
@@ -425,7 +468,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                                 brick.robotController.travel(travelDist);
                             }
                         case DEFCATCH:
-                        	System.out.println("Catch");
+                        	//System.out.println("Catch");
                             if((System.currentTimeMillis() - kickTime > 3000)){
                                 //RobotDebugWindow.messageAttacker.setMessage("Catching");
 
@@ -439,7 +482,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                             
                             break;
                         case DEFKICK:
-                        	System.out.println("Kick");
+                        	//System.out.println("Kick");
                             if((System.currentTimeMillis() - caughtTime > 1000)){
                                 //RobotDebugWindow.messageAttacker.setMessage("Kicking");
                          
@@ -455,7 +498,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFUNCATCH:
-                        	System.out.println("Uncatch");
+                        	//System.out.println("Uncatch");
                         	//if(!catcherReleased) {
                         		brick.robotController.openCatcher();
                                 hasBall = false;
