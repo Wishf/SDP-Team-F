@@ -53,21 +53,26 @@ public class TestSidewaysStrategy extends GeneralStrategy {
 		double targetAngle;//calcTargetAngle(dx, dy);
 		double dx;
 		double dy;	
+		double ourX, ourY;
 		double angleDifference;
 		
-		if(worldState.weAreShootingRight){
-			targetAngle = 0;
-		}
-		else{
-			targetAngle = 180;
-		}
+		//Always aim towards enemy goal
+		dx = goalX - attackerRobotX;
+		dy = 0;//goalY[1] - attackerRobotY;
+		targetAngle = calcTargetAngle(dx, dy);
+		
+		
 			
 		if(this.brick.name.equals("attacker")){
+			ourX = attackerRobotX;
+			ourY = attackerRobotY;
 			dx = brick.testTarget.getX() - attackerRobotX; //ballX - attackerRobotX;
 			dy = brick.testTarget.getY() - attackerRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		}
 		else{
+			ourX = defenderRobotX;
+			ourY = defenderRobotY;
 			dx = brick.testTarget.getX() - defenderRobotX; //ballX - attackerRobotX;
 			dy = brick.testTarget.getY() - defenderRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(defenderOrientation, targetAngle);
@@ -86,11 +91,34 @@ public class TestSidewaysStrategy extends GeneralStrategy {
 			rotate = true;
 		}
 		
-		boolean move_robot = false;
+		
+		
+		
+		/*int border_threshold = 70;
+		if(ourY < topY + border_threshold){			
+			dy = topY + border_threshold - attackerRobotY;
+		}
+		else if( ourY > bottomY - border_threshold){
+			dy = bottomY - border_threshold - attackerRobotY;
+		}*/
+		
+		
+		
+		
+		boolean move_robot = false;	
 		
 		if(Math.abs(dy) > 20){
 			move_robot = true;
+			if(attackerOrientation > 90){
+				dy = -dy;
+			}
 		}
+		
+		
+		
+		
+		
+		
 		
 		
 		
@@ -163,10 +191,10 @@ public class TestSidewaysStrategy extends GeneralStrategy {
 					switch (op) {
 					case STOP:
 						brick.robotController.stop();
-						RobotDebugWindow.messageAttacker.setMessage("STOP");
+						//RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
-						brick.robotController.rotate(rotateBy);
+						brick.robotController.rotate(-rotateBy);
 						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
 						break;
 					case DEFTRAVEL:

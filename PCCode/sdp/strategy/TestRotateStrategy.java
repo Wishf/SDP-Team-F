@@ -53,15 +53,20 @@ public class TestRotateStrategy extends GeneralStrategy {
 		
 		double dx;
 		double dy;		
+		double ourX, ourY;
 		double angleDifference;		
 		double ourOrientation;
 		
 		if(this.brick.name.equals("attacker")){
+			ourX = attackerRobotX;
+			ourY = attackerRobotY;
 			dx = brick.testTarget.getX() - attackerRobotX; //ballX - attackerRobotX;
 			dy = brick.testTarget.getY() - attackerRobotY;//ballY - attackerRobotY;
 			ourOrientation = attackerOrientation;
 		}
 		else{
+			ourX = defenderRobotX;
+			ourY = defenderRobotY;
 			dx = brick.testTarget.getX() - defenderRobotX; //ballX - attackerRobotX;
 			dy = brick.testTarget.getY() - defenderRobotY;//ballY - attackerRobotY;
 			ourOrientation = defenderOrientation;

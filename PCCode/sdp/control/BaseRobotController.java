@@ -23,7 +23,7 @@ public abstract class BaseRobotController implements PacketListener {
     protected DrivePacket lastPacket = null;
     
     protected double linearVelocity = 0, vX=0, vY=0, angularVelocity = 0;
-    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.08, maxAngularVelocity = .2;
+    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.1, maxAngularVelocity = .15;
     
     protected double vForwards=0, vSideways=0;
     
@@ -31,7 +31,7 @@ public abstract class BaseRobotController implements PacketListener {
     private long lastSetWorldState = -1;
     
     
-    private double smoothing = 0.92;
+    private double smoothing = 0.87;
     private DecimalFormat df = new DecimalFormat("+0.00000;-0.00000"); 
     protected double lastLinearVelocity = 0, lastXV=0, lastYV=0, lastAngularVelocity = 0;
 
@@ -124,11 +124,11 @@ public abstract class BaseRobotController implements PacketListener {
         		//System.out.println("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
         		
         		if(position == (byte)'d'){
-        			RobotDebugWindow.messageDefender.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
+        			//RobotDebugWindow.messageDefender.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
             		
         		}
         		else {
-        			RobotDebugWindow.messageAttacker.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
+        			//RobotDebugWindow.messageAttacker.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
             		
         		}
         		

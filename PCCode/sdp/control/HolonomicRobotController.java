@@ -65,6 +65,8 @@ public class HolonomicRobotController extends BaseRobotController {
     public byte SIDEWAYS_ARC_POWER = 70;
     
     
+    double LEFT_CORR_COEF = 0.7;
+    
     private static final int PACKET_LIFETIME = 100;
     
     
@@ -189,8 +191,9 @@ public class HolonomicRobotController extends BaseRobotController {
     	power = Math.min(TRAVEL_MAX, power);
     	
     	
+    	
     	leftMotorPower = (byte) power;
-    	rightMotorPower = (byte) power;
+    	rightMotorPower = (byte) (power*LEFT_CORR_COEF);
     	rearMotorPower = 0;
     	
 
@@ -218,7 +221,7 @@ public boolean travelSideways(double displacement){
     	
 		double a = SIDEWAYS_A, minPower = SIDEWAYS_MIN, c = SIDEWAYS_C;
 		
-		double vp = Math.min(1, Math.abs(this.vSideways)/this.maxForwardsVelocity);
+		double vp = Math.min(1, Math.abs(this.vSideways)/this.maxSidewaysVelocity);
     	
     	double power = a*Math.abs(displacement) + minPower - vp*c;  	
     	
@@ -228,8 +231,7 @@ public boolean travelSideways(double displacement){
     	double arcCorrectionCoef = 0.2;
     	byte arcCorrectionPower = (byte)SIDEWAYS_ARC_POWER;
     	
-    	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
-    	rightMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
+    	
     	rearMotorPower = (byte) power;
     	
     	
@@ -238,10 +240,16 @@ public boolean travelSideways(double displacement){
     		leftMotorDir = DriveDirection.FORWARD;
         	rightMotorDir = DriveDirection.BACKWARD;
         	
+        	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
+        	rightMotorPower = (byte) (arcCorrectionPower*LEFT_CORR_COEF);//(power*arcCorrectionCoef);
+        	
     		rearMotorDir = DriveDirection.FORWARD;
     	} else {
     		leftMotorDir = DriveDirection.BACKWARD;
         	rightMotorDir = DriveDirection.FORWARD;
+        	
+        	leftMotorPower = (byte) arcCorrectionPower;//(power*arcCorrectionCoef);
+        	rightMotorPower = (byte) (arcCorrectionPower*LEFT_CORR_COEF);//(power*arcCorrectionCoef);
         	
     		rearMotorDir = DriveDirection.BACKWARD;
     	}
@@ -302,7 +310,7 @@ public boolean travelSideways(double displacement){
     			PACKET_LIFETIME));
 	}
 	
-	public void travelSideways(byte power){
+	public void travelSidewaysAtPower(byte power){
 		leftMotorPower = (byte) SIDEWAYS_ARC_POWER;//(power*arcCorrectionCoef);
     	rightMotorPower = (byte) SIDEWAYS_ARC_POWER;//(power*arcCorrectionCoef);
     	rearMotorPower = (byte) Math.abs(power);

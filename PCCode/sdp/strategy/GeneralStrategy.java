@@ -54,7 +54,7 @@ public class GeneralStrategy implements Strategy {
 	protected static boolean weAreShootingRight;
 	private int BOUNCE_SHOT_DISTANCE = 50;
 	
-	protected double ROTATION_THRESHOLD = 15;
+	protected double ROTATION_THRESHOLD = 20;
 
 	@Override
 	public void stopControlThread() {

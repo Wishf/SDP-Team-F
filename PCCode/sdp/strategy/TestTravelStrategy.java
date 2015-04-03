@@ -89,13 +89,10 @@ public class TestTravelStrategy extends GeneralStrategy {
 			rotate = true;
 		}
 		
-		int border_threshold = 100;
-		boolean move_robot = false;		
-		if(Math.abs(dy) > 20){
-			
-			if(ourY < bottomY - border_threshold && ourY > topY + border_threshold){			
-				move_robot = true;
-			}
+		boolean move_robot = false;	
+		
+		if(Math.abs(dy) > 10){
+			move_robot = true;
 		}
 		
 		
@@ -169,15 +166,15 @@ public class TestTravelStrategy extends GeneralStrategy {
 					switch (op) {
 					case STOP:
 						brick.robotController.stop();
-						RobotDebugWindow.messageAttacker.setMessage("STOP");
+						//RobotDebugWindow.messageAttacker.setMessage("STOP");
 						break;
 					case DEFROTATE:
 						brick.robotController.rotate(-rotateBy);
-						RobotDebugWindow.messageAttacker.setMessage("ROTATING: "+rotateBy);
+						//RobotDebugWindow.messageAttacker.setMessage("ROTATING: "+rotateBy);
 						break;
 					case DEFTRAVEL:
 						 brick.robotController.travel(travelDist);
-						 RobotDebugWindow.messageAttacker.setMessage("TRAVELING: "+travelDist);
+						 //RobotDebugWindow.messageAttacker.setMessage("TRAVELING: "+travelDist);
 						break;
 					case DESIDEWAYS:
 						brick.robotController.travelSideways(travelDist);

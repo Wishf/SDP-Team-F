@@ -77,7 +77,7 @@ public class BrickCommServer implements PacketListener {
         comm.addListener(robotController);
         
         
-        testTarget = new Point(0,0);
+        testTarget = new Point(0,200);
     }
 
     public void connect() {

@@ -40,7 +40,7 @@ int motorDirs[MOTOR_N] = {
   1, 1, 1};
 
 // The power multiplier for each motor, in case we need to drive certain motors harder
-int motorMultiplier[MOTOR_N] = {
+double motorMultiplier[MOTOR_N] = {
   1, 1, 1};
 
 // The time in milliseconds since the Arduino was turned on/reset when the most recent motion command arrived

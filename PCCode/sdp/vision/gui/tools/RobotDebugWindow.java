@@ -94,7 +94,7 @@ public class RobotDebugWindow implements GUITool {
 		public DebugWindow(String robot) {
 			label = new JLabel();
 			field = new JTextField(40);
-			font = new Font("Courier", Font.BOLD, 30);
+			font = new Font("Courier", Font.BOLD, 36);
 			
 			label.setFont(font);
 			field.setFont(font);
