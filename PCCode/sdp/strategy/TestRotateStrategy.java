@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class RotateTestStrategy extends GeneralStrategy {
+public class TestRotateStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 	
 	
 
-	public RotateTestStrategy(BrickCommServer brick) {
+	public TestRotateStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -57,13 +57,13 @@ public class RotateTestStrategy extends GeneralStrategy {
 		double ourOrientation;
 		
 		if(this.brick.name.equals("attacker")){
-			dx = ballX - attackerRobotX;
-			dy = ballY - attackerRobotY;
+			dx = brick.testTarget.getX() - attackerRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - attackerRobotY;//ballY - attackerRobotY;
 			ourOrientation = attackerOrientation;
 		}
 		else{
-			dx = ballX - defenderRobotX;
-			dy = ballY - defenderRobotY;
+			dx = brick.testTarget.getX() - defenderRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - defenderRobotY;//ballY - attackerRobotY;
 			ourOrientation = defenderOrientation;
 		}
 		
@@ -72,7 +72,7 @@ public class RotateTestStrategy extends GeneralStrategy {
 		
 		
 		boolean rotate = false;
-		if(Math.abs(angleDifference) > 10)
+		if(Math.abs(angleDifference) > ROTATION_THRESHOLD)
 		{
 			rotate = true;
 		}

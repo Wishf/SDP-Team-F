@@ -27,6 +27,9 @@ public class TargetFollowerStrategy implements WorldStateReceiver {
 
 	@Override
 	public void sendWorldState(WorldState worldState) {
+
+		brick.robotController.setWorldState(worldState);
+		
 		float robotX = worldState.getAttackerRobot().x, robotY = worldState
 				.getAttackerRobot().y;
 		float robotO = worldState.getAttackerRobot().orientation_angle;

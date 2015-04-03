@@ -7,6 +7,7 @@ import sdp.control.HolonomicRobotController;
 //import sdp.comms.packets.PositionPacket;
 //import sun.nio.cs.Surrogate;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class BrickCommServer implements PacketListener {
     private List<StateChangeListener> stateChangeListeners;
     public HolonomicRobotController robotController;
     public String name = "";
+    
+    public Point testTarget;
     
     private final static ThreadFactory EXECUTOR_FACTORY = new ThreadFactory() {
     	
@@ -70,6 +73,11 @@ public class BrickCommServer implements PacketListener {
         	robotController = new HolonomicRobotController(comm, (byte)'d');
         else
         	robotController = new HolonomicRobotController(comm, (byte)'a');
+        
+        comm.addListener(robotController);
+        
+        
+        testTarget = new Point(0,0);
     }
 
     public void connect() {

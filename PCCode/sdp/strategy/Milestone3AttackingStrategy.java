@@ -88,6 +88,7 @@ public class Milestone3AttackingStrategy extends GeneralStrategy {
     @Override
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
 
         MovingObject ball = worldState.getBall();
 

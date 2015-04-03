@@ -43,6 +43,7 @@ public class CornerStrategy extends GeneralStrategy {
     @Override
     public void sendWorldState(WorldState worldState) {
         super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
         //ControlBox.controlBox.reset();
        
         double angleToTop = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, defenderRobotX, topY);

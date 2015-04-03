@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class SidewaysTestStrategy extends GeneralStrategy {
+public class TestSidewaysStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 	
 	
 
-	public SidewaysTestStrategy(BrickCommServer brick) {
+	public TestSidewaysStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -63,13 +63,13 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 		}
 			
 		if(this.brick.name.equals("attacker")){
-			dx = ballX - attackerRobotX;
-			dy = ballY - attackerRobotY;
+			dx = brick.testTarget.getX() - attackerRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - attackerRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		}
 		else{
-			dx = ballX - defenderRobotX;
-			dy = ballY - defenderRobotY;
+			dx = brick.testTarget.getX() - defenderRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - defenderRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(defenderOrientation, targetAngle);
 		}
 		
@@ -77,8 +77,11 @@ public class SidewaysTestStrategy extends GeneralStrategy {
 		
 		
 		
+		
+		
+		
 		boolean rotate = false;
-		if(Math.abs(angleDifference) > 30)
+		if(Math.abs(angleDifference) > ROTATION_THRESHOLD)
 		{
 			rotate = true;
 		}

@@ -283,7 +283,7 @@ public class CalibrationTool implements GUITool, ActionListener {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 
-                System.out.println(System.getProperty("user.dir"));
+                //System.out.println(System.getProperty("user.dir"));
                 attFileLabel.setText(file.getName());
                 
                 
@@ -352,7 +352,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 	
 	File saveDefToFile(File file){
 		if(file == null){
-			System.out.print("balss");
+			System.out.print("balls");
 		}
 		sc.bcsDefender.robotController.saveConfig(file);
 		defFileLabel.setText(file.getName());
@@ -363,7 +363,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 	
 	File saveAttToFile(File file){
 		if(file == null){
-			System.out.print("balss");
+			System.out.print("balls");
 		}
 		sc.bcsAttacker.robotController.saveConfig(file);
 		attFileLabel.setText(file.getName());   
@@ -398,7 +398,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 				file.createNewFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("yo");
+			//System.out.println("yo");
 			e.printStackTrace();
 		}
 		
@@ -410,7 +410,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 		String path = System.getProperty("user.dir")+File.separator+"default-attacker.yml";
 		
 		File attFile = new File(path);
-		System.out.print(attFile.getName());
+		//System.out.print(attFile.getName());
 		
 		path = System.getProperty("user.dir")+File.separator+"default-defender.yml";		
 		File defFile = new File(path);
@@ -427,8 +427,8 @@ public class CalibrationTool implements GUITool, ActionListener {
         	attFile = saveAttToDefaultFile();
         }
 		else{
-			sc.bcsAttacker.robotController.loadConfig(attFile);
-			//attFileLabel.setText(attFile.getName());
+			attFileLabel.setText(attFile.getName());
+			sc.bcsAttacker.robotController.loadConfig(attFile);			
 		}
 		
 		
@@ -453,7 +453,7 @@ public class CalibrationTool implements GUITool, ActionListener {
 		saveAttToDefaultFile();
 		saveDefToDefaultFile();
 		
-		System.out.println("hello");
+		//System.out.println("hello");
 		
 		subWindow.setVisible(false);		
 		return true;

@@ -73,7 +73,7 @@ public class RobotDebugWindow implements GUITool {
 
 	@Override
 	public boolean deactivate() {
-		subWindow.setVisible(false);
+		//subWindow.setVisible(false);
 		return true;
 	}
 

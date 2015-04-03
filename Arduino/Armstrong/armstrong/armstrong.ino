@@ -126,14 +126,19 @@ bool hasBall = false;
 long catchStartTime;
 int catchWindDownSpeed;
 
-int catchTachoOpen;
-int catchTachoClosed;
+int catchTachoOpen = 0;
+int catchTachoClosed = 10;
 #define CATCH_TACHO_CAUGHT_THRESHOLD_MIN 1
 #define CATCH_TACHO_CAUGHT_THRESHOLD_MAX 4
 
-// Start by calibrating
+
+
+#define CATCH_SEND_PERIOD 25
+long catchStateLastSent = 0;
+
+// Don't Start by calibrating
 int catchState = CATCH_STATE_DISENGAGE;
-bool catcherCalibrated = false;
+bool catcherCalibrated = true;
 
 
 
@@ -338,6 +343,8 @@ void doCatcher(){
       catchState = CATCH_STATE_DISENGAGED;
       moveMotor(CATCH_MOTOR, CATCH_DISENGAGE_HOLD_POWER * CATCH_DISENGAGE_DIR);
 
+      has_ball();
+
       if(!catcherCalibrated){
         catchTachoOpen = tacho(CATCHER_TACHO);
         catchState = CATCH_STATE_ENGAGE;
@@ -346,6 +353,17 @@ void doCatcher(){
       }
     }
   }
+
+
+
+  //Send state
+  if(catchState != CATCH_STATE_DISENGAGED || catchState == CATCH_STATE_ENGAGED){
+    if(millis() - catchStateLastSent > CATCH_SEND_PERIOD){
+      has_ball();
+      catchStateLastSent = millis();
+    }
+  }
+
 }
 
 
@@ -625,11 +643,11 @@ void has_ball(){
     comms.send('2');
   }
   else{
-    if(catchState == CATCH_STATE_DISENGAGE){
+    if(catchState == CATCH_STATE_DISENGAGED){
       comms.send('0');
-    } else if(catchState == CATCH_STATE_OPERATING_DISENGAGE || catchState == CATCH_STATE_WINDDOWN_DISENGAGE){
+    } else if(catchState == CATCH_STATE_DISENGAGE || catchState == CATCH_STATE_OPERATING_DISENGAGE || catchState == CATCH_STATE_WINDDOWN_DISENGAGE){
       comms.send('1');
-    } else if(catchState == CATCH_STATE_OPERATING_ENGAGE || catchState == CATCH_STATE_WINDDOWN_ENGAGE){
+    } else if(catchState == CATCH_STATE_ENGAGE || catchState == CATCH_STATE_OPERATING_ENGAGE || catchState == CATCH_STATE_WINDDOWN_ENGAGE){
       comms.send('3');
     }
   }

@@ -35,6 +35,9 @@ public class InterceptorStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
+		
+		
 		boolean ballInAttackerArea = false;
 		ballPositions.addLast(new Vector2f(worldState.getBall().x, worldState
 				.getBall().y));

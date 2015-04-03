@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import sdp.strategy.StrategyController;
 import sdp.vision.PixelInfo;
 import sdp.vision.gui.GUITool;
 import sdp.vision.gui.VisionGUI;
@@ -15,6 +16,7 @@ import sdp.world.StaticWorldState;
 
 public class AlignmentTool implements GUITool {
 	private VisionGUI gui;
+	protected StrategyController sc;
 	private Point point = null;
 
 	private final MouseAdapter mouseListener = new MouseAdapter() {
@@ -29,8 +31,9 @@ public class AlignmentTool implements GUITool {
 		}
 	};
 
-	public AlignmentTool(VisionGUI gui) {
+	public AlignmentTool(VisionGUI gui, StrategyController sc) {
 		this.gui = gui;
+		this.sc = sc;
 	}
 
 	@Override
@@ -67,6 +70,10 @@ public class AlignmentTool implements GUITool {
 				debugGraphics.setColor(Color.WHITE);
 				debugGraphics.drawString("x=" + point.x + "  y=" + point.y,
 						300, 20);
+				
+				
+				sc.bcsAttacker.testTarget = point;
+				sc.bcsDefender.testTarget = point;
 			}
 		}
 	}

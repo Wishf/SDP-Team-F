@@ -23,7 +23,7 @@ public abstract class BaseRobotController implements PacketListener {
     protected DrivePacket lastPacket = null;
     
     protected double linearVelocity = 0, vX=0, vY=0, angularVelocity = 0;
-    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.08, maxAngularVelocity = .25;
+    protected double maxForwardsVelocity = 0.1, maxSidewaysVelocity = 0.08, maxAngularVelocity = .2;
     
     protected double vForwards=0, vSideways=0;
     
@@ -36,8 +36,8 @@ public abstract class BaseRobotController implements PacketListener {
     protected double lastLinearVelocity = 0, lastXV=0, lastYV=0, lastAngularVelocity = 0;
 
 
-	protected boolean ballCaught;
-	protected BallStates catcherState;
+	public boolean ballCaught;
+	public BallStates catcherState;
 
 
 	public BaseRobotController(Radio radio, byte position) {
@@ -47,6 +47,8 @@ public abstract class BaseRobotController implements PacketListener {
         
         this.oldRobot = new MovingObject();
         this.freshRobot = new MovingObject();
+        
+        this.catcherState = BallStates.OPEN;
     }
 
     public boolean sendCommand(Packet packet) {
@@ -73,17 +75,14 @@ public abstract class BaseRobotController implements PacketListener {
     			freshRobot = worldState.getAttackerRobot().copyTo(freshRobot);
     		}
     		
+    		//System.out.println(freshRobot.x+" "+oldRobot.x);
+    		
     		
     		//Check if changed(since it's all double values, direct comparison is pretty much guaranteed to work correctly)
     		if(!freshRobot.equals(oldRobot)){
+    			
     			long delta = System.currentTimeMillis() - lastSetWorldState;     			
     			lastSetWorldState = System.currentTimeMillis();
-    			
-    			//Probably not needed anymore
-    			if(delta < 10){
-        			return;
-        		}
-    			
     			
     			
         			
@@ -122,13 +121,15 @@ public abstract class BaseRobotController implements PacketListener {
         		
         		this.linearVelocity = Math.sqrt(vX*vX + vY*vY);
         		
-        		
+        		//System.out.println("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
         		
         		if(position == (byte)'d'){
-        			//RobotDebugWindow.messageDefender.setMessage("vx="+df.format(this.xV)+"; vy="+df.format(this.yV)+"; av="+df.format(this.angularVelocity));
+        			RobotDebugWindow.messageDefender.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
+            		
         		}
         		else {
-        			//RobotDebugWindow.messageAttacker.setMessage("vx="+df.format(this.xV)+"; vy="+df.format(this.yV)+"; av="+df.format(this.angularVelocity));
+        			RobotDebugWindow.messageAttacker.setMessage("vF="+df.format(this.vForwards)+"; vS="+df.format(this.vSideways)+"; av="+df.format(this.angularVelocity));
+            		
         		}
         		
         		
@@ -148,7 +149,7 @@ public abstract class BaseRobotController implements PacketListener {
     			freshRobot = worldState.getDefenderRobot().copyTo(freshRobot);
     		}
     		else {
-    			freshRobot = worldState.getAttackerRobot().copyTo(oldRobot);
+    			freshRobot = worldState.getAttackerRobot().copyTo(freshRobot);
     		}
     		oldRobot = freshRobot.copyTo(oldRobot);
     	}
@@ -173,6 +174,7 @@ public abstract class BaseRobotController implements PacketListener {
 
     @Override
     public void packetArrived(Packet p) {
+    	//System.out.println("yolo");
         if(p instanceof MotionCompletePacket){
             onMotionComplete();
         } else if(p instanceof CatcherStateToggledPacket) {
@@ -184,8 +186,8 @@ public abstract class BaseRobotController implements PacketListener {
 		}
     }
 
-    public boolean getCatcherState(){
-        return catcherEngaged;
+    public BallStates getCatcherState(){
+        return catcherState;
     }
 
     public abstract void onMotionComplete();

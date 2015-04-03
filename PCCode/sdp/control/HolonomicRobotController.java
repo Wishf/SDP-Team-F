@@ -143,10 +143,10 @@ public class HolonomicRobotController extends BaseRobotController {
     	power = Math.min(maxPower, power);
     	
     	if(position == (byte)'d'){
-			RobotDebugWindow.messageDefender.setMessage("rotating power="+power);
+			//RobotDebugWindow.messageDefender.setMessage("rotating power="+power);
 		}
 		else {
-			RobotDebugWindow.messageAttacker.setMessage("rotating power="+power);
+			//RobotDebugWindow.messageAttacker.setMessage("rotating power="+power);
 		}
     	
     	//System.out.println("Rotating power: "+power);
@@ -485,7 +485,7 @@ public boolean travelSideways(double displacement){
 	    
 
 		data.put("ROTATE_MIN", this.ROTATE_MIN);
-		data.put("ROTATE_MAX", this.ROTATE_MIN);
+		data.put("ROTATE_MAX", this.ROTATE_MAX);
 		data.put("ROTATE_A", this.ROTATE_A);
 		data.put("ROTATE_REAR_COEF", this.ROTATE_REAR_COEF);
 		data.put("ROTATE_C", this.ROTATE_C);

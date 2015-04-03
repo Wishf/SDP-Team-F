@@ -144,10 +144,10 @@ public class StrategySelectorTool implements GUITool {
 		//private JButton marStrat = new JButton("Marking");
 		private JButton nullStrat = new JButton("Deactivate");
 		private JButton actStrat = new JButton("Activate");
-		private JButton calibStrat = new JButton("Calibrate");
-		private JButton catchStrat = new JButton("Test - Catching");
-        private JButton mstAStrat = new JButton("Test - Attacker sideways");
-        private JButton mstBStrat = new JButton("Test - Attacker rotate");
+		private JButton testTravelStrat = new JButton("Test - AttTravel");
+		private JButton testCatchingStrat = new JButton("Test - AttCatching");
+        private JButton testSidewaysStrat = new JButton("Test - AttSideways");
+        private JButton testRotateStrat = new JButton("Test - AttRotate");
         private JButton ms3AStrat = new JButton("MILESTONE 3 - Attacker");
         private JButton ms3BStrat = new JButton("MILESTONE 3 - Defender");
 		private JButton pauseController = new JButton("Pause");
@@ -160,10 +160,10 @@ public class StrategySelectorTool implements GUITool {
 			//this.add(marStrat);
 			this.add(nullStrat);
 			this.add(actStrat);
-			this.add(calibStrat);
-			this.add(catchStrat);
-            this.add(mstAStrat);
-            this.add(mstBStrat);
+			this.add(testTravelStrat);
+			this.add(testCatchingStrat);
+            this.add(testSidewaysStrat);
+            this.add(testRotateStrat);
             this.add(ms3AStrat);
             this.add(ms3BStrat);
 			this.add(pauseController);
@@ -209,15 +209,15 @@ public class StrategySelectorTool implements GUITool {
             //mstAStrat.addActionListener((e) -> { sc.changeToStrategy(StrategyType.MILESTONE_TWO_A); });
             //mstBStrat.addActionListener((e) -> { sc.changeToStrategy(StrategyType.MILESTONE_TWO_B); });
 			
-			calibStrat.addActionListener(new ActionListener() {
+			testTravelStrat.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					sc.changeToStrategy(StrategyType.CALIBRATION);
+					sc.changeToStrategy(StrategyType.TEST_TRAVEL);
 				}
 			});
 			
-			catchStrat.addActionListener(new ActionListener() {
+			testCatchingStrat.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -226,7 +226,7 @@ public class StrategySelectorTool implements GUITool {
 			});
 			
 			
-			mstAStrat.addActionListener(new ActionListener() {
+			testSidewaysStrat.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -234,7 +234,7 @@ public class StrategySelectorTool implements GUITool {
 				}
 			});
 			
-			mstBStrat.addActionListener(new ActionListener() {
+			testRotateStrat.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {

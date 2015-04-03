@@ -20,7 +20,7 @@ public class StrategyController implements WorldStateReceiver {
 			; //100; // TODO: Test lower values for this and see where it breaks
 	
 	public enum StrategyType {
-		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, TEST_SIDEWAYS, TEST_ROTATE, MILESTONE_THREE_A, MILESTONE_THREE_B, CALIBRATION, TEST_CATCH
+		DO_SOMETHING, DO_NOTHING, PASSING, ATTACKING, DEFENDING, MARKING, TEST_SIDEWAYS, TEST_ROTATE, MILESTONE_THREE_A, MILESTONE_THREE_B, TEST_TRAVEL, TEST_CATCH
 	}
 	
 	public enum BallLocation{
@@ -138,39 +138,39 @@ public class StrategyController implements WorldStateReceiver {
 			break;			
 
         case TEST_SIDEWAYS:
-        	ats = new SidewaysTestStrategy(this.bcsAttacker);
-        	dfs = new SidewaysTestStrategy(this.bcsDefender);
+        	ats = new TestSidewaysStrategy(this.bcsAttacker);
+        	//dfs = new TestSidewaysStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
-            StrategyController.currentStrategies.add(dfs);
+            //StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
-            dfs.startControlThread();
+            //dfs.startControlThread();
             
             break;
         case TEST_ROTATE:
-        	ats = new RotateTestStrategy(this.bcsAttacker);
-        	dfs = new RotateTestStrategy(this.bcsDefender);
+        	ats = new TestRotateStrategy(this.bcsAttacker);
+        	//dfs = new TestRotateStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
-            StrategyController.currentStrategies.add(dfs);
+            //StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
-            dfs.startControlThread();
+            //dfs.startControlThread();
             
             break;
         case TEST_CATCH:
-        	ats = new CatcherTestStrategy(this.bcsAttacker);
-        	dfs = new CatcherTestStrategy(this.bcsDefender);
+        	ats = new TestCatcherStrategy(this.bcsAttacker);
+        	//dfs = new TestCatcherStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
-            StrategyController.currentStrategies.add(dfs);
+            //StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
-            dfs.startControlThread();
+            //dfs.startControlThread();
             
             break;
-        case CALIBRATION:
-            //ats = new CalibrationStrategy(this.bcsAttacker);
-            //dfs = new CalibrationStrategy(this.bcsDefender);
+        case TEST_TRAVEL:
+        	ats = new TestTravelStrategy(this.bcsAttacker);
+        	//dfs = new TestRotateStrategy(this.bcsDefender);
             StrategyController.currentStrategies.add(ats);
-            StrategyController.currentStrategies.add(dfs);
+            //StrategyController.currentStrategies.add(dfs);
             ats.startControlThread();
-            dfs.startControlThread();
+            //dfs.startControlThread();
             
             break;
 		case DO_NOTHING:

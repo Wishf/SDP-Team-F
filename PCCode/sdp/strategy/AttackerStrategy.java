@@ -37,6 +37,7 @@ public class AttackerStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
 
 		if (worldState.weAreShootingRight && ballX > defenderCheck
 				&& ballX < leftCheck || !worldState.weAreShootingRight

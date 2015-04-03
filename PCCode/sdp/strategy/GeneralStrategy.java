@@ -53,6 +53,8 @@ public class GeneralStrategy implements Strategy {
 	protected boolean attackerNotOnPitch;
 	protected static boolean weAreShootingRight;
 	private int BOUNCE_SHOT_DISTANCE = 50;
+	
+	protected double ROTATION_THRESHOLD = 15;
 
 	@Override
 	public void stopControlThread() {

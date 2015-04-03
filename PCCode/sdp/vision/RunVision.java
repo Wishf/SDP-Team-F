@@ -122,7 +122,7 @@ public class RunVision {
 					strategyController);
 			gui.addTool(stratSelect, "Robot and strategy control");
 			
-			AlignmentTool alignmentTool = new AlignmentTool(gui);
+			AlignmentTool alignmentTool = new AlignmentTool(gui, strategyController);
 			gui.addTool(alignmentTool, "Alignment");
 			vision.addRecogniser(alignmentTool.new FrameDisplay());
 			

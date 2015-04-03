@@ -12,7 +12,7 @@ import sdp.world.oldmodel.MovingObject;
 import sdp.world.oldmodel.Point2;
 import sdp.world.oldmodel.WorldState;
 
-public class CatcherTestStrategy extends GeneralStrategy {
+public class TestTravelStrategy extends GeneralStrategy {
 
 	
 	private BrickCommServer brick;
@@ -27,7 +27,7 @@ public class CatcherTestStrategy extends GeneralStrategy {
 	
 	
 
-	public CatcherTestStrategy(BrickCommServer brick) {
+	public TestTravelStrategy(BrickCommServer brick) {
 		this.brick = brick;
 		this.controlThread = new ControlThread();
 	}
@@ -48,57 +48,55 @@ public class CatcherTestStrategy extends GeneralStrategy {
 	@Override
 	public void sendWorldState(WorldState worldState) {
 		super.sendWorldState(worldState);
+		brick.robotController.setWorldState(worldState);
 		
-		
-		
-		double ballDistance = Math.sqrt((ballX - defenderRobotX)*(ballX - defenderRobotX) + (ballY - defenderRobotY)*(ballY - defenderRobotY));
-		
-		double catchThreshold = 35;
-        boolean catch_ball = false;
-        boolean kick_ball = false;
-        boolean rotate = false;
-        boolean move_robot = false;
-		
-        
-        double targetAngle;//calcTargetAngle(dx, dy);
+		double targetAngle=90;//calcTargetAngle(dx, dy);
+		double ourX, ourY;
 		double dx;
 		double dy;	
 		double angleDifference;
 		
-		if(worldState.weAreShootingRight){
+		/*if(worldState.weAreShootingRight){
 			targetAngle = 0;
 		}
 		else{
 			targetAngle = 180;
-		}
+		}*/
 			
 		if(this.brick.name.equals("attacker")){
-			dx = ballX - attackerRobotX;
-			dy = ballY - attackerRobotY;
+			ourX = attackerRobotX;
+			ourY = attackerRobotY;
+			dx = brick.testTarget.getX() - attackerRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - attackerRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
 		}
 		else{
-			dx = ballX - defenderRobotX;
-			dy = ballY - defenderRobotY;
+			ourX = defenderRobotX;
+			ourY = defenderRobotY;
+			dx = brick.testTarget.getX() - defenderRobotX; //ballX - attackerRobotX;
+			dy = brick.testTarget.getY() - defenderRobotY;//ballY - attackerRobotY;
 			angleDifference = calcAngleDiff(defenderOrientation, targetAngle);
 		}
-        
 		
-		if(Math.abs(angleDifference) > 20)
+		
+		
+		
+		
+		
+		boolean rotate = false;
+		if(Math.abs(angleDifference) > ROTATION_THRESHOLD)
 		{
 			rotate = true;
 		}
 		
+		int border_threshold = 100;
+		boolean move_robot = false;		
 		if(Math.abs(dy) > 20){
-			move_robot = true;
+			
+			if(ourY < bottomY - border_threshold && ourY > topY + border_threshold){			
+				move_robot = true;
+			}
 		}
-		
-        if(ballCaught){
-        	kick_ball = true;
-        }
-        else if((ballDistance < catchThreshold)  /*&& ballInDefenderArea*/) {
-            catch_ball = true;            
-        }
 		
 		
 		
@@ -109,20 +107,12 @@ public class CatcherTestStrategy extends GeneralStrategy {
 			
 			
 			
-			if (catch_ball) {
-                //System.out.println("CATCH");
-                this.controlThread.operation.op = Operation.Type.DEFCATCH;
-			}
-			 else if (kick_ball) {
-		        RobotDebugWindow.messageAttacker.setMessage("Kick");
-			    this.controlThread.operation.op = Operation.Type.DEFKICK;
-			} 
-			 else if(rotate){
+			if(rotate){
 				this.controlThread.operation.op = Operation.Type.DEFROTATE;
 				controlThread.operation.angleDifference = angleDifference;
 			}
 			else if(move_robot){
-				this.controlThread.operation.op = Operation.Type.DESIDEWAYS;
+				this.controlThread.operation.op = Operation.Type.DEFTRAVEL;
 				controlThread.operation.travelDistance = dy;
 			}
 			else{
@@ -183,13 +173,14 @@ public class CatcherTestStrategy extends GeneralStrategy {
 						break;
 					case DEFROTATE:
 						brick.robotController.rotate(-rotateBy);
-						//RobotDebugWindow.messageAttacker.setMessage("Rotating: "+angleDifference);
+						RobotDebugWindow.messageAttacker.setMessage("ROTATING: "+rotateBy);
 						break;
 					case DEFTRAVEL:
 						 brick.robotController.travel(travelDist);
+						 RobotDebugWindow.messageAttacker.setMessage("TRAVELING: "+travelDist);
 						break;
 					case DESIDEWAYS:
-						brick.robotController.travelSideways(-travelDist);
+						brick.robotController.travelSideways(travelDist);
 						break;
 					/*case DEBACK:
 						if (travelDist != 0) {
@@ -198,7 +189,7 @@ public class CatcherTestStrategy extends GeneralStrategy {
 						}
 						break;*/
 					case DEFCATCH:
-						if((System.currentTimeMillis() - kickTime > 500)){
+						if((System.currentTimeMillis() - kickTime > 3000)){
 							brick.execute(new RobotCommand.Catch());
 							ballCaught = true;
 							caughtTime = System.currentTimeMillis();
