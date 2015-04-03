@@ -112,7 +112,7 @@ public class NewInterceptorStrategy extends GeneralStrategy {
 		if(!worldState.weAreShootingRight){
 			dist = -dist;
 		}
-		RobotDebugWindow.messageAttacker.setMessage("dist:"+dist);
+		//RobotDebugWindow.messageAttacker.setMessage("dist:"+dist);
 		// if we are shooting right and we need to move right sideways, the distance is positive so convert it to be negative.
 		
 		double angle = 0;

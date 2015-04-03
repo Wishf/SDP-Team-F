@@ -108,7 +108,21 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     	double aimX, aimY;
     	double goalTargetY;
     	
-    	if(attackerRobotY > goalY[1]){
+    	boolean straightShot = false;
+    	
+    	
+    	if(straightShot){
+    		if (enemyDefenderRobotY > goalY[1]) {
+                aimX = goalX;
+                aimY = (goalY[0] + goalY[1]) / 2.0;
+            } else {
+            	aimX = goalX;
+                aimY = (goalY[1] + goalY[2]) / 2.0;
+            }
+    	}
+    	
+    	
+    	if(attackerRobotY < goalY[1]){
     		//Aim for top wall
     		
     		goalTargetY = (goalY[1]+goalY[2])/2.0;
@@ -116,7 +130,12 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     		
     		double yRatio = (topY - attackerRobotY)/(topY - goalTargetY); 
     		
-    		aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		//aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		
+    		double  X = goalX - attackerRobotX;    		
+    		aimX = attackerRobotX + (yRatio*X)/(1+yRatio);
+    		
+    		
     		aimY = topY;
     		
     	}
@@ -127,7 +146,11 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     		
     		double yRatio = (attackerRobotY - bottomY)/(goalTargetY-bottomY); 
     		
-    		aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		//aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		double  X = goalX - attackerRobotX;    		
+    		aimX = attackerRobotX + (yRatio*X)/(1+yRatio);
+    		
+    		
     		aimY = bottomY;
     		
     	}
