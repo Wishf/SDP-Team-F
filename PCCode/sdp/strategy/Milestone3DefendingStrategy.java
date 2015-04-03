@@ -109,7 +109,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         }
 
        
-        double catchThreshold = 30;
+        double catchThreshold = 35;
        
         
         boolean catch_ball = false;
@@ -147,13 +147,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         	if(Math.abs(angleToTeamMate) < 15 && Math.abs(targetDistance )< 25){
         		//System.out.println(".................TRUE  "  + angleToTeamMate);
             
-	        	if(!catcherReleased){	        		
-	        		uncatch = true;	        		
-	        	}
-	        	else{
-		            kick_ball = true;
-		            
-	        	}
+	        	kick_ball = true;
         	}        	
         	else if(Math.abs(targetDistance) < 25 && Math.abs(angleToTeamMate) > 15 ){
         		rotate = true;
@@ -199,12 +193,12 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
         synchronized (this.controlThread) {
         	
            
-        	if (uncatch && !catcherReleased) {
+        	/*if (uncatch && !catcherReleased) {
                 
                 this.controlThread.operation.op = Operation.Type.DEFUNCATCH;
                 catcherReleased = true;
                 
-            } else if(rotate){            	
+            } else*/ if(rotate){            	
             	 
             	 if(isObjectTooClose(defenderRobotX, defenderRobotY, 30)){
             		 
@@ -371,11 +365,11 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             break;
                         case DEFKICK:
                         	RobotDebugWindow.messageDefender.setMessage("KICK");
-                        	if(System.currentTimeMillis() - caughtTime < 2000)
+                        	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
                         		brick.robotController.stop();
                         	}
-                            if((System.currentTimeMillis() - caughtTime > 2000)){
+                            if((System.currentTimeMillis() - caughtTime > 1000)){
                                 //System.out.println("Kicking");
 
                                 brick.robotController.kick();

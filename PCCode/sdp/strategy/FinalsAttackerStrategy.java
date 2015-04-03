@@ -91,7 +91,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
     	} else {
     		return new Point2(attackerRobotX, 200);
     	}*/
-        if (enemyDefenderRobotY >= goalY[1] && enemyDefenderRobotY <= goalY[2]) {
+        /*if (enemyDefenderRobotY >= goalY[1] && enemyDefenderRobotY <= goalY[2]) {
             System.out.println("Defender is between points 1 and 2.");
             return new Point2(attackerRobotX, (goalY[0] + goalY[1] / 2));
         } else if ((enemyDefenderRobotY >= goalY[0] && enemyDefenderRobotY <= goalY[1])) {
@@ -101,7 +101,48 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         else {
             //System.out.println("Defender is " + enemyDefenderRobotY);
             return new Point2(attackerRobotX, (goalY[1]));
-        }
+        }*/
+    	
+    	
+    	//Just rotate and wall shoot the far side
+    	double aimX, aimY;
+    	double goalTargetY;
+    	
+    	if(attackerRobotY > goalY[1]){
+    		//Aim for top wall
+    		
+    		goalTargetY = (goalY[1]+goalY[2])/2.0;
+    				
+    		
+    		double yRatio = (topY - attackerRobotY)/(topY - goalTargetY); 
+    		
+    		aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		aimY = topY;
+    		
+    	}
+    	else{
+    		
+    		goalTargetY = (goalY[0]+goalY[1])/2.0;
+    				
+    		
+    		double yRatio = (attackerRobotY - bottomY)/(goalTargetY-bottomY); 
+    		
+    		aimX = attackerRobotX - (goalX - attackerRobotX)/2.0*yRatio;
+    		aimY = bottomY;
+    		
+    	}
+    	
+    	//System.out.println(aimX+" "+aimY);
+    	
+    	return new Point2((float)aimX, (float)aimY);
+    	
+    	/*double dx = attackerRobotX - aimX;
+    	double dy = attackerRobotY - aimY;
+    	
+    	targetAngle = calcTargetAngle(dx,dy);
+    	rotate = true;
+    	
+    	System.out.println("have the ball, target angle "+targetAngle);*/
     }
     
     public Point2 shootingTarget(float x, float y) {
@@ -179,10 +220,14 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                 //
                 //	waitForShoot = false;
         		//} else {
-        			travel_sideways = true;
+        			travel_sideways = false;
                 	target = shootAvoidObstacle();//shootingTarget(attackerRobotX, attackerRobotY);
                 	rotate = true;
-                	targetAngle = getPiAngle(enemyDefenderRobotX);
+                	
+                	double dx = attackerRobotX - target.getX();
+                	double dy = attackerRobotY - target.getY();
+                	
+                	targetAngle = calcTargetAngle(dx,dy);
                 	//waitForShoot = true;
                 	kick_ball = true;
                 	//System.out.println("Point position " + target + " defY " + enemyDefenderRobotY);
@@ -346,7 +391,7 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         if(rotate) {
         	angleDifference = calcAngleDiff(attackerOrientation, targetAngle);
         	
-        	if(Math.abs(angleDifference) < 20) {
+        	if(Math.abs(angleDifference) < ROTATION_THRESHOLD) {
         		rotate = false;
         	}
         }
