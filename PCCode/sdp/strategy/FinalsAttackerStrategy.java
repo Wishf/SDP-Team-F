@@ -202,7 +202,13 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
         double catchThreshold = 35;
         
         //worldState.getEnemyDefenderRobot().orientation_angle
-        
+
+
+        /*
+        1. Choosing strategy based on the ball position
+
+        2. Fidd
+         */
         if(isBallInAttackerArea(worldState)) {
         	
         	if(ballXYdistance > catchThreshold) {
@@ -531,7 +537,11 @@ public class FinalsAttackerStrategy extends GeneralStrategy {
                         	//System.out.println("Kick");
                             if((System.currentTimeMillis() - caughtTime > 1000)){
                                 //RobotDebugWindow.messageAttacker.setMessage("Kicking");
-                         
+
+                                brick.robotController.stop();
+
+                                Thread.sleep(1000);
+
                                 brick.robotController.kick();
 
                                 kicked = true;
