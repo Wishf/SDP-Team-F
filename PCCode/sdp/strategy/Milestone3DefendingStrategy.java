@@ -121,7 +121,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 		double angleToTeamMate = calculateAngle(defenderRobotX, defenderRobotY, defenderOrientation, attackerRobotX, attackerRobotY);        
         double ballDistance = Math.sqrt((ballX - defenderRobotX)*(ballX - defenderRobotX) + (ballY - defenderRobotY)*(ballY - defenderRobotY));
         
-        //RobotDebugWindow.messageAttacker.setMessage("" + ballCaughtDefender);
+        //RobotDebugWindow.messageDefender.setMessage("" + ballCaughtDefender);
         double targetDistance;
         //BAL CAUGHT
         if(ballCaughtDefender){
@@ -256,7 +256,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
 	            		 if(Math.abs(angleToCentre) <100){
 	            			 controlThread.operation.travelDistance = 40;
 	            		 }else{
-	            			 System.out.println();
+	            			 //System.out.println();
 	            			 controlThread.operation.travelDistance = - 40;
 	            		 }
             		 
@@ -320,7 +320,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                     //System.out.println("operation: " + op);
                     switch (op) {
                         case DEFROTATE:
-                        	RobotDebugWindow.messageAttacker.setMessage("rotate");
+                        	RobotDebugWindow.messageDefender.setMessage("ROTATING: "+rotateBy);
                         	if(System.currentTimeMillis() - caughtTime < 1500)
                         	{
                         		brick.robotController.stop();
@@ -330,7 +330,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFTRAVEL:
-                        	RobotDebugWindow.messageAttacker.setMessage("MOVE");
+                        	RobotDebugWindow.messageDefender.setMessage("TRAVEL: "+travelDist);
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
                         		brick.robotController.stop();
@@ -340,7 +340,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DESIDEWAYS:
-                        	RobotDebugWindow.messageAttacker.setMessage("SIDEWAYS");
+                        	RobotDebugWindow.messageDefender.setMessage("SIDEWAYS: "+travelDist);
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
                         		brick.robotController.stop();
@@ -350,7 +350,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEBACK:
-                        	RobotDebugWindow.messageAttacker.setMessage("BACKWARDS");
+                        	RobotDebugWindow.messageDefender.setMessage("BACKWARDS: "+travelDist);
                         	if(System.currentTimeMillis() - caughtTime < 1000)
                         	{
                         		brick.robotController.stop();
@@ -360,9 +360,9 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFCATCH:
-                        	RobotDebugWindow.messageAttacker.setMessage("CATCH");
+                        	RobotDebugWindow.messageDefender.setMessage("CATCH");
                             if((System.currentTimeMillis() - kickTime > 1000)){
-                                System.out.println("CATCH");
+                                //System.out.println("CATCH");
                                 brick.robotController.closeCatcher();
                                 ballCaughtDefender = true;
                                 caughtTime = System.currentTimeMillis();
@@ -370,7 +370,7 @@ public class Milestone3DefendingStrategy extends GeneralStrategy {
                             }
                             break;
                         case DEFKICK:
-                        	RobotDebugWindow.messageAttacker.setMessage("KICK");
+                        	RobotDebugWindow.messageDefender.setMessage("KICK");
                         	if(System.currentTimeMillis() - caughtTime < 2000)
                         	{
                         		brick.robotController.stop();
